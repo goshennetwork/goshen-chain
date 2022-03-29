@@ -32,8 +32,7 @@ rustc-hex = {version = "2.1", default-features = false }
 triehash-ethereum = { version = "0.2",  path = "../util/triehash-ethereum", default-features = false }
 unexpected = { path = "../util/unexpected", default-features = false }
 vm = { path = "../vm/vm", default-features = false }
-serde = "1.0"
-serde_derive = "1.0"
+serde = {version="1.0",default-features = false}
 serde_json = {version = "1.0", optional = true }
 ethjson = { path = "../ethjson", optional = true }
 globset = {version = "0.4", optional = true}
@@ -42,6 +41,7 @@ tempfile = {version = "3.1.0", optional = true}
 walkdir = {version = "2.3", optional = true}
 rayon = {version = "1.1", optional = true}
 regex = {version = "1.3.9", optional = true}
+hashbrown = "0.12.0"
 
 [dev-dependencies]
 rand = "0.7.3"

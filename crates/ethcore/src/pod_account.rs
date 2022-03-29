@@ -16,8 +16,13 @@
 
 //! Account system expressed in Plain Old Data.
 
+use crate::alloc::string::ToString;
 use crate::state::Account;
+use alloc::collections::BTreeMap;
+use alloc::vec;
+use alloc::vec::Vec;
 use bytes::Bytes;
+use core::fmt;
 use ethereum_types::{BigEndianHash, H256, U256};
 use ethtrie::RlpCodec;
 use hash::keccak;
@@ -27,13 +32,11 @@ use keccak_hasher::KeccakHasher;
 use rlp::{self, RlpStream};
 use rustc_hex::ToHex;
 use serde::Serializer;
-use std::collections::BTreeMap;
-use std::fmt;
 use trie::{DBValue, TrieFactory};
 use triehash::sec_trie_root;
 use types::account_diff::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// An account, expressed as Plain-Old-Data (hence the name).
 /// Does not have a DB overlay cache, code hash or anything like that.
 pub struct PodAccount {
@@ -41,7 +44,6 @@ pub struct PodAccount {
     pub balance: U256,
     /// The nonce of the account.
     pub nonce: U256,
-    #[serde(serialize_with = "opt_bytes_to_hex")]
     /// The code of the account or `None` in the special case that it is unknown.
     pub code: Option<Bytes>,
     /// The storage of the account.
@@ -99,7 +101,7 @@ impl PodAccount {
         let mut r = H256::default();
         let mut t = factory.create(db, &mut r);
         for (k, v) in &self.storage {
-            if let Err(e) = t.insert(k.as_bytes(), &rlp::encode(&v.into_uint())) {
+            if let Err(_) = t.insert(k.as_bytes(), &rlp::encode(&v.into_uint())) {
                 //warn!("Encountered potential DB corruption: {}", e);
             }
         }
@@ -206,8 +208,8 @@ pub fn diff_pod(pre: Option<&PodAccount>, post: Option<&PodAccount>) -> Option<A
 #[cfg(test)]
 mod test {
     use super::{diff_pod, PodAccount};
+    use alloc::collections::BTreeMap;
     use ethereum_types::H256;
-    use std::collections::BTreeMap;
     use types::account_diff::*;
 
     #[test]
