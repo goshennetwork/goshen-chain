@@ -20,8 +20,9 @@
 // https://github.com/openethereum/openethereum/issues/10302
 #![allow(deprecated)]
 
+use core::fmt::{self, Display};
+#[cfg(feature = "std")]
 use std::error;
-use std::fmt::{self, Display};
 
 use ethereum_types::{Address, Bloom, H256, U256};
 use ethtrie::TrieError;
@@ -32,7 +33,11 @@ use unexpected::{Mismatch, OutOfBounds};
 
 use crate::engines::EngineError;
 
+use crate::alloc::string::ToString;
 pub use crate::executed::ExecutionError;
+use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::String;
 
 #[derive(Debug, PartialEq, Clone, Eq)]
 /// Errors concerning block processing.
@@ -163,7 +168,7 @@ impl fmt::Display for BlockError {
         f.write_fmt(format_args!("Block error ({})", msg))
     }
 }
-
+#[cfg(feature = "std")]
 impl error::Error for BlockError {}
 
 impl<E> From<Box<E>> for Error
@@ -175,6 +180,7 @@ where
     }
 }
 
+#[cfg(feature = "std")]
 impl ::std::error::Error for Error {}
 
 ///Error concerning TrieDBs.

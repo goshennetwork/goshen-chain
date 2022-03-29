@@ -17,7 +17,8 @@
 use crate::block::ExecutedBlock;
 use crate::engines::{Engine, Seal};
 use crate::machine::Machine;
-use std::sync::atomic::{AtomicU64, Ordering};
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
 use types::header::Header;
 
 /// `InstantSeal` params.

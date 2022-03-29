@@ -22,6 +22,8 @@ use keccak_hasher::KeccakHasher;
 use rlp::NULL_RLP;
 use trie::DBValue;
 
+use alloc::boxed::Box;
+
 /// A factory for different kinds of account dbs.
 #[derive(Debug, Clone)]
 pub enum Factory {

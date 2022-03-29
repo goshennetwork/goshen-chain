@@ -22,6 +22,8 @@ use ethereum_types::U256;
 use types::header::Header;
 use types::BlockNumber;
 
+use alloc::vec::Vec;
+
 /// Params for a null engine.
 #[derive(Clone, Default)]
 pub struct NullEngineParams {
@@ -70,7 +72,7 @@ impl<M: Machine> Engine<M> for NullEngine<M> {
     }
 
     fn on_close_block(&self, block: &mut ExecutedBlock) -> Result<(), M::Error> {
-        use std::ops::Shr;
+        use core::ops::Shr;
 
         let author = *block.header.author();
         let number = block.header.number();
