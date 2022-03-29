@@ -28,9 +28,12 @@ pub use self::null_engine::NullEngine;
 
 pub use types::engines::ForkChoice;
 
-use std::collections::{BTreeMap, HashMap};
-use std::sync::Arc;
-use std::{error, fmt};
+use alloc::collections::BTreeMap;
+use alloc::sync::Arc;
+use core::fmt;
+use hashbrown::HashMap;
+#[cfg(feature = "std")]
+use std::error;
 
 use crate::error::Error;
 use crate::spec::CommonParams;
@@ -42,6 +45,9 @@ use vm::{CreateContractAddress, EnvInfo, Schedule};
 
 use crate::block::ExecutedBlock;
 use crate::machine::{self, Machine};
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
 use bytes::Bytes;
 use ethereum_types::{Address, H256, H64, U256};
 use unexpected::{Mismatch, OutOfBounds};
@@ -146,7 +152,7 @@ impl fmt::Display for EngineError {
         f.write_fmt(format_args!("Engine error ({})", msg))
     }
 }
-
+#[cfg(feature = "std")]
 impl error::Error for EngineError {
     fn description(&self) -> &str {
         "Engine error"
