@@ -37,16 +37,16 @@ use keccak_hasher::KeccakHasher;
 use trie::{DBValue, TrieSpec};
 use types::header::Header;
 use types::transaction;
-use types::transaction::SignedTransaction;
+use types::transaction::{SignedTransaction, UnverifiedTransaction};
 use vm::LastHashes;
 
 /// Riscv evm execution env.
 pub struct BlockGenInfo {
-    parent_block_header: Header,
-    last_hashes: Arc<LastHashes>,
-    author: Address,
-    gas_range_target: (U256, U256),
-    extra_data: Bytes,
+    pub parent_block_header: Header,
+    pub last_hashes: Arc<LastHashes>,
+    pub author: Address,
+    pub gas_range_target: (U256, U256),
+    pub extra_data: Bytes,
 }
 
 const MB: usize = 1024 * 1024;
@@ -56,8 +56,8 @@ impl BlockGenInfo {
     pub fn new(
         parent_block_header: Header, last_hashes: Arc<LastHashes>, author: Address,
         gas_range_target: (U256, U256), extra_data: Bytes,
-    ) -> Result<BlockGenInfo, Error> {
-        Ok(BlockGenInfo { last_hashes, parent_block_header, author, gas_range_target, extra_data })
+    ) -> BlockGenInfo {
+        BlockGenInfo { last_hashes, parent_block_header, author, gas_range_target, extra_data }
     }
 }
 
@@ -73,8 +73,8 @@ const MAX_SKIPPED_TRANSACTIONS: usize = 128;
 
 /// generate and seal new block.
 pub fn generate_block(
-    db: Box<dyn HashDB<KeccakHasher, DBValue>>, engine: &impl EthEngine, info: BlockGenInfo,
-    txes: Vec<SignedTransaction>,
+    db: Box<dyn HashDB<KeccakHasher, DBValue>>, engine: &impl EthEngine, info: &BlockGenInfo,
+    txes: Vec<UnverifiedTransaction>,
 ) -> Option<SealedBlock> {
     let trie_factory = TrieFactory::new(TrieSpec::Secure);
     let factories = Factories {
@@ -93,7 +93,7 @@ pub fn generate_block(
         info.last_hashes.clone(),
         info.author,
         info.gas_range_target,
-        info.extra_data,
+        info.extra_data.clone(),
     )
     .ok()?;
 
@@ -103,7 +103,12 @@ pub fn generate_block(
     let min_tx_gas: U256 = schedule.tx_gas.into();
 
     for transaction in txes {
-        let hash = transaction.hash();
+        let transaction = {
+            match engine.machine().verify_transaction_unordered(transaction, &open_block.header) {
+                Err(e) => continue,
+                Ok(t) => t,
+            }
+        };
         // Re-verify transaction again vs current state.
         let result = engine
             .machine()
