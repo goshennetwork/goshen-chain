@@ -80,6 +80,7 @@ impl Pricer for Blake2FPricer {
 /// Pricing model
 #[derive(Debug)]
 pub enum Pricing {
+    #[cfg(feature = "std")]
     AltBn128Pairing(AltBn128PairingPricer),
     AltBn128ConstOperations(AltBn128ConstOperations),
     Blake2F(Blake2FPricer),
