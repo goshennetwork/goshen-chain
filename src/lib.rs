@@ -26,15 +26,15 @@ mod machine;
 type HashDBOracle = dyn HashDB<KeccakHasher, DBValue>;
 
 pub fn state_transition(
-	db: impl HashDB<KeccakHasher, DBValue> + Clone + 'static, hash: H256,
+	db: impl HashDB<KeccakHasher, DBValue> + Clone + 'static, entry_hash: H256,
 ) -> H256 {
-	state_transition_to_header(db, hash).hash()
+	state_transition_to_header(db, entry_hash).hash()
 }
 
 pub fn state_transition_to_header(
-	db: impl HashDB<KeccakHasher, DBValue> + Clone + 'static, hash: H256,
+	db: impl HashDB<KeccakHasher, DBValue> + Clone + 'static, entry_hash: H256,
 ) -> Header {
-	let input = RollupInput::load_from_hashdb(&db, hash);
+	let input = RollupInput::load_from_hashdb(&db, entry_hash);
 	let mut prev = input.prev_header;
 	let batches = input.batches;
 
