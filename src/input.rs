@@ -1,3 +1,6 @@
+use alloc::borrow::ToOwned;
+use alloc::format;
+use alloc::string::ToString;
 use crate::HashDBOracle;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
@@ -10,9 +13,10 @@ use ethereum_types::{Address, H256};
 use hash_db::HashDB;
 use keccak_hasher::KeccakHasher;
 use rlp::Rlp;
+use common_types::bytes::ToPretty;
 
 // format: queueNum(uint64) + queueStart(uint64) + batchNum(uint64) + batch0Time(uint64) +
-// batchLeftTimeDiff([]uint32) + batchesData + queueInfoHash
+// batchLeftTimeDiff([]uint32) + batchesData
 // TODO: load queue tx
 fn load_batches_from_hashdb(db: &HashDBOracle, hash: H256) -> Vec<Batch> {
     let raw = db.get(&hash).expect("input not found");
@@ -22,14 +26,14 @@ fn load_batches_from_hashdb(db: &HashDBOracle, hash: H256) -> Vec<Batch> {
     let batch_num = BigEndian::read_u64(&raw[16..24]) as usize;
     let mut batches = Vec::with_capacity(queue_num + batch_num);
     let mut timestamps = Vec::with_capacity(batch_num);
-    assert!(raw.len() > 24 + 32);
-    let queue_hash = H256::from_slice(&raw[raw.len() - 32..]);
-    let queue_txes = load_queue_txes(db, queue_hash);
+    // assert!(raw.len() > 24 + 32);
+    // let queue_hash = H256::from_slice(&raw[raw.len() - 32..]);
+    // let queue_txes = load_queue_txes(db, queue_hash);
 
     if batch_num > 0 {
         let timeend = 24 + batch_num * 4 + 4;
         let time_slice = &raw[24..timeend];
-        let batches_slice = &raw[timeend..raw.len() - 32];
+        let batches_slice = &raw[timeend..raw.len()];
         let mut time = BigEndian::read_u64(&time_slice[..8]);
         timestamps.push(time);
         for i in 1..batch_num {
@@ -109,7 +113,7 @@ impl RollupInput {
 }
 
 pub fn load_header(db: &HashDBOracle, hash: H256) -> Header {
-    let raw = db.get(&hash).expect("input not found");
+    let raw = db.get(&hash).expect(&*format!("input not found, 0x{}", hash.to_hex()));
     // TODO: eip1559 base fee
     Header::decode_rlp(&Rlp::new(&raw), u64::MAX).expect("load header err")
 }
