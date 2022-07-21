@@ -1631,7 +1631,9 @@ dependencies = [
  "ethereum-types",
  "hash-db 0.12.4",
  "keccak-hasher 0.1.1",
+ "memory-db 0.11.0",
  "rlp",
+ "rustc-hex 1.0.0",
  "trie-db",
 ]
 
@@ -1966,6 +1968,15 @@ checksum = "4574b75faccaacddb9b284faecdf0b544b80b6b294f3d062d325c5726a209c20"
 dependencies = [
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "transition"
+version = "0.1.0"
+dependencies = [
+ "hash-db 0.12.4",
+ "keccak-hasher 0.1.1",
+ "memory-db 0.11.0",
 ]
 
 [[package]]
