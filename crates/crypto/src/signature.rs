@@ -1,4 +1,5 @@
 extern crate alloc;
+
 use crate::publickey::Message;
 use alloc::string::String;
 use core::fmt;
@@ -7,6 +8,7 @@ use core::ops::{Deref, DerefMut};
 use core::str::FromStr;
 use ethereum_types::{Address, H256, H520};
 use rustc_hex::ToHex;
+// use riscv_evm::runtime::ecrecover;
 
 /// Signature encoded as RSV components
 #[repr(C)]
@@ -178,4 +180,6 @@ impl DerefMut for Signature {
 
 pub fn recover(signature: &Signature, message: &Message) -> Option<Address> {
     todo!("use riscv syscall")
+    // let addr_bytes = ecrecover(message.0, signature.0[..32], signature.0[32..64], signature.0[64]);
+    // return Some(Address::from_slice(addr_bytes));Q
 }
