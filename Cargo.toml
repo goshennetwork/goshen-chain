@@ -7,7 +7,7 @@ edition = "2021"
 [lib]
 
 [dependencies]
-ethcore = { path = "crates/ethcore", default-features = false }
+ethcore = { path = "crates/ethcore", default-features = true }
 hash-db = { path = "crates/db/hash-db-0.12.4", default-features = false }
 memory-db = { path = "crates/db/memory-db", default-features = false }
 trie-db = { path = "crates/db/trie-db-0.12.4", default-features = false }
