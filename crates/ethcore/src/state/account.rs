@@ -392,18 +392,18 @@ impl Account {
         // TODO: fill out self.code_cache;
         self.code_size.is_some()
             || if self.code_hash != KECCAK_EMPTY {
-                match db.get(&self.code_hash) {
-                    Some(x) => {
-                        self.code_size = Some(x.len());
-                        true
-                    }
-                    _ => false,
+            match db.get(&self.code_hash) {
+                Some(x) => {
+                    self.code_size = Some(x.len());
+                    true
                 }
-            } else {
-                // If the code hash is empty hash, then the code size is zero.
-                self.code_size = Some(0);
-                true
+                _ => false,
             }
+        } else {
+            // If the code hash is empty hash, then the code size is zero.
+            self.code_size = Some(0);
+            true
+        }
     }
 
     /// Determine whether there are any un-`commit()`-ed storage-setting operations.
@@ -486,6 +486,9 @@ impl Account {
     pub fn commit_storage(
         &mut self, trie_factory: &TrieFactory, db: &mut dyn HashDB<KeccakHasher, DBValue>,
     ) -> TrieResult<()> {
+        if self.storage_changes.len() == 0 {
+            return Ok(());
+        }
         let mut t = trie_factory.from_existing(db, &mut self.storage_root)?;
         for (k, v) in self.storage_changes.drain() {
             // cast key and value to trait type,
