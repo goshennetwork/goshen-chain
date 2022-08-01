@@ -28,7 +28,7 @@ use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec;
 use alloc::vec::Vec;
-use bytes::{Bytes, BytesRef};
+use bytes::{Bytes, BytesRef, ToPretty};
 use core::cmp;
 use core::convert::TryFrom;
 use ethereum_types::{Address, H256, U256, U512};
@@ -43,6 +43,7 @@ use vm::{
 /// Precompile that can never be prunned from state trie (0x3, only in tests)
 const UNPRUNABLE_PRECOMPILE_ADDRESS: Option<Address> =
     Some(ethereum_types::H160([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]));
+const INITIAL_ENQUEUE_TX_NONCE: u64 = 1 << 63;
 
 #[cfg(not(any(test, feature = "test-helpers")))]
 /// Precompile that can never be prunned from state trie (none)
@@ -1094,7 +1095,7 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         let init_gas = t.tx().gas - base_gas_required;
 
         // validate transaction nonce
-        if check_nonce && t.tx().nonce != nonce {
+        if t.tx().nonce.as_u64() < INITIAL_ENQUEUE_TX_NONCE && check_nonce && t.tx().nonce != nonce {
             return Err(ExecutionError::InvalidNonce { expected: nonce, got: t.tx().nonce });
         }
 
