@@ -19,17 +19,13 @@
 //! Miner module
 //! Keeps track of transactions and currently sealed pending block.
 
-use crate::block::{OpenBlock, SealedBlock};
-use crate::engines::EthEngine;
-use crate::error::Error;
-use crate::executed::ExecutionError;
-use crate::factory::{Factories, VmFactory};
-use crate::state_db::StateDB;
 use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
+
 use bytes::Bytes;
 use ethereum_types::{Address, U256};
+
 use ethtrie::TrieFactory;
 use evm::VMType;
 use hash_db::HashDB;
@@ -37,8 +33,16 @@ use keccak_hasher::KeccakHasher;
 use trie::{DBValue, TrieSpec};
 use types::header::Header;
 use types::transaction;
-use types::transaction::{SignedTransaction, UnverifiedTransaction};
+use types::transaction::UnverifiedTransaction;
 use vm::LastHashes;
+
+use crate::block::{OpenBlock, SealedBlock};
+use crate::engines::EthEngine;
+use crate::error::Error;
+use crate::executed::ExecutionError;
+use crate::factory::{Factories, VmFactory};
+use crate::l2_cfg::INITIAL_ENQUEUE_TX_NONCE;
+use crate::state_db::StateDB;
 
 /// Riscv evm execution env.
 pub struct BlockGenInfo {
@@ -95,7 +99,7 @@ pub fn generate_block(
         info.gas_range_target,
         info.extra_data.clone(),
     )
-    .ok()?;
+        .ok()?;
 
     let block_number = open_block.header.number();
     let mut skipped_transactions = 0usize;
@@ -149,7 +153,11 @@ pub fn generate_block(
                 println!("{}", _e.to_string());
             }
             // imported ok
-            _ => {}
+            Ok(receipt) => {
+                if receipt.logs.len() > 0{
+    // TODO: set nonce and mix_hash
+                }
+            }
         }
     }
 

@@ -28,7 +28,7 @@ use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec;
 use alloc::vec::Vec;
-use bytes::{Bytes, BytesRef, ToPretty};
+use bytes::{Bytes, BytesRef};
 use core::cmp;
 use core::convert::TryFrom;
 use ethereum_types::{Address, H256, U256, U512};
@@ -36,14 +36,14 @@ use evm::{CallType, FinalizationResult, Finalize};
 use hash::keccak;
 use types::transaction::{Action, SignedTransaction, TypedTransaction};
 use vm::{
-    self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError
+    self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError,
 };
+use crate::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, INTRINSIC_GAS_FACTOR};
 
 #[cfg(any(test, feature = "test-helpers"))]
 /// Precompile that can never be prunned from state trie (0x3, only in tests)
 const UNPRUNABLE_PRECOMPILE_ADDRESS: Option<Address> =
     Some(ethereum_types::H160([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]));
-const INITIAL_ENQUEUE_TX_NONCE: u64 = 1 << 63;
 
 #[cfg(not(any(test, feature = "test-helpers")))]
 /// Precompile that can never be prunned from state trie (none)
@@ -192,7 +192,7 @@ impl TransactOptions<trace::NoopTracer, trace::NoopVMTracer> {
 
 /// Trap result returned by executive.
 pub type ExecutiveTrapResult<'a, T> =
-    vm::TrapResult<T, CallCreateExecutive<'a>, CallCreateExecutive<'a>>;
+vm::TrapResult<T, CallCreateExecutive<'a>, CallCreateExecutive<'a>>;
 /// Trap error for executive.
 pub type ExecutiveTrapError<'a> = vm::TrapError<CallCreateExecutive<'a>, CallCreateExecutive<'a>>;
 
@@ -415,9 +415,9 @@ impl<'a> CallCreateExecutive<'a> {
         origin_info: &'any OriginInfo, substate: &'any mut Substate, output: OutputPolicy,
         tracer: &'any mut T, vm_tracer: &'any mut V,
     ) -> Externalities<'any, T, V, B>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         Externalities::new(
             state,
@@ -467,8 +467,8 @@ impl<'a> CallCreateExecutive<'a> {
                         .machine
                         .builtin(&params.code_address, self.info.number)
                         .expect(
-                        "Builtin is_some is checked when creating this kind in new_call_raw; qed",
-                    );
+                            "Builtin is_some is checked when creating this kind in new_call_raw; qed",
+                        );
 
                     Self::check_static_flag(&params, self.static_flag, self.is_create)?;
                     state.checkpoint();
@@ -807,135 +807,135 @@ impl<'a> CallCreateExecutive<'a> {
         let mut callstack: Vec<(Option<Address>, CallCreateExecutive<'a>)> = Vec::new();
         loop {
             match last_res {
-				None => {
-					match callstack.pop() {
-						Some((_, exec)) => {
-							let second_last = callstack.last_mut();
-							let parent_substate = match second_last {
-								Some((_, ref mut second_last)) => second_last.unconfirmed_substate().expect("Current stack value is created from second last item; second last item must be call or create; qed"),
-								None => top_substate,
-							};
+                None => {
+                    match callstack.pop() {
+                        Some((_, exec)) => {
+                            let second_last = callstack.last_mut();
+                            let parent_substate = match second_last {
+                                Some((_, ref mut second_last)) => second_last.unconfirmed_substate().expect("Current stack value is created from second last item; second last item must be call or create; qed"),
+                                None => top_substate,
+                            };
 
-							last_res = Some((exec.is_create, exec.gas, exec.exec(state, parent_substate, tracer, vm_tracer)));
-						},
-						None => panic!("When callstack only had one item and it was executed, this function would return; callstack never reaches zero item; qed"),
-					}
-				},
-				Some((is_create, gas, Ok(val))) => {
-					let current = callstack.pop();
+                            last_res = Some((exec.is_create, exec.gas, exec.exec(state, parent_substate, tracer, vm_tracer)));
+                        }
+                        None => panic!("When callstack only had one item and it was executed, this function would return; callstack never reaches zero item; qed"),
+                    }
+                }
+                Some((is_create, gas, Ok(val))) => {
+                    let current = callstack.pop();
 
-					match current {
-						Some((address, mut exec)) => {
-							if is_create {
-								let address = address.expect("If the last executed status was from a create executive, then the destination address was pushed to the callstack; address is_some if it is_create; qed");
+                    match current {
+                        Some((address, mut exec)) => {
+                            if is_create {
+                                let address = address.expect("If the last executed status was from a create executive, then the destination address was pushed to the callstack; address is_some if it is_create; qed");
 
-								match val {
-									Ok(ref val) if val.apply_state => {
-										tracer.done_trace_create(
-											gas - val.gas_left,
-											&val.return_data,
-											address
-										);
-									},
-									Ok(_) => {
-										tracer.done_trace_failed(&vm::Error::Reverted);
-									},
-									Err(ref err) => {
-										tracer.done_trace_failed(err);
-									},
-								}
+                                match val {
+                                    Ok(ref val) if val.apply_state => {
+                                        tracer.done_trace_create(
+                                            gas - val.gas_left,
+                                            &val.return_data,
+                                            address,
+                                        );
+                                    }
+                                    Ok(_) => {
+                                        tracer.done_trace_failed(&vm::Error::Reverted);
+                                    }
+                                    Err(ref err) => {
+                                        tracer.done_trace_failed(err);
+                                    }
+                                }
 
-								vm_tracer.done_subtrace();
+                                vm_tracer.done_subtrace();
 
-								let second_last = callstack.last_mut();
-								let parent_substate = match second_last {
-									Some((_, ref mut second_last)) => second_last.unconfirmed_substate().expect("Current stack value is created from second last item; second last item must be call or create; qed"),
-									None => top_substate,
-								};
+                                let second_last = callstack.last_mut();
+                                let parent_substate = match second_last {
+                                    Some((_, ref mut second_last)) => second_last.unconfirmed_substate().expect("Current stack value is created from second last item; second last item must be call or create; qed"),
+                                    None => top_substate,
+                                };
 
-								let contract_create_result = into_contract_create_result(val, &address, exec.unconfirmed_substate().expect("Executive is resumed from a create; it has an unconfirmed substate; qed"));
-								last_res = Some((exec.is_create, exec.gas, exec.resume_create(
-									contract_create_result,
-									state,
-									parent_substate,
-									tracer,
-									vm_tracer
-								)));
-							} else {
-								match val {
-									Ok(ref val) if val.apply_state => {
-										tracer.done_trace_call(
-											gas - val.gas_left,
-											&val.return_data,
-										);
-									},
-									Ok(_) => {
-										tracer.done_trace_failed(&vm::Error::Reverted);
-									},
-									Err(ref err) => {
-										tracer.done_trace_failed(err);
-									},
-								}
+                                let contract_create_result = into_contract_create_result(val, &address, exec.unconfirmed_substate().expect("Executive is resumed from a create; it has an unconfirmed substate; qed"));
+                                last_res = Some((exec.is_create, exec.gas, exec.resume_create(
+                                    contract_create_result,
+                                    state,
+                                    parent_substate,
+                                    tracer,
+                                    vm_tracer,
+                                )));
+                            } else {
+                                match val {
+                                    Ok(ref val) if val.apply_state => {
+                                        tracer.done_trace_call(
+                                            gas - val.gas_left,
+                                            &val.return_data,
+                                        );
+                                    }
+                                    Ok(_) => {
+                                        tracer.done_trace_failed(&vm::Error::Reverted);
+                                    }
+                                    Err(ref err) => {
+                                        tracer.done_trace_failed(err);
+                                    }
+                                }
 
-								vm_tracer.done_subtrace();
+                                vm_tracer.done_subtrace();
 
-								let second_last = callstack.last_mut();
-								let parent_substate = match second_last {
-									Some((_, ref mut second_last)) => second_last.unconfirmed_substate().expect("Current stack value is created from second last item; second last item must be call or create; qed"),
-									None => top_substate,
-								};
+                                let second_last = callstack.last_mut();
+                                let parent_substate = match second_last {
+                                    Some((_, ref mut second_last)) => second_last.unconfirmed_substate().expect("Current stack value is created from second last item; second last item must be call or create; qed"),
+                                    None => top_substate,
+                                };
 
-								last_res = Some((exec.is_create, exec.gas, exec.resume_call(
-									into_message_call_result(val),
-									state,
-									parent_substate,
-									tracer,
-									vm_tracer
-								)));
-							}
-						},
-						None => return val,
-					}
-				},
-				Some((_, _, Err(TrapError::Call(subparams, resume)))) => {
-					tracer.prepare_trace_call(&subparams, resume.depth + 1, resume.machine.builtin(&subparams.address, resume.info.number).is_some());
-					vm_tracer.prepare_subtrace(subparams.code.as_ref().map_or_else(|| &[] as &[u8], |d| &*d as &[u8]));
+                                last_res = Some((exec.is_create, exec.gas, exec.resume_call(
+                                    into_message_call_result(val),
+                                    state,
+                                    parent_substate,
+                                    tracer,
+                                    vm_tracer,
+                                )));
+                            }
+                        }
+                        None => return val,
+                    }
+                }
+                Some((_, _, Err(TrapError::Call(subparams, resume)))) => {
+                    tracer.prepare_trace_call(&subparams, resume.depth + 1, resume.machine.builtin(&subparams.address, resume.info.number).is_some());
+                    vm_tracer.prepare_subtrace(subparams.code.as_ref().map_or_else(|| &[] as &[u8], |d| &*d as &[u8]));
 
-					let sub_exec = CallCreateExecutive::new_call_raw(
-						subparams,
-						resume.info,
-						resume.machine,
-						resume.schedule,
-						resume.factory,
-						resume.depth + 1,
-						resume.stack_depth,
-						resume.static_flag,
-					);
+                    let sub_exec = CallCreateExecutive::new_call_raw(
+                        subparams,
+                        resume.info,
+                        resume.machine,
+                        resume.schedule,
+                        resume.factory,
+                        resume.depth + 1,
+                        resume.stack_depth,
+                        resume.static_flag,
+                    );
 
-					callstack.push((None, resume));
-					callstack.push((None, sub_exec));
-					last_res = None;
-				},
-				Some((_, _, Err(TrapError::Create(subparams, address, resume)))) => {
-					tracer.prepare_trace_create(&subparams);
-					vm_tracer.prepare_subtrace(subparams.code.as_ref().map_or_else(|| &[] as &[u8], |d| &*d as &[u8]));
+                    callstack.push((None, resume));
+                    callstack.push((None, sub_exec));
+                    last_res = None;
+                }
+                Some((_, _, Err(TrapError::Create(subparams, address, resume)))) => {
+                    tracer.prepare_trace_create(&subparams);
+                    vm_tracer.prepare_subtrace(subparams.code.as_ref().map_or_else(|| &[] as &[u8], |d| &*d as &[u8]));
 
-					let sub_exec = CallCreateExecutive::new_create_raw(
-						subparams,
-						resume.info,
-						resume.machine,
-						resume.schedule,
-						resume.factory,
-						resume.depth + 1,
-						resume.stack_depth,
-						resume.static_flag
-					);
+                    let sub_exec = CallCreateExecutive::new_create_raw(
+                        subparams,
+                        resume.info,
+                        resume.machine,
+                        resume.schedule,
+                        resume.factory,
+                        resume.depth + 1,
+                        resume.stack_depth,
+                        resume.static_flag,
+                    );
 
-					callstack.push((Some(address), resume));
-					callstack.push((None, sub_exec));
-					last_res = None;
-				},
-			}
+                    callstack.push((Some(address), resume));
+                    callstack.push((None, sub_exec));
+                    last_res = None;
+                }
+            }
         }
     }
 }
@@ -984,9 +984,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn transact<T, V>(
         &'a mut self, t: &SignedTransaction, options: TransactOptions<T, V>,
     ) -> Result<Executed<T::Output, V::Output>, ExecutionError>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         self.transact_with_tracer(
             t,
@@ -1003,9 +1003,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn transact_virtual<T, V>(
         &'a mut self, t: &SignedTransaction, options: TransactOptions<T, V>,
     ) -> Result<Executed<T::Output, V::Output>, ExecutionError>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         let sender = t.sender();
         let balance = self.state.balance(&sender)?;
@@ -1024,9 +1024,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         &'a mut self, t: &SignedTransaction, check_nonce: bool, output_from_create: bool,
         mut tracer: T, mut vm_tracer: V,
     ) -> Result<Executed<T::Output, V::Output>, ExecutionError>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         let schedule = self.schedule;
 
@@ -1067,14 +1067,18 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
             if let Some(al) = t.access_list() {
                 for item in al.iter() {
                     access_list.insert_address(item.0);
-                    base_gas_required += vm::schedule::EIP2930_ACCESS_LIST_ADDRESS_COST.into();
+                    base_gas_required += (vm::schedule::EIP2930_ACCESS_LIST_ADDRESS_COST * INTRINSIC_GAS_FACTOR).into();
                     for key in item.1.iter() {
                         access_list.insert_storage_key(item.0, *key);
                         base_gas_required +=
-                            vm::schedule::EIP2930_ACCESS_LIST_STORAGE_KEY_COST.into();
+                            (vm::schedule::EIP2930_ACCESS_LIST_STORAGE_KEY_COST * INTRINSIC_GAS_FACTOR).into();
                     }
                 }
             }
+        }
+
+        if t.tx().nonce.as_u64() > INITIAL_ENQUEUE_TX_NONCE {
+            base_gas_required = U256::zero();
         }
 
         if t.tx().gas < base_gas_required {
@@ -1219,9 +1223,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         &mut self, params: ActionParams, substate: &mut Substate, stack_depth: usize,
         tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         tracer.prepare_trace_call(
             &params,
@@ -1244,7 +1248,7 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
             stack_depth,
             self.static_flag,
         )
-        .consume(self.state, substate, tracer, vm_tracer);
+            .consume(self.state, substate, tracer, vm_tracer);
 
         match result {
             Ok(ref val) if val.apply_state => {
@@ -1266,9 +1270,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn call<T, V>(
         &mut self, params: ActionParams, substate: &mut Substate, tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         self.call_with_stack_depth(params, substate, 0, tracer, vm_tracer)
     }
@@ -1280,9 +1284,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         &mut self, params: ActionParams, substate: &mut Substate, stack_depth: usize,
         tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         tracer.prepare_trace_create(&params);
         vm_tracer
@@ -1302,7 +1306,7 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
             stack_depth,
             self.static_flag,
         )
-        .consume(self.state, substate, tracer, vm_tracer);
+            .consume(self.state, substate, tracer, vm_tracer);
 
         match result {
             Ok(ref val) if val.apply_state => {
@@ -1324,9 +1328,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn create<T, V>(
         &mut self, params: ActionParams, substate: &mut Substate, tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-    where
-        T: Tracer,
-        V: VMTracer,
+        where
+            T: Tracer,
+            V: VMTracer,
     {
         self.create_with_stack_depth(params, substate, 0, tracer, vm_tracer)
     }
@@ -1476,7 +1480,7 @@ mod tests {
     use crate::state::{CleanupMode, Substate};
     use crate::test_helpers::{get_temp_state, get_temp_state_with_factory};
     use crate::trace::{
-        trace, ExecutiveTracer, ExecutiveVMTracer, FlatTrace, MemoryDiff, NoopTracer, NoopVMTracer, StorageDiff, Tracer, VMExecutedOperation, VMOperation, VMTrace, VMTracer
+        trace, ExecutiveTracer, ExecutiveVMTracer, FlatTrace, MemoryDiff, NoopTracer, NoopVMTracer, StorageDiff, Tracer, VMExecutedOperation, VMOperation, VMTrace, VMTracer,
     };
     use alloc::sync::Arc;
     use bytes::Bytes;
@@ -1486,7 +1490,7 @@ mod tests {
     use evm::{evm_test, evm_test_ignore, Factory, VMType};
     use rustc_hex::FromHex;
     use types::transaction::{
-        AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction
+        AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction,
     };
     use vm::{ActionParams, ActionValue, CallType, CreateContractAddress, EnvInfo};
 
@@ -1519,9 +1523,9 @@ mod tests {
                 CreateContractAddress::FromSenderAndNonce,
                 &address,
                 &U256::from(88),
-                &[]
+                &[],
             )
-            .0
+                .0
         );
     }
 
@@ -1535,7 +1539,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.sender = sender.clone();
@@ -1599,7 +1603,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -1674,14 +1678,14 @@ mod tests {
                         value: 100.into(),
                         gas: 100_000.into(),
                         input: vec![],
-                        call_type: CallType::Call
+                        call_type: CallType::Call,
                     }),
                     result: trace::Res::Call(trace::CallResult {
                         gas_used: 33021.into(),
-                        output: vec![]
+                        output: vec![],
                     }),
                     subtraces: 1,
-                    trace_address: Default::default()
+                    trace_address: Default::default(),
                 },
                 FlatTrace {
                     action: trace::Action::Call(trace::Call {
@@ -1690,18 +1694,18 @@ mod tests {
                         value: 1.into(),
                         gas: 66560.into(),
                         input: vec![],
-                        call_type: CallType::Call
+                        call_type: CallType::Call,
                     }),
                     result: trace::Res::Call(trace::CallResult {
                         gas_used: 600.into(),
                         output: vec![
                             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 156, 17, 133, 165, 197, 233, 252,
-                            84, 97, 40, 8, 151, 126, 232, 245, 72, 178, 37, 141, 49
-                        ]
+                            84, 97, 40, 8, 151, 126, 232, 245, 72, 178, 37, 141, 49,
+                        ],
                     }),
                     subtraces: 0,
                     trace_address: vec![0].into_iter().collect(),
-                }
+                },
             ]
         );
     }
@@ -1740,7 +1744,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -1808,36 +1812,36 @@ mod tests {
         assert_eq!(tracer.drain(), expected_trace);
 
         let expected_vm_trace = VMTrace {
-			parent_step: 0,
-			code: vec![124, 96, 16, 128, 96, 12, 96, 0, 57, 96, 0, 243, 0, 96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53, 85, 96, 0, 82, 96, 29, 96, 3, 96, 23, 240, 96, 0, 85],
-			operations: vec![
-				VMOperation { pc: 0, instruction: 124, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99997.into(), stack_push: vec_into![U256::from_dec_str("2589892687202724018173567190521546555304938078595079151649957320078677").unwrap()], mem_diff: None, store_diff: None }) },
-				VMOperation { pc: 30, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99994.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
-				VMOperation { pc: 32, instruction: 82, gas_cost: 6.into(), executed: Some(VMExecutedOperation { gas_used: 99988.into(), stack_push: vec_into![], mem_diff: Some(MemoryDiff { offset: 0, data: vec![0, 0, 0, 96, 16, 128, 96, 12, 96, 0, 57, 96, 0, 243, 0, 96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53, 85] }), store_diff: None }) },
-				VMOperation { pc: 33, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99985.into(), stack_push: vec_into![29], mem_diff: None, store_diff: None }) },
-				VMOperation { pc: 35, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99982.into(), stack_push: vec_into![3], mem_diff: None, store_diff: None }) },
-				VMOperation { pc: 37, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99979.into(), stack_push: vec_into![23], mem_diff: None, store_diff: None }) },
-				VMOperation { pc: 39, instruction: 240, gas_cost: 99979.into(), executed: Some(VMExecutedOperation { gas_used: 64755.into(), stack_push: vec_into![U256::from_dec_str("1135198453258042933984631383966629874710669425204").unwrap()], mem_diff: None, store_diff: None }) },
-				VMOperation { pc: 40, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 64752.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
-				VMOperation { pc: 42, instruction: 85, gas_cost: 20000.into(), executed: Some(VMExecutedOperation { gas_used: 44752.into(), stack_push: vec_into![], mem_diff: None, store_diff: Some(StorageDiff { location: 0.into(), value: U256::from_dec_str("1135198453258042933984631383966629874710669425204").unwrap() }) }) }
-			],
-			subs: vec![
-				VMTrace {
-					parent_step: 6,
-					code: vec![96, 16, 128, 96, 12, 96, 0, 57, 96, 0, 243, 0, 96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53, 85],
-					operations: vec![
-						VMOperation { pc: 0, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67976.into(), stack_push: vec_into![16], mem_diff: None, store_diff: None }) },
-						VMOperation { pc: 2, instruction: 128, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67973.into(), stack_push: vec_into![16, 16], mem_diff: None, store_diff: None }) },
-						VMOperation { pc: 3, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67970.into(), stack_push: vec_into![12], mem_diff: None, store_diff: None }) },
-						VMOperation { pc: 5, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67967.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
-						VMOperation { pc: 7, instruction: 57, gas_cost: 9.into(), executed: Some(VMExecutedOperation { gas_used: 67958.into(), stack_push: vec_into![], mem_diff: Some(MemoryDiff { offset: 0, data: vec![96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53] }), store_diff: None }) },
-						VMOperation { pc: 8, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67955.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
-						VMOperation { pc: 10, instruction: 243, gas_cost: 0.into(), executed: Some(VMExecutedOperation { gas_used: 67955.into(), stack_push: vec_into![], mem_diff: None, store_diff: None }) }
-					],
-					subs: vec![]
-				}
-			]
-		};
+            parent_step: 0,
+            code: vec![124, 96, 16, 128, 96, 12, 96, 0, 57, 96, 0, 243, 0, 96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53, 85, 96, 0, 82, 96, 29, 96, 3, 96, 23, 240, 96, 0, 85],
+            operations: vec![
+                VMOperation { pc: 0, instruction: 124, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99997.into(), stack_push: vec_into![U256::from_dec_str("2589892687202724018173567190521546555304938078595079151649957320078677").unwrap()], mem_diff: None, store_diff: None }) },
+                VMOperation { pc: 30, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99994.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
+                VMOperation { pc: 32, instruction: 82, gas_cost: 6.into(), executed: Some(VMExecutedOperation { gas_used: 99988.into(), stack_push: vec_into![], mem_diff: Some(MemoryDiff { offset: 0, data: vec![0, 0, 0, 96, 16, 128, 96, 12, 96, 0, 57, 96, 0, 243, 0, 96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53, 85] }), store_diff: None }) },
+                VMOperation { pc: 33, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99985.into(), stack_push: vec_into![29], mem_diff: None, store_diff: None }) },
+                VMOperation { pc: 35, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99982.into(), stack_push: vec_into![3], mem_diff: None, store_diff: None }) },
+                VMOperation { pc: 37, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 99979.into(), stack_push: vec_into![23], mem_diff: None, store_diff: None }) },
+                VMOperation { pc: 39, instruction: 240, gas_cost: 99979.into(), executed: Some(VMExecutedOperation { gas_used: 64755.into(), stack_push: vec_into![U256::from_dec_str("1135198453258042933984631383966629874710669425204").unwrap()], mem_diff: None, store_diff: None }) },
+                VMOperation { pc: 40, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 64752.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
+                VMOperation { pc: 42, instruction: 85, gas_cost: 20000.into(), executed: Some(VMExecutedOperation { gas_used: 44752.into(), stack_push: vec_into![], mem_diff: None, store_diff: Some(StorageDiff { location: 0.into(), value: U256::from_dec_str("1135198453258042933984631383966629874710669425204").unwrap() }) }) },
+            ],
+            subs: vec![
+                VMTrace {
+                    parent_step: 6,
+                    code: vec![96, 16, 128, 96, 12, 96, 0, 57, 96, 0, 243, 0, 96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53, 85],
+                    operations: vec![
+                        VMOperation { pc: 0, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67976.into(), stack_push: vec_into![16], mem_diff: None, store_diff: None }) },
+                        VMOperation { pc: 2, instruction: 128, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67973.into(), stack_push: vec_into![16, 16], mem_diff: None, store_diff: None }) },
+                        VMOperation { pc: 3, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67970.into(), stack_push: vec_into![12], mem_diff: None, store_diff: None }) },
+                        VMOperation { pc: 5, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67967.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
+                        VMOperation { pc: 7, instruction: 57, gas_cost: 9.into(), executed: Some(VMExecutedOperation { gas_used: 67958.into(), stack_push: vec_into![], mem_diff: Some(MemoryDiff { offset: 0, data: vec![96, 0, 53, 84, 21, 96, 9, 87, 0, 91, 96, 32, 53, 96, 0, 53] }), store_diff: None }) },
+                        VMOperation { pc: 8, instruction: 96, gas_cost: 3.into(), executed: Some(VMExecutedOperation { gas_used: 67955.into(), stack_push: vec_into![0], mem_diff: None, store_diff: None }) },
+                        VMOperation { pc: 10, instruction: 243, gas_cost: 0.into(), executed: Some(VMExecutedOperation { gas_used: 67955.into(), stack_push: vec_into![], mem_diff: None, store_diff: None }) },
+                    ],
+                    subs: vec![],
+                }
+            ],
+        };
         assert_eq!(vm_tracer.drain().unwrap(), expected_vm_trace);
     }
 
@@ -1870,7 +1874,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.code_address = address.clone();
@@ -1951,7 +1955,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -2124,7 +2128,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -2186,14 +2190,14 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         let next_address = contract_address(
             CreateContractAddress::FromSenderAndNonce,
             &address,
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.sender = sender.clone();
@@ -2318,7 +2322,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.gas = U256::from(100_000u64);
@@ -2359,7 +2363,7 @@ mod tests {
             gas_price: U256::zero(),
             nonce: U256::zero(),
         })
-        .sign(keypair.secret(), None);
+            .sign(keypair.secret(), None);
         let sender = t.sender();
         let contract = contract_address(
             CreateContractAddress::FromSenderAndNonce,
@@ -2367,7 +2371,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
 
         let mut state = get_temp_state_with_factory(factory);
         state.add_balance(&sender, &U256::from(18), CleanupMode::NoEmpty).unwrap();
@@ -2408,7 +2412,7 @@ mod tests {
             gas_price: U256::zero(),
             nonce: U256::one(),
         })
-        .sign(keypair.secret(), None);
+            .sign(keypair.secret(), None);
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
@@ -2426,10 +2430,10 @@ mod tests {
 
         match res {
             Err(ExecutionError::InvalidNonce { expected, got })
-                if expected == U256::zero() && got == U256::one() =>
-            {
-                ()
-            }
+            if expected == U256::zero() && got == U256::one() =>
+                {
+                    ()
+                }
             _ => assert!(false, "Expected invalid nonce error."),
         }
     }
@@ -2445,7 +2449,7 @@ mod tests {
             gas_price: U256::zero(),
             nonce: U256::zero(),
         })
-        .sign(keypair.secret(), None);
+            .sign(keypair.secret(), None);
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
@@ -2464,12 +2468,12 @@ mod tests {
 
         match res {
             Err(ExecutionError::BlockGasLimitReached { gas_limit, gas_used, gas })
-                if gas_limit == U256::from(100_000)
-                    && gas_used == U256::from(20_000)
-                    && gas == U256::from(80_001) =>
-            {
-                ()
-            }
+            if gas_limit == U256::from(100_000)
+                && gas_used == U256::from(20_000)
+                && gas == U256::from(80_001) =>
+                {
+                    ()
+                }
             _ => assert!(false, "Expected block gas limit error."),
         }
     }
@@ -2497,7 +2501,7 @@ mod tests {
             ),
             max_priority_fee_per_gas: U256::from(30),
         })
-        .sign(keypair.secret(), None);
+            .sign(keypair.secret(), None);
 
         let sender = t.sender();
 
@@ -2530,7 +2534,7 @@ mod tests {
             gas_price: U256::one(),
             nonce: U256::zero(),
         })
-        .sign(keypair.secret(), None);
+            .sign(keypair.secret(), None);
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
@@ -2548,10 +2552,10 @@ mod tests {
 
         match res {
             Err(ExecutionError::NotEnoughCash { required, got })
-                if required == U512::from(100_018) && got == U512::from(100_017) =>
-            {
-                ()
-            }
+            if required == U512::from(100_018) && got == U512::from(100_017) =>
+                {
+                    ()
+                }
             _ => assert!(false, "Expected not enough cash error. {:?}", res),
         }
     }
@@ -2583,7 +2587,7 @@ mod tests {
             ),
             max_priority_fee_per_gas,
         })
-        .sign(keypair.secret(), None);
+            .sign(keypair.secret(), None);
 
         let sender = t.sender();
 
@@ -2603,13 +2607,13 @@ mod tests {
 
         match res {
             Err(ExecutionError::NotEnoughCash { required, got })
-                if required
-                    == U512::from(max_priority_fee_per_gas) * U512::from(100_000)
-                        + U512::from(17)
-                    && got == U512::from(15000017) =>
-            {
-                ()
-            }
+            if required
+                == U512::from(max_priority_fee_per_gas) * U512::from(100_000)
+                + U512::from(17)
+                && got == U512::from(15000017) =>
+                {
+                    ()
+                }
             _ => assert!(false, "Expected not enough cash error. {:?}", res),
         }
     }
@@ -2641,7 +2645,7 @@ mod tests {
             ),
             max_priority_fee_per_gas,
         })
-        .sign(keypair.secret(), None);
+            .sign(keypair.secret(), None);
 
         let sender = t.sender();
 
@@ -2661,10 +2665,10 @@ mod tests {
 
         match res {
             Err(ExecutionError::TransactionMalformed(err))
-                if err.contains("maxPriorityFeePerGas higher than maxFeePerGas") =>
-            {
-                ()
-            }
+            if err.contains("maxPriorityFeePerGas higher than maxFeePerGas") =>
+                {
+                    ()
+                }
             _ => assert!(
                 false,
                 "Expected maxPriorityFeePerGas higher than maxFeePerGas error. {:?}",
@@ -2684,7 +2688,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-        .0;
+            .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();

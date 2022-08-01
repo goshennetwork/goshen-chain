@@ -18,6 +18,7 @@
 
 use evm::Schedule;
 use types::transaction::{self, Action};
+use crate::l2_cfg::INTRINSIC_GAS_FACTOR;
 
 /// Extends transaction with gas verification method.
 pub trait Transaction {
@@ -44,8 +45,8 @@ fn gas_required_for(is_create: bool, data: &[u8], schedule: &Schedule) -> u64 {
         (if is_create { schedule.tx_create_gas } else { schedule.tx_gas }) as u64,
         |g, b| {
             g + (match *b {
-                0 => schedule.tx_data_zero_gas,
-                _ => schedule.tx_data_non_zero_gas,
+                0 => schedule.tx_data_zero_gas * INTRINSIC_GAS_FACTOR,
+                _ => schedule.tx_data_non_zero_gas * INTRINSIC_GAS_FACTOR,
             }) as u64
         },
     )
