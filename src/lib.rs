@@ -53,7 +53,7 @@ pub fn state_transition_to_header(
         );
         if let Some(block) = generate_block(db_clone, &engine, &info, batch.transactions) {
             prev = block.header.clone();
-            // println!("{}, 0x{}, {}", block.header.number(), block.header.hash().to_hex(), block.transactions.len());
+            println!("{}, 0x{}, {}", block.header.number(), block.header.hash().to_hex(), block.transactions.len());
         } else {
             prev = info.parent_block_header;
         }
