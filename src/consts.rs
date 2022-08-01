@@ -6,8 +6,8 @@ pub const L1_CROSS_LAYER_WITNESS: Address =
 pub const L2_FEE_COLLECTOR: Address =
     H160([0xfe, 0xe0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x0f, 0xee]);
 
-pub const L2_BLOCK_MAX_GAS_LIMIT: u32 = 20000000;
-pub const L2_BLOCK_MIN_GAS_LIMIT: u32 = 10000000;
+pub const L2_BLOCK_MAX_GAS_LIMIT: u32 = 0x3938700;
+pub const L2_BLOCK_MIN_GAS_LIMIT: u32 = 0x3938700;
 
 pub const L2_CHAIN_ID: u64 = 21772;
 // same as ethcore::spec::spec::MAX_TRANSACTION

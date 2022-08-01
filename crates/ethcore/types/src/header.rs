@@ -16,14 +16,17 @@
 
 //! Block header.
 
-use crate::bytes::Bytes;
-use crate::hash::{keccak, KECCAK_EMPTY_LIST_RLP, KECCAK_NULL_RLP};
-use crate::BlockNumber;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::iter::FromIterator;
-use ethereum_types::{Address, Bloom, H256, U256};
+
+use ethereum_types::{Address, Bloom, H256, H64, U256};
+use keccak_hash::KECCAK_EMPTY;
 use rlp::{DecoderError, Encodable, Rlp, RlpStream};
+
+use crate::BlockNumber;
+use crate::bytes::Bytes;
+use crate::hash::{keccak, KECCAK_EMPTY_LIST_RLP, KECCAK_NULL_RLP};
 
 /// Semantic boolean for when a seal/signature is included.
 #[derive(Debug, Clone, Copy)]
@@ -71,6 +74,10 @@ pub struct Header {
     uncles_hash: H256,
     /// Block extra data.
     extra_data: Bytes,
+
+    mix_hash: H256,
+
+    nonce: H64,
 
     /// State root.
     state_root: H256,
@@ -132,6 +139,9 @@ impl Default for Header {
             uncles_hash: KECCAK_EMPTY_LIST_RLP,
             extra_data: vec![],
 
+            mix_hash: KECCAK_EMPTY,
+            nonce: H64::zero(),
+
             state_root: KECCAK_NULL_RLP,
             receipts_root: KECCAK_NULL_RLP,
             log_bloom: Bloom::default(),
@@ -175,6 +185,16 @@ impl Header {
     /// Get the extra data field of the header.
     pub fn extra_data(&self) -> &Bytes {
         &self.extra_data
+    }
+
+    /// Get the extra data field of the header.
+    pub fn mix_hash(&self) -> &H256 {
+        &self.mix_hash
+    }
+
+    /// Get the nonce field of the header.
+    pub fn nonce(&self) -> &H64 {
+        &self.nonce
     }
 
     /// Get the state root field of the header.
@@ -281,6 +301,16 @@ impl Header {
         change_field(&mut self.hash, &mut self.extra_data, a);
     }
 
+    /// Set the mix hash field of the header.
+    pub fn set_mix_hash(&mut self, a: H256) {
+        change_field(&mut self.hash, &mut self.mix_hash, a);
+    }
+
+    /// Set the nonce field of the header.
+    pub fn set_nonce(&mut self, a: H64) {
+        change_field(&mut self.hash, &mut self.nonce, a);
+    }
+
     /// Set the gas used field of the header.
     pub fn set_gas_used(&mut self, a: U256) {
         change_field(&mut self.hash, &mut self.gas_used, a);
@@ -337,7 +367,7 @@ impl Header {
 
     /// Place this header into an RLP stream `s`, optionally `with_seal`.
     fn stream_rlp(&self, s: &mut RlpStream, with_seal: Seal) {
-        let stream_length_without_seal = if self.base_fee_per_gas.is_some() { 14 } else { 13 };
+        let stream_length_without_seal = if self.base_fee_per_gas.is_some() { 16 } else { 15 };
 
         if let Seal::With = with_seal {
             s.begin_list(stream_length_without_seal + self.seal.len());
@@ -358,6 +388,8 @@ impl Header {
         s.append(&self.gas_used);
         s.append(&self.timestamp);
         s.append(&self.extra_data);
+        s.append(&self.mix_hash);
+        s.append(&self.nonce);
 
         if let Seal::With = with_seal {
             for b in &self.seal {
@@ -373,8 +405,8 @@ impl Header {
 
 /// Alter value of given field, reset memoised hash if changed.
 fn change_field<T>(hash: &mut Option<H256>, field: &mut T, value: T)
-where
-    T: PartialEq<T>,
+    where
+        T: PartialEq<T>,
 {
     if field != &value {
         *field = value;
@@ -398,6 +430,8 @@ impl Header {
             gas_used: r.val_at(10)?,
             timestamp: r.val_at(11)?,
             extra_data: r.val_at(12)?,
+            mix_hash: r.val_at(13)?,
+            nonce: r.val_at(14)?,
             seal: vec![],
             hash: keccak(r.as_raw()).into(),
             base_fee_per_gas: None,
@@ -447,12 +481,13 @@ impl ExtendedHeader {
 
 #[cfg(test)]
 mod tests {
-    use crate::BlockNumber;
-
-    use super::Header;
     use ethereum_types::U256;
     use rlp::{self, Rlp};
     use rustc_hex::FromHex;
+
+    use crate::BlockNumber;
+
+    use super::Header;
 
     #[test]
     fn test_header_seal_fields() {
