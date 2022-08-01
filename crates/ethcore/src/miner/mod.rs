@@ -118,10 +118,10 @@ pub fn generate_block(
 
         match result {
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
-                gas_limit,
-                gas_used,
-                gas,
-            })) => {
+                                     gas_limit,
+                                     gas_used,
+                                     gas,
+                                 })) => {
                 //debug!(target: "miner", "Skipping adding transaction to block because of gas limit: {:?} (limit: {:?}, used: {:?}, gas: {:?})", hash, gas_limit, gas_used, gas);
                 // Exit early if gas left is smaller then min_tx_gas
                 let gas_left = gas_limit - gas_used;
@@ -145,13 +145,20 @@ pub fn generate_block(
             Err(Error::Transaction(transaction::Error::NotAllowed)) => {
                 //debug!(target: "miner", "Skipping non-allowed transaction for sender {:?}", hash);
             }
-            Err(_e) => {}
+            Err(_e) => {
+                println!("{}", _e.to_string());
+            }
             // imported ok
             _ => {}
         }
     }
 
-    let closed_block = open_block.close().ok()?;
-    let sealed_block = closed_block.lock().try_seal(engine, Vec::new()).expect("seal failed");
-    Some(sealed_block)
+    let closed_block = open_block.close();
+    match closed_block {
+        Ok(t) => {
+            let sealed_block = t.lock().try_seal(engine, Vec::new()).expect("seal failed");
+            Some(sealed_block)
+        }
+        Err(e) => panic!("{}", e)
+    }
 }
