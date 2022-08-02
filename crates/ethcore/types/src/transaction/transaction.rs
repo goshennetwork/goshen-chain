@@ -28,6 +28,7 @@ use alloc::vec::Vec;
 use core::cmp::min;
 use core::ops::Deref;
 use rlp::{self, DecoderError, Rlp, RlpStream};
+use crate::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, L1_CROSS_LAYER_WITNESS};
 
 pub type AccessListItem = (H160, Vec<H256>);
 pub type AccessList = Vec<AccessListItem>;
@@ -288,7 +289,7 @@ impl AccessListTx {
             signature,
             H256::zero(),
         )
-        .compute_hash())
+            .compute_hash())
     }
 
     fn encode_payload(
@@ -413,7 +414,7 @@ impl EIP1559TransactionTx {
             signature,
             H256::zero(),
         )
-        .compute_hash())
+            .compute_hash())
     }
 
     fn encode_payload(
@@ -471,8 +472,10 @@ impl EIP1559TransactionTx {
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum TypedTransaction {
-    Legacy(Transaction),      // old legacy RLP encoded transaction
-    AccessList(AccessListTx), // EIP-2930 Transaction with a list of addresses and storage keys that the transaction plans to access.
+    Legacy(Transaction),
+    // old legacy RLP encoded transaction
+    AccessList(AccessListTx),
+    // EIP-2930 Transaction with a list of addresses and storage keys that the transaction plans to access.
     // Accesses outside the list are possible, but become more expensive.
     EIP1559Transaction(EIP1559TransactionTx),
 }
@@ -516,7 +519,7 @@ impl TypedTransaction {
             },
             hash: H256::zero(),
         }
-        .compute_hash()
+            .compute_hash()
     }
 
     /// Specify the sender; this won't survive the serialize/deserialize process, but can be cloned.
@@ -528,7 +531,7 @@ impl TypedTransaction {
                 signature: SignatureComponents { r: U256::one(), s: U256::one(), standard_v: 4 },
                 hash: H256::zero(),
             }
-            .compute_hash(),
+                .compute_hash(),
             sender: from,
         }
     }
@@ -544,7 +547,7 @@ impl TypedTransaction {
                 signature: SignatureComponents { r: U256::zero(), s: U256::zero(), standard_v: 0 },
                 hash: H256::zero(),
             }
-            .compute_hash(),
+                .compute_hash(),
             sender: UNSIGNED_SENDER,
         }
     }
@@ -558,7 +561,7 @@ impl TypedTransaction {
             signature: SignatureComponents { r: U256::one(), s: U256::one(), standard_v: 0 },
             hash: H256::zero(),
         }
-        .compute_hash()
+            .compute_hash()
     }
 
     // Next functions are for encoded/decode
@@ -789,7 +792,7 @@ impl UnverifiedTransaction {
         self.signature.r.is_zero() && self.signature.s.is_zero()
     }
 
-    ///	Reference to unsigned part of this transaction.
+    ///    Reference to unsigned part of this transaction.
     pub fn as_unsigned(&self) -> &TypedTransaction {
         &self.unsigned
     }
@@ -896,6 +899,11 @@ impl SignedTransaction {
     pub fn sender(&self) -> Address {
         self.sender
     }
+
+    pub fn is_enqueued(&self) -> bool {
+        return self.sender == L1_CROSS_LAYER_WITNESS || self.tx().nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE;
+    }
+
 
     /// Checks is signature is empty.
     pub fn is_unsigned(&self) -> bool {
@@ -1054,7 +1062,7 @@ mod tests {
             value: U256::from(1u32),
             data: b"Hello!".to_vec(),
         })
-        .sign(&key.secret(), None);
+            .sign(&key.secret(), None);
         assert_eq!(Address::from(keccak(key.public())), t.sender());
         assert_eq!(t.chain_id(), None);
     }
@@ -1069,7 +1077,7 @@ mod tests {
             value: U256::from(1u32),
             data: b"Hello!".to_vec(),
         })
-        .fake_sign(Address::from_low_u64_be(0x69));
+            .fake_sign(Address::from_low_u64_be(0x69));
         assert_eq!(Address::from_low_u64_be(0x69), t.sender());
         assert_eq!(t.chain_id(), None);
 
@@ -1091,7 +1099,7 @@ mod tests {
             value: U256::from(1u32),
             data: vec![],
         })
-        .null_sign(1);
+            .null_sign(1);
 
         let res = SignedTransaction::new(t.transaction);
         match res {
@@ -1111,7 +1119,7 @@ mod tests {
             value: U256::from(1),
             data: b"Hello!".to_vec(),
         })
-        .sign(&key.secret(), Some(69));
+            .sign(&key.secret(), Some(69));
         assert_eq!(Address::from(keccak(key.public())), t.sender());
         assert_eq!(t.chain_id(), Some(69));
     }
@@ -1136,7 +1144,7 @@ mod tests {
                 (H160::from_low_u64_be(400), vec![]),
             ],
         ))
-        .sign(&key.secret(), Some(69));
+            .sign(&key.secret(), Some(69));
         let encoded = t.encode();
 
         let t_new =
@@ -1169,7 +1177,7 @@ mod tests {
             ),
             max_priority_fee_per_gas: U256::from(100u32),
         })
-        .sign(&key.secret(), Some(69));
+            .sign(&key.secret(), Some(69));
         let encoded = t.encode();
 
         let t_new =
@@ -1277,7 +1285,7 @@ mod tests {
             ),
             max_priority_fee_per_gas: gas_price,
         })
-        .sign(&key.secret(), Some(69));
+            .sign(&key.secret(), Some(69));
 
         let result = t.transaction.effective_gas_price(Some(124.into()));
         assert_eq!(

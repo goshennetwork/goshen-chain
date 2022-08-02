@@ -486,9 +486,6 @@ impl Account {
     pub fn commit_storage(
         &mut self, trie_factory: &TrieFactory, db: &mut dyn HashDB<KeccakHasher, DBValue>,
     ) -> TrieResult<()> {
-        if self.storage_changes.len() == 0 {
-            return Ok(());
-        }
         let mut t = trie_factory.from_existing(db, &mut self.storage_root)?;
         for (k, v) in self.storage_changes.drain() {
             // cast key and value to trait type,

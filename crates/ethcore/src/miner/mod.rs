@@ -22,9 +22,11 @@
 use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
+use std::any::Any;
 
 use bytes::Bytes;
 use ethereum_types::{Address, U256};
+use hash::keccak;
 
 use ethtrie::TrieFactory;
 use evm::VMType;
@@ -41,7 +43,6 @@ use crate::engines::EthEngine;
 use crate::error::Error;
 use crate::executed::ExecutionError;
 use crate::factory::{Factories, VmFactory};
-use crate::l2_cfg::INITIAL_ENQUEUE_TX_NONCE;
 use crate::state_db::StateDB;
 
 /// Riscv evm execution env.
@@ -78,7 +79,7 @@ const MAX_SKIPPED_TRANSACTIONS: usize = 128;
 /// generate and seal new block.
 pub fn generate_block(
     db: Box<dyn HashDB<KeccakHasher, DBValue>>, engine: &impl EthEngine, info: &BlockGenInfo,
-    txes: Vec<UnverifiedTransaction>,
+    txes: Vec<UnverifiedTransaction>, l2_witness_layer: Address,
 ) -> Option<SealedBlock> {
     let trie_factory = TrieFactory::new(TrieSpec::Secure);
     let factories = Factories {
@@ -150,12 +151,16 @@ pub fn generate_block(
                 //debug!(target: "miner", "Skipping non-allowed transaction for sender {:?}", hash);
             }
             Err(_e) => {
-                println!("{}", _e.to_string());
+                panic!("{}", _e.to_string());
             }
             // imported ok
             Ok(receipt) => {
-                if receipt.logs.len() > 0{
-    // TODO: set nonce and mix_hash
+                for log in receipt.logs.iter() {
+                    if log.address == l2_witness_layer {
+                        if log.topics[0] == keccak("MessageSent(uint64,address,address,bytes32,bytes)".as_bytes()) {
+                            println!("todo!")
+                        }
+                    }
                 }
             }
         }

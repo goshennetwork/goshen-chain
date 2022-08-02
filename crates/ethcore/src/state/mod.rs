@@ -43,7 +43,7 @@ use types::transaction::SignedTransaction;
 
 use vm::EnvInfo;
 
-use bytes::{Bytes, ToPretty};
+use bytes::{Bytes};
 use ethereum_types::{Address, H256, U256};
 use hash_db::{AsHashDB, HashDB};
 use keccak_hasher::KeccakHasher;
@@ -1232,7 +1232,7 @@ impl<B: Backend> State<B> {
                 let db = &self.db.as_hash_db();
                 let db = self.factories.trie.readonly(db, &self.root)?;
                 let from_rlp = |b: &[u8]| Account::from_rlp(b).expect("decoding db value failed");
-                let mut maybe_acc = db.get_with(a.as_bytes(), from_rlp)?;
+                let mut maybe_acc = db.get_with(a.as_bytes(), from_rlp).unwrap();
                 if let Some(ref mut account) = maybe_acc.as_mut() {
                     let accountdb = self
                         .factories
