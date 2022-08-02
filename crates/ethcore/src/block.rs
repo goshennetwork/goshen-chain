@@ -56,7 +56,6 @@ use rlp::{encode_list, RlpStream};
 use types::header::Header;
 use types::receipt::{TransactionOutcome, TypedReceipt};
 use types::transaction::{Error as TransactionError, SignedTransaction};
-use crate::l2_cfg::INITIAL_ENQUEUE_TX_NONCE;
 
 /// Block that is ready for transactions to be added.
 ///
@@ -254,7 +253,7 @@ impl<'x> OpenBlock<'x> {
 
         // adjust difficulty
         let mut difficulty = self.block.header.difficulty();
-        if t.tx().nonce.as_u64() > INITIAL_ENQUEUE_TX_NONCE {
+        if t.is_enqueued() {
             self.block.header.set_difficulty(*difficulty+1);
         }
         self.block.transactions_set.insert(h.unwrap_or_else(|| t.hash()));

@@ -4,7 +4,7 @@ use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
-use ethereum_types::{Address, H256};
+use ethereum_types::{H256};
 use common_types::bytes::ToPretty;
 
 use common_types::header::Header;
@@ -15,7 +15,7 @@ use input::RollupInput;
 use keccak_hasher::KeccakHasher;
 use trie_db::DBValue;
 
-use crate::consts::{L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_FEE_COLLECTOR};
+use crate::consts::{L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_CROSS_LAYER_WITNESS, L2_FEE_COLLECTOR};
 use crate::input::load_last_hashes;
 
 mod consts;
@@ -37,7 +37,7 @@ pub fn state_transition_to_header(
     let mut prev = input.prev_header;
     let batches = input.batches;
 
-    let mut latest_hashes = load_last_hashes(&db, prev.hash(), prev.number());
+    let latest_hashes = load_last_hashes(&db, prev.hash(), prev.number());
     let machine = machine::create_l2_machine();
     let mut engine = L2Seal::new(0, machine);
     for batch in batches {
@@ -51,7 +51,8 @@ pub fn state_transition_to_header(
             (L2_BLOCK_MIN_GAS_LIMIT.into(), L2_BLOCK_MAX_GAS_LIMIT.into()),
             Vec::new(),
         );
-        if let Some(block) = generate_block(db_clone, &engine, &info, batch.transactions) {
+        if let Some(block) = generate_block(db_clone, &engine, &info, batch.transactions,
+                                            L2_CROSS_LAYER_WITNESS) {
             prev = block.header.clone();
             println!("{}, 0x{}, {}", block.header.number(), block.header.hash().to_hex(), block.transactions.len());
         } else {

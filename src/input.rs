@@ -1,13 +1,9 @@
-use alloc::borrow::ToOwned;
 use alloc::format;
-use alloc::string::ToString;
 use crate::HashDBOracle;
-use alloc::sync::Arc;
 use alloc::vec::Vec;
 use byteorder::{BigEndian, ByteOrder};
 use common_types::header::Header;
-use common_types::transaction::{SignedTransaction, TypedTransaction, UnverifiedTransaction};
-use core::hash::Hash;
+use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
 use ethereum_types::{Address, H256};
 use hash_db::HashDB;
