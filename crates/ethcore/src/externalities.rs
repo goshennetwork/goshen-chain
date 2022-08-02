@@ -20,7 +20,7 @@ use crate::machine::EthereumMachine as Machine;
 use crate::state::{Backend as StateBackend, CleanupMode, State, Substate};
 use crate::trace::{Tracer, VMTracer};
 use alloc::sync::Arc;
-use bytes::Bytes;
+use bytes::{Bytes, ToPretty};
 use core::cmp;
 use ethereum_types::{Address, H256, U256};
 use types::transaction::UNSIGNED_SENDER;
@@ -125,6 +125,7 @@ where
     }
 
     fn storage_at(&self, key: &H256) -> vm::Result<H256> {
+        println!("{}, {}", self.origin_info.address.to_hex(), key.to_hex());
         self.state.storage_at(&self.origin_info.address, key).map_err(Into::into)
     }
 

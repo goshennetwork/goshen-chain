@@ -18,7 +18,7 @@
 
 use evm::Schedule;
 use types::transaction::{self, Action};
-use crate::l2_cfg::INTRINSIC_GAS_FACTOR;
+use common_types::l2_cfg::INTRINSIC_GAS_FACTOR;
 
 /// Extends transaction with gas verification method.
 pub trait Transaction {
