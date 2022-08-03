@@ -606,7 +606,7 @@ mod tests {
             (3141562.into(), 31415620.into()),
             vec![],
         )
-            .unwrap();
+        .unwrap();
         let b = b.close_and_lock().unwrap();
         let _ = b.seal(&*spec.engine, vec![]);
     }
@@ -630,11 +630,11 @@ mod tests {
             (3141562.into(), 31415620.into()),
             vec![],
         )
-            .unwrap()
-            .close_and_lock()
-            .unwrap()
-            .seal(engine, vec![])
-            .unwrap();
+        .unwrap()
+        .close_and_lock()
+        .unwrap()
+        .seal(engine, vec![])
+        .unwrap();
         let orig_bytes = b.rlp_bytes();
 
         let db = spec.ensure_db_good(get_temp_state_db(), &Default::default()).unwrap();
@@ -647,7 +647,7 @@ mod tests {
             last_hashes,
             Default::default(),
         )
-            .unwrap();
+        .unwrap();
 
         assert_eq!(e.rlp_bytes(), orig_bytes);
     }
@@ -671,7 +671,7 @@ mod tests {
             (3141562.into(), 31415620.into()),
             vec![],
         )
-            .unwrap();
+        .unwrap();
         let mut uncle1_header = Header::new();
         uncle1_header.set_extra_data(b"uncle1".to_vec());
         let mut uncle2_header = Header::new();
@@ -692,7 +692,7 @@ mod tests {
             last_hashes,
             Default::default(),
         )
-            .unwrap();
+        .unwrap();
 
         let bytes = e.rlp_bytes();
         assert_eq!(bytes, orig_bytes);

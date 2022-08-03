@@ -17,7 +17,8 @@
 //! Simple executive tracer.
 
 use crate::trace::trace::{
-    Action, Call, CallResult, Create, CreateResult, MemoryDiff, Res, Reward, RewardType, StorageDiff, Suicide, VMExecutedOperation, VMOperation, VMTrace
+    Action, Call, CallResult, Create, CreateResult, MemoryDiff, Res, Reward, RewardType,
+    StorageDiff, Suicide, VMExecutedOperation, VMOperation, VMTrace,
 };
 use crate::trace::{FlatTrace, Tracer, VMTracer};
 use alloc::vec;
