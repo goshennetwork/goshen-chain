@@ -20,7 +20,8 @@ fn main() {
     // prevHeaders: [5947, 6202]
     // queue: 3405, 67
     // proofs: [6202, 6320]
-    let hash = H256::from_str("931c34773ca61f4e21a56ae5cd49393990111cb02e77ae99c389cbafbc2266fd").unwrap();
+    let hash =
+        H256::from_str("931c34773ca61f4e21a56ae5cd49393990111cb02e77ae99c389cbafbc2266fd").unwrap();
     let header = state_transition_to_header(db, hash);
     println!("0x{}", header.hash().to_hex());
 }

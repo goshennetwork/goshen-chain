@@ -91,9 +91,14 @@ impl FlatTransactionTraces {
         for t in self.0.iter() {
             if let Action::Call(call) = &t.action {
                 if let Res::Call(res) = &t.result {
-                    println!("type: {:#?}, gas: {}, from: {}, to: {}, gasUsed: {}",
-                             call.call_type, call.gas, call.from.to_hex(), call.to.to_hex(),
-                             res.gas_used);
+                    println!(
+                        "type: {:#?}, gas: {}, from: {}, to: {}, gasUsed: {}",
+                        call.call_type,
+                        call.gas,
+                        call.from.to_hex(),
+                        call.to.to_hex(),
+                        res.gas_used
+                    );
                 }
             }
         }

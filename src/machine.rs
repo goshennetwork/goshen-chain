@@ -1,11 +1,12 @@
 use crate::consts::{L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_MAX_TRANSACTION_SIZE};
 use alloc::collections::BTreeMap;
-use alloc::string::{ToString};
+use alloc::string::ToString;
 use common_types::BlockNumber;
 use ethcore::machine::EthereumMachine;
 use ethcore::spec::CommonParams;
 use ethcore_builtin::{
-    Blake2F, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, Modexp2565Pricer, Pricing, Ripemd160, Sha256,
+    Blake2F, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, Modexp2565Pricer,
+    Pricing, Ripemd160, Sha256,
 };
 use ethereum_types::{Address, H160, U256};
 

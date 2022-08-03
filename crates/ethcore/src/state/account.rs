@@ -392,18 +392,18 @@ impl Account {
         // TODO: fill out self.code_cache;
         self.code_size.is_some()
             || if self.code_hash != KECCAK_EMPTY {
-            match db.get(&self.code_hash) {
-                Some(x) => {
-                    self.code_size = Some(x.len());
-                    true
+                match db.get(&self.code_hash) {
+                    Some(x) => {
+                        self.code_size = Some(x.len());
+                        true
+                    }
+                    _ => false,
                 }
-                _ => false,
+            } else {
+                // If the code hash is empty hash, then the code size is zero.
+                self.code_size = Some(0);
+                true
             }
-        } else {
-            // If the code hash is empty hash, then the code size is zero.
-            self.code_size = Some(0);
-            true
-        }
     }
 
     /// Determine whether there are any un-`commit()`-ed storage-setting operations.

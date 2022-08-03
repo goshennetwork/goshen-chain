@@ -100,13 +100,12 @@ pub fn generate_block(
         info.gas_range_target,
         info.extra_data.clone(),
     )
-        .ok()?;
+    .ok()?;
 
     let block_number = open_block.header.number();
     let mut skipped_transactions = 0usize;
     let schedule = engine.schedule(block_number);
     let min_tx_gas: U256 = schedule.tx_gas.into();
-
 
     let event_sig = "MessageSent(uint64,address,address,bytes32,bytes)".as_bytes();
     let event_id = keccak(event_sig);
@@ -127,10 +126,10 @@ pub fn generate_block(
 
         match result {
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
-                                     gas_limit,
-                                     gas_used,
-                                     gas,
-                                 })) => {
+                gas_limit,
+                gas_used,
+                gas,
+            })) => {
                 //debug!(target: "miner", "Skipping adding transaction to block because of gas limit: {:?} (limit: {:?}, used: {:?}, gas: {:?})", hash, gas_limit, gas_used, gas);
                 // Exit early if gas left is smaller then min_tx_gas
                 let gas_left = gas_limit - gas_used;
@@ -161,7 +160,7 @@ pub fn generate_block(
             Ok(receipt) => {
                 for log in receipt.logs.iter() {
                     if log.address == l2_witness_layer {
-                        if log.topics[0] ==  event_id{
+                        if log.topics[0] == event_id {
                             println!("todo!")
                         }
                     }
@@ -176,6 +175,6 @@ pub fn generate_block(
             let sealed_block = t.lock().try_seal(engine, Vec::new()).expect("seal failed");
             Some(sealed_block)
         }
-        Err(e) => panic!("{}", e)
+        Err(e) => panic!("{}", e),
     }
 }
