@@ -38,7 +38,7 @@ use core::{cmp, ops};
 use hashbrown::HashSet;
 
 use bytes::Bytes;
-use ethereum_types::{Address, Bloom, H256, U256};
+use ethereum_types::{Address, Bloom, H256, H64, U256, U64};
 
 use crate::engines::EthEngine;
 use crate::error::{BlockError, Error};
@@ -309,6 +309,11 @@ impl<'x> OpenBlock<'x> {
         } else {
             self.block.header.set_extra_data(header.extra_data().clone());
         }
+    }
+
+    pub fn update_mmr(&mut self, size: u64, root: H256){
+        self.block.header.set_nonce(H64::from_low_u64_be(size));
+        self.block.header.set_mix_hash(root);
     }
 
     /// Turn this into a `ClosedBlock`.
