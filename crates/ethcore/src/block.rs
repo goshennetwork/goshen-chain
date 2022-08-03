@@ -254,7 +254,7 @@ impl<'x> OpenBlock<'x> {
         // adjust difficulty
         let mut difficulty = self.block.header.difficulty();
         if t.is_enqueued() {
-            self.block.header.set_difficulty(*difficulty+1);
+            self.block.header.set_difficulty(*difficulty + 1);
         }
         self.block.transactions_set.insert(h.unwrap_or_else(|| t.hash()));
         self.block.transactions.push(t.into());

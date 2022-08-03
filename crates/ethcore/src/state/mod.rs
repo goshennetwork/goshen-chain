@@ -840,7 +840,7 @@ impl<B: Backend> State<B> {
         &mut self, env_info: &EnvInfo, machine: &Machine, t: &SignedTransaction, tracing: bool,
     ) -> ApplyResult<FlatTrace, VMTrace> {
         if tracing {
-            let options = TransactOptions::with_tracing();
+            let options = TransactOptions::with_tracing_and_vm_tracing();
             self.apply_with_tracing(env_info, machine, t, options.tracer, options.vm_tracer)
         } else {
             let options = TransactOptions::with_no_tracing();

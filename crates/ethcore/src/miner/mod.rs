@@ -24,7 +24,7 @@ use alloc::sync::Arc;
 use alloc::vec::Vec;
 use std::any::Any;
 
-use bytes::Bytes;
+use bytes::{Bytes, ToPretty};
 use ethereum_types::{Address, U256};
 use hash::keccak;
 
@@ -92,7 +92,7 @@ pub fn generate_block(
     let mut open_block = OpenBlock::new(
         engine,
         factories,
-        false,
+        true,
         state_db,
         &info.parent_block_header,
         info.last_hashes.clone(),
@@ -106,6 +106,10 @@ pub fn generate_block(
     let mut skipped_transactions = 0usize;
     let schedule = engine.schedule(block_number);
     let min_tx_gas: U256 = schedule.tx_gas.into();
+
+
+    let event_sig = "MessageSent(uint64,address,address,bytes32,bytes)".as_bytes();
+    let event_id = keccak(event_sig);
 
     for transaction in txes {
         let transaction = {
@@ -157,7 +161,7 @@ pub fn generate_block(
             Ok(receipt) => {
                 for log in receipt.logs.iter() {
                     if log.address == l2_witness_layer {
-                        if log.topics[0] == keccak("MessageSent(uint64,address,address,bytes32,bytes)".as_bytes()) {
+                        if log.topics[0] ==  event_id{
                             println!("todo!")
                         }
                     }

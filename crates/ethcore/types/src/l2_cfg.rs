@@ -1,5 +1,6 @@
 use ethereum_types::{Address, H160};
 
+pub const TX_BASE_SIZE: usize = 213;
 pub const INTRINSIC_GAS_FACTOR: usize = 100;
 pub const INITIAL_ENQUEUE_TX_NONCE: u64 = 1 << 63;
 pub const L1_CROSS_LAYER_WITNESS: Address =
