@@ -15,13 +15,8 @@ fn main() {
     for line in contents.lines() {
         db.insert(&line.from_hex().unwrap());
     }
-    // batch: 300
-    // headers: [6203, 6320]
-    // prevHeaders: [5947, 6202]
-    // queue: 3405, 67
-    // proofs: [6202, 6320]
     let hash =
-        H256::from_str("931c34773ca61f4e21a56ae5cd49393990111cb02e77ae99c389cbafbc2266fd").unwrap();
+        H256::from_str("eb611f33cdb62869b3c051d5c00021cc7e407095af80b50645b7ddc33aa92541").unwrap();
     let header = state_transition_to_header(db, hash);
     println!("0x{}", header.hash().to_hex());
 }

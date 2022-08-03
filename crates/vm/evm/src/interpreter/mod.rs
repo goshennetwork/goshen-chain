@@ -23,7 +23,7 @@ mod memory;
 mod shared_cache;
 mod stack;
 
-use bytes::{Bytes, ToPretty};
+use bytes::{Bytes};
 use core::marker::PhantomData;
 use core::{cmp, mem};
 use ethereum_types::{Address, BigEndianHash, H256, U256};
