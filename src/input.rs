@@ -1,14 +1,14 @@
-use alloc::format;
 use crate::HashDBOracle;
+use alloc::format;
 use alloc::vec::Vec;
 use byteorder::{BigEndian, ByteOrder};
+use common_types::bytes::ToPretty;
 use common_types::header::Header;
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
-use ethereum_types::{H256};
+use ethereum_types::H256;
 use hash_db::HashDB;
 use rlp::Rlp;
-use common_types::bytes::ToPretty;
 
 // format: queueNum(uint64) + queueStart(uint64) + batchNum(uint64) + batch0Time(uint64) +
 // batchLeftTimeDiff([]uint32) + batchesData
@@ -20,9 +20,11 @@ fn load_batches_from_hashdb(db: &HashDBOracle, batch_hash: H256, queue_hash: H25
     let mut batches = Vec::with_capacity(queue_num + batch_num);
     let mut timestamps = Vec::with_capacity(batch_num);
     let queue_txes = load_queue_txes(db, queue_hash);
-    batches.extend(queue_txes.iter().map(|item| {
-        Batch { transactions: item.txs.clone(), timestamp: item.timestamp }
-    }));
+    batches.extend(
+        queue_txes
+            .iter()
+            .map(|item| Batch { transactions: item.txs.clone(), timestamp: item.timestamp }),
+    );
 
     if batch_num > 0 {
         let timeend = 24 + batch_num * 4 + 4;

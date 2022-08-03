@@ -29,7 +29,8 @@ use evm::Finalize;
 use hash::keccak;
 use rlp::RlpStream;
 use vm::{
-    self, ActionParams, CallType, ContractCreateResult, CreateContractAddress, EnvInfo, Ext, MessageCallResult, ReturnData, Schedule
+    self, ActionParams, CallType, ContractCreateResult, CreateContractAddress, EnvInfo, Ext,
+    MessageCallResult, ReturnData, Schedule,
 };
 
 use super::HookType;

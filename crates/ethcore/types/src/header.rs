@@ -24,9 +24,9 @@ use ethereum_types::{Address, Bloom, H256, H64, U256};
 use keccak_hash::KECCAK_EMPTY;
 use rlp::{DecoderError, Encodable, Rlp, RlpStream};
 
-use crate::BlockNumber;
 use crate::bytes::Bytes;
 use crate::hash::{keccak, KECCAK_EMPTY_LIST_RLP, KECCAK_NULL_RLP};
+use crate::BlockNumber;
 
 /// Semantic boolean for when a seal/signature is included.
 #[derive(Debug, Clone, Copy)]
@@ -405,8 +405,8 @@ impl Header {
 
 /// Alter value of given field, reset memoised hash if changed.
 fn change_field<T>(hash: &mut Option<H256>, field: &mut T, value: T)
-    where
-        T: PartialEq<T>,
+where
+    T: PartialEq<T>,
 {
     if field != &value {
         *field = value;

@@ -23,8 +23,8 @@ use rlp::{Decodable, DecoderError, Encodable, Rlp, RlpStream};
 use super::error::Error;
 use alloc::vec::Vec;
 use evm::CallType;
-use vm::ActionParams;
 use evm::Instruction;
+use vm::ActionParams;
 
 /// `Call` result.
 #[derive(Debug, Clone, PartialEq, Default, RlpEncodable, RlpDecodable)]
@@ -436,10 +436,14 @@ impl VMTrace {
     pub fn print(&self) {
         for op in self.operations.iter() {
             match &op.executed {
-                Some(e) => println!("{},{},{},{}", op.pc,
-                                    Instruction::from_u8(op.instruction).unwrap().info().name,
-                                    op.gas_cost + e.gas_used, op.gas_cost),
-                None => ()
+                Some(e) => println!(
+                    "{},{},{},{}",
+                    op.pc,
+                    Instruction::from_u8(op.instruction).unwrap().info().name,
+                    op.gas_cost + e.gas_used,
+                    op.gas_cost
+                ),
+                None => (),
             }
         }
         for sub in self.subs.iter() {
