@@ -5,9 +5,8 @@ use byteorder::{BigEndian, ByteOrder};
 use common_types::header::Header;
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
-use ethereum_types::{Address, H256};
+use ethereum_types::{H256};
 use hash_db::HashDB;
-use keccak_hasher::KeccakHasher;
 use rlp::Rlp;
 use common_types::bytes::ToPretty;
 

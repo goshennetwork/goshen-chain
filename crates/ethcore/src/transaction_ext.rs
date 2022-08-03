@@ -19,6 +19,7 @@
 use evm::Schedule;
 use types::transaction::{self, Action};
 use common_types::l2_cfg::INTRINSIC_GAS_FACTOR;
+use types::l2_cfg::TX_BASE_SIZE;
 
 /// Extends transaction with gas verification method.
 pub trait Transaction {
@@ -42,7 +43,10 @@ impl Transaction for transaction::Transaction {
 /// Get the transaction cost in gas for the given params.
 fn gas_required_for(is_create: bool, data: &[u8], schedule: &Schedule) -> u64 {
     data.iter().fold(
-        (if is_create { schedule.tx_create_gas } else { schedule.tx_gas }) as u64,
+        (
+            TX_BASE_SIZE * schedule.tx_data_non_zero_gas * INTRINSIC_GAS_FACTOR
+                + if is_create { schedule.tx_create_gas } else { schedule.tx_gas }
+        ) as u64,
         |g, b| {
             g + (match *b {
                 0 => schedule.tx_data_zero_gas * INTRINSIC_GAS_FACTOR,

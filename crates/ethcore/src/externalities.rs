@@ -125,7 +125,6 @@ where
     }
 
     fn storage_at(&self, key: &H256) -> vm::Result<H256> {
-        println!("{}, {}", self.origin_info.address.to_hex(), key.to_hex());
         self.state.storage_at(&self.origin_info.address, key).map_err(Into::into)
     }
 
