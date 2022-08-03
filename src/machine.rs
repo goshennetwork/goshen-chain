@@ -1,11 +1,11 @@
 use crate::consts::{L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_MAX_TRANSACTION_SIZE};
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use alloc::string::{ToString};
 use common_types::BlockNumber;
 use ethcore::machine::EthereumMachine;
 use ethcore::spec::CommonParams;
 use ethcore_builtin::{
-    Blake2F, Blake2FPricer, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, Modexp2565Pricer, Pricing, Ripemd160, Sha256
+    Blake2F, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, Modexp2565Pricer, Pricing, Ripemd160, Sha256,
 };
 use ethereum_types::{Address, H160, U256};
 
@@ -106,11 +106,11 @@ fn create_params() -> CommonParams {
         eip1884_transition: 0u32.into(),
         eip2028_transition: 0u32.into(),
         eip2315_transition: BlockNumber::MAX.into(),
-        eip2929_transition: 0u32.into(),
+        eip2929_transition: BlockNumber::MAX.into(),
         eip2930_transition: 0u32.into(),
-        eip3198_transition: 0u32.into(),
-        eip3529_transition: 0u32.into(),
-        eip3541_transition: 0u32.into(),
+        eip3198_transition: BlockNumber::MAX.into(),
+        eip3529_transition: BlockNumber::MAX.into(),
+        eip3541_transition: BlockNumber::MAX.into(),
         dust_protection_transition: BlockNumber::MAX.into(),
         eip3607_transition: 0u32.into(),
         nonce_cap_increment: 64u32.into(),

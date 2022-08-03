@@ -10,6 +10,7 @@ use common_types::bytes::ToPretty;
 use common_types::header::Header;
 use ethcore::engines::L2Seal;
 use ethcore::miner::{BlockGenInfo, generate_block};
+// use ethcore::trace::Tracing::Enabled;
 use hash_db::HashDB;
 use input::RollupInput;
 use keccak_hasher::KeccakHasher;
@@ -54,7 +55,7 @@ pub fn state_transition_to_header(
         if let Some(block) = generate_block(db_clone, &engine, &info, batch.transactions,
                                             L2_CROSS_LAYER_WITNESS) {
             prev = block.header.clone();
-            println!("{}, 0x{}, {}", block.header.number(), block.header.hash().to_hex(), block.transactions.len());
+            // println!("{}, 0x{}, {}", block.header.number(), block.header.hash().to_hex(), block.transactions.len());
         } else {
             prev = info.parent_block_header;
         }

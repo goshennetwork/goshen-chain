@@ -28,7 +28,7 @@ use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec;
 use alloc::vec::Vec;
-use bytes::{Bytes, BytesRef, ToPretty};
+use bytes::{Bytes, BytesRef};
 use core::cmp;
 use core::convert::TryFrom;
 use ethereum_types::{Address, H256, U256, U512};
@@ -38,7 +38,7 @@ use types::transaction::{Action, SignedTransaction, TypedTransaction};
 use vm::{
     self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError,
 };
-use common_types::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, INTRINSIC_GAS_FACTOR};
+use common_types::l2_cfg::{INTRINSIC_GAS_FACTOR};
 
 #[cfg(any(test, feature = "test-helpers"))]
 /// Precompile that can never be prunned from state trie (0x3, only in tests)
