@@ -14,7 +14,7 @@ num-bigint = {version = "0.4", default-features = false}
 num-traits = {version = "0.2.11", default-features = false}
 parity-bytes = {version = "0.1", default-features = false}
 ethjson = {path = "../../ethjson", default-features=false, optional = true}
-bn = { git = "https://github.com/paritytech/bn", default-features = false, optional = true }
+bn = { version = "0.6.0", package="substrate-bn", default-features = false}
 eth_pairings = { git = "https://github.com/matter-labs/eip1962.git", optional = true, default-features = false, features = ["eip_2537"], rev = "ece6cbabc41948db4200e41f0bfdab7ab94c7af8" }
 
 [dev-dependencies]
@@ -25,4 +25,4 @@ maplit = "1.0.2"
 
 [features]
 default = ["std"]
-std = ["ethjson", "bn", "eth_pairings", "crypto/std"]
+std = ["ethjson", "eth_pairings", "crypto/std"]
