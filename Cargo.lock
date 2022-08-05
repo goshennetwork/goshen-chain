@@ -186,18 +186,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bn"
-version = "0.4.4"
-source = "git+https://github.com/paritytech/bn#6079255e65793038b9a6e5292203eab482737cc2"
-dependencies = [
- "byteorder",
- "crunchy",
- "lazy_static",
- "rand 0.5.6",
- "rustc-hex 2.1.0",
-]
-
-[[package]]
 name = "bstr"
 version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -601,7 +589,6 @@ dependencies = [
 name = "ethcore-builtin"
 version = "0.1.0"
 dependencies = [
- "bn",
  "byteorder",
  "crypto",
  "eip-152",
@@ -615,6 +602,7 @@ dependencies = [
  "num-traits",
  "parity-bytes",
  "rustc-hex 1.0.0",
+ "substrate-bn",
 ]
 
 [[package]]
@@ -1000,6 +988,9 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+dependencies = [
+ "spin",
+]
 
 [[package]]
 name = "libc"
@@ -1401,6 +1392,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rand"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34af8d1a0e25924bc5b7c43c079c942339d8f0a8b57c39049bef581b46327404"
+dependencies = [
+ "rand_core 0.6.3",
+]
+
+[[package]]
 name = "rand_chacha"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1443,6 +1443,12 @@ checksum = "90bde5296fc891b0cef12a6d03ddccc162ce7b2aff54160af9338f8d40df6d19"
 dependencies = [
  "getrandom 0.1.13",
 ]
+
+[[package]]
+name = "rand_core"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d34f1408f55294453790c48b2f1ebbb1c5b4b7563eb1f418bcfcfdbb06ebb4e7"
 
 [[package]]
 name = "rand_hc"
@@ -1618,7 +1624,15 @@ dependencies = [
 name = "riscv-l2chain"
 version = "0.1.0"
 dependencies = [
+ "byteorder",
+ "common-types",
  "ethcore",
+ "ethcore-builtin",
+ "ethereum-types",
+ "hash-db 0.12.4",
+ "keccak-hasher 0.1.1",
+ "rlp",
+ "trie-db",
 ]
 
 [[package]]
@@ -1796,6 +1810,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "spin"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
+
+[[package]]
 name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1808,6 +1828,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8131256a5896cabcf5eb04f4d6dacbe1aefda854b0d9896e09cb58829ec5638c"
 dependencies = [
  "generic-array",
+]
+
+[[package]]
+name = "substrate-bn"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "lazy_static",
+ "rand 0.8.5",
+ "rustc-hex 2.1.0",
 ]
 
 [[package]]
