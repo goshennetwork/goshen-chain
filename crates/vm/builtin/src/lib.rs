@@ -79,15 +79,12 @@ impl Pricer for Blake2FPricer {
 
 /// Pricing model
 #[derive(Debug)]
-enum Pricing {
-    #[cfg(feature = "std")]
+pub enum Pricing {
     AltBn128Pairing(AltBn128PairingPricer),
-    #[cfg(feature = "std")]
     AltBn128ConstOperations(AltBn128ConstOperations),
     Blake2F(Blake2FPricer),
     Linear(Linear),
     Modexp(ModexpPricer),
-    #[cfg(feature = "std")]
     Modexp2565(Modexp2565Pricer),
     #[cfg(feature = "std")]
     Bls12Pairing(Bls12PairingPricer),
@@ -102,14 +99,11 @@ enum Pricing {
 impl Pricer for Pricing {
     fn cost(&self, input: &[u8]) -> U256 {
         match self {
-            #[cfg(feature = "std")]
             Pricing::AltBn128Pairing(inner) => inner.cost(input),
-            #[cfg(feature = "std")]
             Pricing::AltBn128ConstOperations(inner) => inner.cost(input),
             Pricing::Blake2F(inner) => inner.cost(input),
             Pricing::Linear(inner) => inner.cost(input),
             Pricing::Modexp(inner) => inner.cost(input),
-            #[cfg(feature = "std")]
             Pricing::Modexp2565(inner) => inner.cost(input),
             #[cfg(feature = "std")]
             Pricing::Bls12Pairing(inner) => inner.cost(input),
@@ -125,20 +119,20 @@ impl Pricer for Pricing {
 
 /// A linear pricing model. This computes a price using a base cost and a cost per-word.
 #[derive(Debug)]
-struct Linear {
-    base: u64,
-    word: u64,
+pub struct Linear {
+    pub base: u64,
+    pub word: u64,
 }
 
 /// A special pricing model for modular exponentiation.
 #[derive(Debug)]
-struct ModexpPricer {
+pub struct ModexpPricer {
     divisor: u64,
 }
 
 /// The EIP2565 pricing model of modular exponentiation.
 #[derive(Debug)]
-struct Modexp2565Pricer {}
+pub struct Modexp2565Pricer {}
 
 impl Pricer for Linear {
     fn cost(&self, input: &[u8]) -> U256 {
@@ -155,7 +149,7 @@ struct AltBn128PairingPrice {
 
 /// alt_bn128_pairing pricing model. This computes a price using a base cost and a cost per pair.
 #[derive(Debug)]
-struct AltBn128PairingPricer {
+pub struct AltBn128PairingPricer {
     price: AltBn128PairingPrice,
 }
 
@@ -284,7 +278,7 @@ impl ModexpPricer {
         }
     }
 }
-#[cfg(feature = "std")]
+
 impl Pricer for Modexp2565Pricer {
     fn cost(&self, input: &[u8]) -> U256 {
         fn bit_length(a: &U256) -> u64 {
@@ -298,10 +292,10 @@ impl Pricer for Modexp2565Pricer {
             1
         }
 
-        fn calculate_multiplication_complexity(base_len: u64, modulus_len: u64) -> f64 {
+        fn calculate_multiplication_complexity(base_len: u64, modulus_len: u64) -> u128 {
             let max_len = max(base_len, modulus_len);
-            let words = (max_len as f64 / 8f64).ceil();
-            words.powi(2)
+            let words = ((max_len + 7) / 8) as u128;
+            words * words
         }
 
         fn calculate_iteration_count(exponent_len: u64, exponent_low: &U256) -> u64 {
@@ -328,8 +322,7 @@ impl Pricer for Modexp2565Pricer {
 
             let multiplication_complexity = calculate_multiplication_complexity(base_len, mod_len);
             let iteration_count = calculate_iteration_count(exp_len, &exp_low);
-            let computed =
-                (multiplication_complexity * iteration_count as f64 / 3f64).floor() as u64;
+            let computed = (multiplication_complexity * (iteration_count as u128) / 3) as u64;
             U256::from(computed)
         };
         max(U256::from(200u32), cost)
@@ -347,7 +340,7 @@ struct Bls12PairingPrice {
 #[cfg(feature = "std")]
 /// bls12_pairing pricing model. This computes a price using a base cost and a cost per pair.
 #[derive(Debug)]
-struct Bls12PairingPricer {
+pub struct Bls12PairingPricer {
     price: Bls12PairingPrice,
 }
 
@@ -580,8 +573,8 @@ pub type Bls12MultiexpPricerG2 = Bls12MultiexpPricer<G2Marker>;
 /// Call `cost` to compute cost for the given input, `execute` to execute the contract
 /// on the given input, and `is_active` to determine whether the contract is active.
 pub struct Builtin {
-    pricer: BTreeMap<u64, Pricing>,
-    native: EthereumBuiltin,
+    pub pricer: BTreeMap<u64, Pricing>,
+    pub native: EthereumBuiltin,
 }
 
 impl Builtin {
@@ -680,7 +673,7 @@ impl From<ethjson::spec::builtin::Pricing> for Pricing {
 }
 
 /// Ethereum builtins:
-enum EthereumBuiltin {
+pub enum EthereumBuiltin {
     /// The identity function
     Identity(Identity),
     /// ec recovery
@@ -691,13 +684,10 @@ enum EthereumBuiltin {
     Ripemd160(Ripemd160),
     /// modexp (EIP 198)
     Modexp(Modexp),
-    #[cfg(feature = "std")]
     /// alt_bn128_add
     Bn128Add(Bn128Add),
-    #[cfg(feature = "std")]
     /// alt_bn128_mul
     Bn128Mul(Bn128Mul),
-    #[cfg(feature = "std")]
     /// alt_bn128_pairing
     Bn128Pairing(Bn128Pairing),
     /// blake2_f (The Blake2 compression function F, EIP-152)
@@ -768,11 +758,8 @@ impl Implementation for EthereumBuiltin {
             EthereumBuiltin::Sha256(inner) => inner.execute(input, output),
             EthereumBuiltin::Ripemd160(inner) => inner.execute(input, output),
             EthereumBuiltin::Modexp(inner) => inner.execute(input, output),
-            #[cfg(feature = "std")]
             EthereumBuiltin::Bn128Add(inner) => inner.execute(input, output),
-            #[cfg(feature = "std")]
             EthereumBuiltin::Bn128Mul(inner) => inner.execute(input, output),
-            #[cfg(feature = "std")]
             EthereumBuiltin::Bn128Pairing(inner) => inner.execute(input, output),
             EthereumBuiltin::Blake2F(inner) => inner.execute(input, output),
             #[cfg(feature = "std")]
@@ -1208,7 +1195,6 @@ impl Implementation for Bls12MapFp2ToG2 {
     }
 }
 
-#[cfg(feature = "std")]
 fn read_fr(reader: &mut FillZeroReader) -> Result<bn::Fr, &'static str> {
     let mut buf = [0u8; 32];
 
@@ -1216,7 +1202,6 @@ fn read_fr(reader: &mut FillZeroReader) -> Result<bn::Fr, &'static str> {
     bn::Fr::from_slice(&buf[0..32]).map_err(|_| "Invalid field element")
 }
 
-#[cfg(feature = "std")]
 fn read_point(reader: &mut FillZeroReader) -> Result<bn::G1, &'static str> {
     use bn::{AffineG1, Fq, Group, G1};
 
@@ -1234,7 +1219,6 @@ fn read_point(reader: &mut FillZeroReader) -> Result<bn::G1, &'static str> {
     })
 }
 
-#[cfg(feature = "std")]
 impl Implementation for Bn128Add {
     // Can fail if any of the 2 points does not belong the bn128 curve
     fn execute(&self, input: &[u8], output: &mut BytesRef) -> Result<(), &'static str> {
@@ -1260,7 +1244,6 @@ impl Implementation for Bn128Add {
     }
 }
 
-#[cfg(feature = "std")]
 impl Implementation for Bn128Mul {
     // Can fail if first paramter (bn128 curve point) does not actually belong to the curve
     fn execute(&self, input: &[u8], output: &mut BytesRef) -> Result<(), &'static str> {
@@ -1285,7 +1268,6 @@ impl Implementation for Bn128Mul {
     }
 }
 
-#[cfg(feature = "std")]
 impl Implementation for Bn128Pairing {
     /// Can fail if:
     ///     - input length is not a multiple of 192
@@ -1303,7 +1285,6 @@ impl Implementation for Bn128Pairing {
     }
 }
 
-#[cfg(feature = "std")]
 impl Bn128Pairing {
     fn execute_with_error(&self, input: &[u8], output: &mut BytesRef) -> Result<(), &'static str> {
         use bn::{pairing, AffineG1, AffineG2, Fq, Fq2, Group, Gt, G1, G2};
