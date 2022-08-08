@@ -23,7 +23,7 @@ mod memory;
 mod shared_cache;
 mod stack;
 
-use bytes::{Bytes};
+use bytes::Bytes;
 use core::marker::PhantomData;
 use core::{cmp, mem};
 use ethereum_types::{Address, BigEndianHash, H256, U256};
@@ -31,13 +31,11 @@ use hash::keccak;
 use num_bigint::BigUint;
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::format;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
 use vm::{
-    self, ActionParams, ActionValue, CallType, ContractCreateResult, CreateContractAddress,
-    GasLeft, MessageCallResult, ReturnData, Schedule, TrapError, TrapKind,
+    self, ActionParams, ActionValue, CallType, ContractCreateResult, CreateContractAddress, GasLeft, MessageCallResult, ReturnData, Schedule, TrapError, TrapKind
 };
 
 use crate::evm::CostType;
