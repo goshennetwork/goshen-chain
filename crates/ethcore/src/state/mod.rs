@@ -58,6 +58,7 @@ mod account;
 mod substate;
 
 pub mod backend;
+pub mod riscv_db;
 
 pub use self::account::Account;
 pub use self::backend::Backend;

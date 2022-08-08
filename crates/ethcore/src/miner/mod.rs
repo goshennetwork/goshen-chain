@@ -155,7 +155,7 @@ pub fn generate_block(
                 //debug!(target: "miner", "Skipping non-allowed transaction for sender {:?}", hash);
             }
             Err(_e) => {
-                panic!("{}", _e.to_string());
+                panic!("{}", _e);
             }
             // imported ok
             Ok(receipt) => {
