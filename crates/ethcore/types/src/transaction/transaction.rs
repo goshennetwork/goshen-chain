@@ -122,7 +122,6 @@ pub mod signature {
     }
 }
 
-// TODO: is_enqueued method
 /// A set of information describing an externally-originating message call
 /// or contract creation operation.
 #[derive(Default, Debug, Clone, PartialEq, Eq)]

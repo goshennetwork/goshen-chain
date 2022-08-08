@@ -19,10 +19,15 @@
 //! Miner module
 //! Keeps track of transactions and currently sealed pending block.
 
+use crate::block::{OpenBlock, SealedBlock};
+use crate::engines::EthEngine;
+use crate::error::Error;
+use crate::executed::ExecutionError;
+use crate::factory::{Factories, VmFactory};
+use crate::state_db::StateDB;
 use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
-
 use bytes::{Bytes, ToPretty};
 use ethereum_types::{Address, BigEndianHash, H64, U256, U64};
 use hash::{H256, keccak};
@@ -36,13 +41,6 @@ use types::header::Header;
 use types::transaction;
 use types::transaction::UnverifiedTransaction;
 use vm::LastHashes;
-
-use crate::block::{OpenBlock, SealedBlock};
-use crate::engines::EthEngine;
-use crate::error::Error;
-use crate::executed::ExecutionError;
-use crate::factory::{Factories, VmFactory};
-use crate::state_db::StateDB;
 
 /// Riscv evm execution env.
 pub struct BlockGenInfo {
