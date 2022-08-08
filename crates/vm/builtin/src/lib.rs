@@ -1366,7 +1366,7 @@ mod tests {
     use num_bigint::BigUint;
     use num_traits::{One, Zero};
     use parity_bytes::BytesRef;
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use std::convert::TryFrom;
 
     #[test]

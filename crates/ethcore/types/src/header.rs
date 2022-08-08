@@ -483,7 +483,7 @@ impl ExtendedHeader {
 mod tests {
     use ethereum_types::U256;
     use rlp::{self, Rlp};
-    use rustc_hex::FromHex;
+    use hex::FromHex;
 
     use crate::BlockNumber;
 

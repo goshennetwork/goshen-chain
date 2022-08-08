@@ -21,7 +21,7 @@ extern crate ethcore;
 extern crate ethcore_builtin;
 extern crate ethereum_types;
 extern crate parity_bytes as bytes;
-extern crate rustc_hex;
+extern crate hex;
 
 use std::str::FromStr;
 
@@ -30,7 +30,7 @@ use criterion::{Bencher, Criterion};
 use ethcore::ethereum::new_byzantium_test_machine;
 use ethcore::machine::EthereumMachine;
 use ethereum_types::{Address, H160};
-use rustc_hex::FromHex;
+use hex::FromHex;
 
 struct BuiltinBenchmark {
     machine: EthereumMachine,

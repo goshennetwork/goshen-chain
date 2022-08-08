@@ -998,7 +998,7 @@ mod tests {
 
     #[test]
     fn sender_test() {
-        let bytes = ::rustc_hex::FromHex::from_hex("f85f800182520894095e7baea6a6c7c4c2dfeb977efac326af552d870a801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804").unwrap();
+        let bytes = ::hex::FromHex::from_hex("f85f800182520894095e7baea6a6c7c4c2dfeb977efac326af552d870a801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff759b307d495a36649353a0efffd310ac743f371de3b9f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804").unwrap();
         let t = TypedTransaction::decode(&bytes).expect("decoding UnverifiedTransaction failed");
         assert_eq!(t.tx().data, b"");
         assert_eq!(t.tx().gas, U256::from(0x5208u32));
@@ -1188,7 +1188,7 @@ mod tests {
 
     #[test]
     fn should_decode_access_list_in_rlp() {
-        use rustc_hex::FromHex;
+        use hex::FromHex;
         let encoded_tx = "b8cb01f8a7802a820bb882c35080018648656c6c6f21f872f85994000000000000000000000000000000000000000af842a00000000000000000000000000000000000000000000000000000000000000066a00000000000000000000000000000000000000000000000000000000000000067d6940000000000000000000000000000000000000190c080a00ea0f1fda860320f51e182fe68ea90a8e7611653d3975b9301580adade6b8aa4a023530a1a96e0f15f90959baf1cd2d9114f7c7568ac7d77f4413c0a6ca6cdac74";
         let _ = TypedTransaction::decode_rlp(&Rlp::new(&FromHex::from_hex(encoded_tx).unwrap()))
             .expect("decoding tx data failed");
@@ -1196,7 +1196,7 @@ mod tests {
 
     #[test]
     fn should_decode_eip1559_in_rlp() {
-        use rustc_hex::FromHex;
+        use hex::FromHex;
         let encoded_tx = "b8cb01f8a7802a820bb882c35080018648656c6c6f21f872f85994000000000000000000000000000000000000000af842a00000000000000000000000000000000000000000000000000000000000000066a00000000000000000000000000000000000000000000000000000000000000067d6940000000000000000000000000000000000000190c080a00ea0f1fda860320f51e182fe68ea90a8e7611653d3975b9301580adade6b8aa4a023530a1a96e0f15f90959baf1cd2d9114f7c7568ac7d77f4413c0a6ca6cdac74";
         let _ = TypedTransaction::decode_rlp(&Rlp::new(&FromHex::from_hex(encoded_tx).unwrap()))
             .expect("decoding tx data failed");
@@ -1204,7 +1204,7 @@ mod tests {
 
     #[test]
     fn should_decode_access_list_solo() {
-        use rustc_hex::FromHex;
+        use hex::FromHex;
         let encoded_tx = "01f8630103018261a894b94f5374fce5edbc8e2a8697c15331677e6ebf0b0a825544c001a0cb51495c66325615bcd591505577c9dde87bd59b04be2e6ba82f6d7bdea576e3a049e4f02f37666bd91a052a56e91e71e438590df861031ee9a321ce058df3dc2b";
         let _ = TypedTransaction::decode(&FromHex::from_hex(encoded_tx).unwrap())
             .expect("decoding tx data failed");
@@ -1228,7 +1228,7 @@ mod tests {
 
     #[test]
     fn should_agree_with_geth_test() {
-        use rustc_hex::FromHex;
+        use hex::FromHex;
         let encoded_tx = "01f8630103018261a894b94f5374fce5edbc8e2a8697c15331677e6ebf0b0a825544c001a0cb51495c66325615bcd591505577c9dde87bd59b04be2e6ba82f6d7bdea576e3a049e4f02f37666bd91a052a56e91e71e438590df861031ee9a321ce058df3dc2b";
         let _ = TypedTransaction::decode(&FromHex::from_hex(encoded_tx).unwrap())
             .expect("decoding tx data failed");
@@ -1236,7 +1236,7 @@ mod tests {
 
     #[test]
     fn should_agree_with_vitalik() {
-        use rustc_hex::FromHex;
+        use hex::FromHex;
 
         let test_vector = |tx_data: &str, address: &'static str| {
             let signed = TypedTransaction::decode(&FromHex::from_hex(tx_data).unwrap())

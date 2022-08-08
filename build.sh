@@ -1,0 +1,1 @@
+cargo  build --no-default-features --release -Z build-std=alloc,core --target riscv32ima-unknown-none-elf.json
