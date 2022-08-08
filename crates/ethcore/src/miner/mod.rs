@@ -28,7 +28,7 @@ use crate::state_db::StateDB;
 use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
-use bytes::{Bytes, ToPretty};
+use bytes::Bytes;
 use ethereum_types::{Address, BigEndianHash, H64, U256, U64};
 use hash::{H256, keccak};
 

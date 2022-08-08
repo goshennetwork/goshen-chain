@@ -20,13 +20,12 @@ use crate::machine::EthereumMachine as Machine;
 use crate::state::{Backend as StateBackend, CleanupMode, State, Substate};
 use crate::trace::{Tracer, VMTracer};
 use alloc::sync::Arc;
-use bytes::{Bytes};
+use bytes::Bytes;
 use core::cmp;
 use ethereum_types::{Address, H256, U256};
 use types::transaction::UNSIGNED_SENDER;
 use vm::{
-    self, ActionParams, ActionValue, CallType, ContractCreateResult, CreateContractAddress,
-    EnvInfo, Ext, MessageCallResult, ReturnData, Schedule, TrapKind,
+    self, ActionParams, ActionValue, CallType, ContractCreateResult, CreateContractAddress, EnvInfo, Ext, MessageCallResult, ReturnData, Schedule, TrapKind
 };
 
 use alloc::vec::Vec;
