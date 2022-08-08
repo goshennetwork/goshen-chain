@@ -19,7 +19,7 @@ eth_pairings = { git = "https://github.com/matter-labs/eip1962.git", optional = 
 
 [dev-dependencies]
 hex-literal = "0.2.1"
-rustc-hex  = "1.0"
+hex = { version = "0.4", default-features = false }
 macros = { path = "../../util/macros" }
 maplit = "1.0.2"
 

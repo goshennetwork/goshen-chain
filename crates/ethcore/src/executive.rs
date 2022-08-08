@@ -1491,7 +1491,7 @@ mod tests {
     use crypto::publickey::{Generator, Random};
     use ethereum_types::{Address, BigEndianHash, H160, H256, U256, U512};
     use evm::{evm_test, evm_test_ignore, Factory, VMType};
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use types::transaction::{
         AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction
     };

@@ -22,14 +22,14 @@ extern crate bit_set;
 extern crate ethereum_types;
 extern crate evm;
 extern crate parity_bytes as bytes;
-extern crate rustc_hex;
+extern crate hex;
 extern crate vm;
 
 use bytes::Bytes;
 use criterion::{black_box, Bencher, Criterion};
 use ethereum_types::{Address, U256};
 use evm::Factory;
-use rustc_hex::FromHex;
+use hex::FromHex;
 use std::collections::BTreeMap;
 use std::str::FromStr;
 use std::sync::Arc;

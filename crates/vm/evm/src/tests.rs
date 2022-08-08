@@ -20,7 +20,7 @@ use crate::vmtype::VMType;
 use ethereum_types::{Address, H256, U256};
 use hashbrown::{HashMap, HashSet};
 use hex_literal::hex;
-use rustc_hex::FromHex;
+use hex::FromHex;
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::str::FromStr;
