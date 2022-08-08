@@ -96,7 +96,7 @@ pub fn compress(h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool, rounds: us
 mod tests {
     extern crate std;
     use crate::compress;
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use std::vec;
     use std::vec::Vec;
 

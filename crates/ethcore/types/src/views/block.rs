@@ -195,7 +195,7 @@ impl<'a> BlockView<'a> {
 mod tests {
     use super::BlockView;
     use ethereum_types::H256;
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use std::str::FromStr;
 
     #[test]

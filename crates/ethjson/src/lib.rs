@@ -16,7 +16,7 @@
 
 pub use {common_types as types, parity_crypto as crypto};
 
-extern crate rustc_hex;
+extern crate hex;
 extern crate serde;
 extern crate serde_json;
 #[macro_use]

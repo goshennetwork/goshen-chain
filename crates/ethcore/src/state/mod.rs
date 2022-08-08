@@ -1413,7 +1413,7 @@ mod tests {
     use ethereum_types::{Address, BigEndianHash, H256, U256};
     use evm::CallType;
     use hash::{keccak, KECCAK_NULL_RLP};
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use types::transaction::*;
     use vm::EnvInfo;
 

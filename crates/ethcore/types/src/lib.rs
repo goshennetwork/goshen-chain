@@ -41,7 +41,7 @@ pub use {keccak_hash as hash, parity_bytes as bytes};
 extern crate rlp_derive;
 
 #[cfg(test)]
-pub use rustc_hex;
+pub use hex;
 
 #[macro_use]
 pub mod views;

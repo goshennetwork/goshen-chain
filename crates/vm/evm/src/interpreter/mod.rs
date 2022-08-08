@@ -1466,7 +1466,7 @@ mod tests {
     use crate::factory::Factory;
     use crate::vmtype::VMType;
     use ethereum_types::Address;
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use std::sync::Arc;
     use vm::tests::{test_finalize, FakeExt};
     use vm::{self, ActionParams, ActionValue, Exec};
