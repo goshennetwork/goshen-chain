@@ -59,6 +59,8 @@ pub mod json_tests;
 pub mod test_helpers;
 
 extern crate alloc;
+extern crate core;
+
 pub use evm::CreateContractAddress;
 pub use executive::contract_address;
 pub use trie::TrieSpec;

@@ -7,7 +7,7 @@ edition = "2021"
 [lib]
 
 [dependencies]
-ethcore = { path = "crates/ethcore", default-features = true }
+ethcore = { path = "crates/ethcore", default-features = false }
 hash-db = { path = "crates/db/hash-db-0.12.4", default-features = false }
 memory-db = { path = "crates/db/memory-db", default-features = false }
 trie-db = { path = "crates/db/trie-db-0.12.4", default-features = false }
@@ -17,7 +17,7 @@ ethcore-builtin = { path = "crates/vm/builtin", default-features = false }
 byteorder = { version = "1.3.2", default-features = false }
 common-types = { path = "./crates/ethcore/types", default-features = false }
 rlp = { version = "0.4.6", default-features = false }
-rustc-hex = "1.0"
+hex = { version = "0.4", default-features = false }
 
 [features]
 json-tests = ["ethcore/json-tests"]

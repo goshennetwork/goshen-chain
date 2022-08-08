@@ -432,6 +432,7 @@ pub struct VMTrace {
     pub subs: Vec<VMTrace>,
 }
 
+#[cfg(feature = "std")]
 impl VMTrace {
     pub fn print(&self) {
         for op in self.operations.iter() {
