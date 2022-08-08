@@ -14,7 +14,6 @@ impl<M> L2Seal<M> {
     pub fn new(timestamp: u64, machine: M) -> Self {
         L2Seal { timestamp, machine }
     }
-
     pub fn set_timestamp(&mut self, time: u64) {
         self.timestamp = time;
     }

@@ -22,7 +22,7 @@ mod evm_test_client;
 #[cfg(any(test, feature = "test-helpers"))]
 pub use self::evm_test_client::{EvmTestClient, EvmTestError, TransactErr, TransactSuccess};
 pub use self::traits::{
-    BlockInfo, ChainInfo, EngineClient, EngineInfo, PrepareOpenBlock, StateOrBlock,
+    BlockInfo, ChainInfo, EngineClient, EngineInfo, PrepareOpenBlock, StateOrBlock
 };
 pub use crate::state::StateInfo;
 

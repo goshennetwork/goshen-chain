@@ -37,8 +37,7 @@ use evm::{CallType, FinalizationResult, Finalize};
 use hash::keccak;
 use types::transaction::{Action, SignedTransaction, TypedTransaction};
 use vm::{
-    self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo,
-    ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError,
+    self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError
 };
 
 #[cfg(any(test, feature = "test-helpers"))]
@@ -1484,8 +1483,7 @@ mod tests {
     use crate::state::{CleanupMode, Substate};
     use crate::test_helpers::{get_temp_state, get_temp_state_with_factory};
     use crate::trace::{
-        trace, ExecutiveTracer, ExecutiveVMTracer, FlatTrace, MemoryDiff, NoopTracer, NoopVMTracer,
-        StorageDiff, Tracer, VMExecutedOperation, VMOperation, VMTrace, VMTracer,
+        trace, ExecutiveTracer, ExecutiveVMTracer, FlatTrace, MemoryDiff, NoopTracer, NoopVMTracer, StorageDiff, Tracer, VMExecutedOperation, VMOperation, VMTrace, VMTracer
     };
     use alloc::sync::Arc;
     use bytes::Bytes;
@@ -1495,7 +1493,7 @@ mod tests {
     use evm::{evm_test, evm_test_ignore, Factory, VMType};
     use rustc_hex::FromHex;
     use types::transaction::{
-        AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction,
+        AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction
     };
     use vm::{ActionParams, ActionValue, CallType, CreateContractAddress, EnvInfo};
 

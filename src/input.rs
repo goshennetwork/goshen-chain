@@ -2,7 +2,6 @@ use crate::HashDBOracle;
 use alloc::format;
 use alloc::vec::Vec;
 use byteorder::{BigEndian, ByteOrder};
-use common_types::bytes::ToPretty;
 use common_types::header::Header;
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
@@ -83,8 +82,7 @@ fn load_queue_txes(db: &HashDBOracle, hash: H256) -> Vec<QueueTxInfo> {
             let timestamp = BigEndian::read_u64(&chunk[32..]);
             let raw = db.get(&txhash).expect("queue tx not found");
             let rlp = Rlp::new(&raw);
-            let tx = TypedTransaction::decode_rlp(&rlp)
-                .expect(&*format!("decode tx {} failed", txhash.to_hex()));
+            let tx = TypedTransaction::decode_rlp(&rlp).unwrap();
             let mut txs = Vec::new();
             txs.push(tx);
             QueueTxInfo { timestamp, txs }
@@ -110,7 +108,7 @@ impl RollupInput {
 }
 
 pub fn load_header(db: &HashDBOracle, hash: H256) -> Header {
-    let raw = db.get(&hash).expect(&*format!("input not found, 0x{}", hash.to_hex()));
+    let raw = db.get(&hash).expect("input not found");
     // TODO: eip1559 base fee
     Header::decode_rlp(&Rlp::new(&raw), u64::MAX).expect("load header err")
 }
