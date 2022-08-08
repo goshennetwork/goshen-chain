@@ -14,15 +14,19 @@
 
 //! Reference-counted memory-based `HashDB` implementation.
 
+#![no_std]
+
 extern crate hash_db;
+extern crate hashbrown;
 
 #[cfg(test)]
 extern crate keccak_hasher;
+extern crate alloc;
 
 use hash_db::{AsHashDB, AsPlainDB, HashDB, HashDBRef, Hasher as KeyHasher, PlainDB, PlainDBRef};
-use std::collections::hash_map::Entry;
-use std::collections::HashMap;
-use std::{hash, mem};
+use hashbrown::hash_map::Entry;
+use hashbrown::HashMap;
+use core::{hash, mem};
 
 // Backing `HashMap` parametrized with a `Hasher` for the keys `Hasher::Out` and the `Hasher::StdHasher`
 // as hash map builder.
@@ -392,6 +396,7 @@ where
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec::Vec;
     use super::{HashDB, KeyHasher, MemoryDB};
     use keccak_hasher::KeccakHasher;
 

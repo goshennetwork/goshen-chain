@@ -20,7 +20,7 @@ use crate::machine::EthereumMachine as Machine;
 use crate::state::{Backend as StateBackend, CleanupMode, State, Substate};
 use crate::trace::{Tracer, VMTracer};
 use alloc::sync::Arc;
-use bytes::{Bytes, ToPretty};
+use bytes::{Bytes};
 use core::cmp;
 use ethereum_types::{Address, H256, U256};
 use types::transaction::UNSIGNED_SENDER;
