@@ -13,6 +13,7 @@ parity-crypto = { version = "0.6.2", features = [ "publickey" ], optional = true
 sha2 = {version="0.8.0", default-features = false}
 ripemd160= {version="0.8.0", default-features=false}
 digest={version="0.8.1",default-features=false}
+riscv-evm={path="../../../riscv-evm", default-features=false}
 
 [features]
 default = ["std"]

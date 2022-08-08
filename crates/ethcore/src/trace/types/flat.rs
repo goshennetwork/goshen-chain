@@ -87,6 +87,7 @@ impl FlatTransactionTraces {
         self.0.iter().fold(Default::default(), |bloom, trace| bloom | trace.bloom())
     }
 
+    #[cfg(feature = "std")]
     pub fn print(&self) {
         for t in self.0.iter() {
             if let Action::Call(call) = &t.action {
