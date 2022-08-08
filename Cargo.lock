@@ -1321,6 +1321,7 @@ version = "0.11.0"
 dependencies = [
  "criterion",
  "hash-db 0.12.4",
+ "hashbrown 0.12.0",
  "keccak-hasher 0.1.1",
 ]
 
