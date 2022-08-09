@@ -16,6 +16,8 @@
 
 //! Utils common types and macros global reexport.
 
+#![no_std]
+
 #[macro_export]
 macro_rules! vec_into {
 	( $( $x:expr ),* ) => {
