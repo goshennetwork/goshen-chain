@@ -449,11 +449,11 @@ version = "0.1.0"
 dependencies = [
  "digest 0.8.1",
  "ethereum-types 0.9.2",
- "hex",
  "keccak-hash",
  "parity-crypto",
  "ripemd160 0.8.0",
  "riscv-evm",
+ "rustc-hex",
  "sha2 0.8.2",
 ]
 
