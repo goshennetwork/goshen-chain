@@ -177,9 +177,9 @@ impl DerefMut for Signature {
     }
 }
 
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "riscv")]
 use riscv_evm::runtime::ecrecover;
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "riscv")]
 pub fn recover(signature: &Signature, message: &Message) -> Option<Address> {
     let r = signature.r();
     let s = signature.s();
