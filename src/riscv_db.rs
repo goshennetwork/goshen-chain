@@ -4,15 +4,14 @@ use core::cell::RefCell;
 
 use ethereum_types::{Address, H256};
 use hashbrown::HashSet;
-use riscv_evm::runtime::{ecrecover, ret};
 
 use hash_db::{AsHashDB, HashDB};
 use keccak_hasher::KeccakHasher;
 use memory_db::MemoryDB;
-use trie::DBValue;
+use trie_db::DBValue;
 
-use crate::state::{Account, Backend};
-use crate::state::backend::ProofCheck;
+use ethcore::state::{Account, Backend};
+use ethcore::state::backend::ProofCheck;
 
 #[derive(Clone, PartialEq)]
 pub struct RiscvDB(ProofCheck);
