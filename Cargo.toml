@@ -22,6 +22,7 @@ riscv-evm = { path = "../riscv-evm", default-features = false, optional = true }
 
 [features]
 json-tests = ["ethcore/json-tests"]
+riscv = ["riscv-evm","ethcore/riscv"]
 
 [profile.test]
 lto = false

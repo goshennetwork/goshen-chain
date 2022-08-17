@@ -58,7 +58,7 @@ mod account;
 mod substate;
 
 pub mod backend;
-#[cfg(feature = "no_std")]
+#[cfg(feature = "riscv")]
 pub mod riscv_db;
 
 pub use self::account::Account;

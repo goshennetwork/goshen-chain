@@ -18,3 +18,4 @@ riscv-evm = { path = "../../../riscv-evm", default-features = false, optional = 
 [features]
 default = ["std"]
 std = ["parity-crypto"]
+riscv = ["riscv-evm"]
