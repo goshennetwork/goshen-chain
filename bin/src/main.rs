@@ -13,10 +13,11 @@ fn main() {
     let contents = fs::read_to_string("./batch.data").unwrap();
     let mut db = ProofCheck::new(&[]);
     for line in contents.lines() {
-        db.insert(&line.from_hex().unwrap());
+        let data:Vec<u8> = line.from_hex().unwrap();
+        db.insert(&data);
     }
     let hash =
-        H256::from_str("eb611f33cdb62869b3c051d5c00021cc7e407095af80b50645b7ddc33aa92541").unwrap();
+        H256::from_str("6929f9b018ab65ae845cefba93f41474d6e3a849c5cfb3ca7ab365832108842f").unwrap();
     let header = state_transition_to_header(db, hash);
     println!("0x{}", header.hash().to_hex());
 }

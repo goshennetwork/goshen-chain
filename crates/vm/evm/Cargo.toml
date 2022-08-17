@@ -8,9 +8,9 @@ edition = "2018"
 [dependencies]
 bit-set = {version = "0.5.2", default-features = false}
 parity-bytes = {version = "0.1", default-features = false}
-ethereum-types = {version = "0.13.1", default-features = false}
+ethereum-types = {version = "0.12.1", default-features = false}
 vm = { path = "../vm", default-features = false }
-keccak-hash = {version = "0.9.0", default-features = false}
+keccak-hash = {version = "0.8.0", default-features = false}
 ethcore-builtin = { path = "../builtin", default-features = false }
 num-bigint = {version = "0.4", default-features = false}
 log = {version = "0.4", default-features = false, optional = true}
