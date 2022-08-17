@@ -23,6 +23,5 @@ pub extern "C" fn _start() {
     let hash = H256::from(riscv_evm::runtime::input());
     let header = state_transition_to_header(db, hash);
     // println!("0x{}", header.hash().to_hex());
-    // riscv_evm::runtime::debug(header.hash().to_hex().as_str());
     riscv_evm::runtime::ret(header.hash().0);
 }

@@ -7,7 +7,6 @@ use core::hash::{Hash, Hasher};
 use core::ops::{Deref, DerefMut};
 use core::str::FromStr;
 use ethereum_types::{Address, H256, H520};
-use riscv_evm::runtime::ecrecover;
 use rustc_hex::ToHex;
 
 /// Signature encoded as RSV components
@@ -178,6 +177,9 @@ impl DerefMut for Signature {
     }
 }
 
+#[cfg(not(feature = "std"))]
+use riscv_evm::runtime::ecrecover;
+#[cfg(not(feature = "std"))]
 pub fn recover(signature: &Signature, message: &Message) -> Option<Address> {
     let r = signature.r();
     let s = signature.s();
