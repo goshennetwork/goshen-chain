@@ -34,7 +34,7 @@ use core::cmp;
 use core::convert::TryFrom;
 use ethereum_types::{Address, H256, U256, U512};
 use evm::{CallType, FinalizationResult, Finalize};
-use hash::keccak;
+use hash::{keccak, KECCAK_EMPTY};
 use types::transaction::{Action, SignedTransaction, TypedTransaction};
 use vm::{
     self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError
@@ -1050,6 +1050,12 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         };
 
         let sender = t.sender();
+
+        // ensure EOA
+        let code_hash = self.state.code_hash(&sender).unwrap();
+        if code_hash!= KECCAK_EMPTY && code_hash != H256::zero() {
+            return Err(ExecutionError::SenderMustEoa);
+        }
 
         let mut base_gas_required = U256::from(t.tx().gas_required(&schedule));
 

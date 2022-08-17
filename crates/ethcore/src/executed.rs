@@ -124,6 +124,8 @@ pub enum ExecutionError {
     MutableCallInStaticContext,
     /// Returned when transacting from a non-existing account with dust protection enabled.
     SenderMustExist,
+    /// Returned when transacting from an internal account.
+    SenderMustEoa,
     /// Returned when internal evm error occurs.
     Internal(String),
     /// Returned when generic transaction occurs
@@ -135,6 +137,7 @@ impl From<Box<ethtrie::TrieError>> for ExecutionError {
         ExecutionError::Internal(format!("{:?}", err))
     }
 }
+
 impl From<ethtrie::TrieError> for ExecutionError {
     fn from(err: ethtrie::TrieError) -> Self {
         ExecutionError::Internal(format!("{:?}", err))
@@ -186,6 +189,7 @@ impl fmt::Display for ExecutionError {
             ),
             MutableCallInStaticContext => "Mutable Call in static context".to_owned(),
             SenderMustExist => "Transacting from an empty account".to_owned(),
+            SenderMustEoa => "Sender not an eoa".to_owned(),
             Internal(ref msg) => msg.clone(),
             TransactionMalformed(ref err) => format!("Malformed transaction: {}", err),
         };
