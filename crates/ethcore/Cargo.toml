@@ -12,11 +12,11 @@ common-types = { path = "types", default-features = false }
 eip-152 = { version = "0.1", path = "../util/EIP-152", default-features = false }
 ethash = { path = "../concensus/ethash", default-features = false }
 ethcore-builtin = { path = "../vm/builtin", default-features = false }
-ethereum-types = { version = "0.13.1", default-features = false }
+ethereum-types = { version = "0.12.1", default-features = false }
 evm = { path = "../vm/evm", default-features = false }
 hash-db = { path = "../db/hash-db-0.12.4", default-features = false }
 itertools = { version = "0.8", default-features = false }
-keccak-hash = { version = "0.9.0", default-features = false }
+keccak-hash = { version = "0.8.0", default-features = false }
 keccak-hasher = { path = "../util/keccak-hasher", default-features = false }
 crypto = { path = "../crypto", default-features = false }
 lru = { version = "0.7.3" }
@@ -54,7 +54,7 @@ trie-standardmap = "0.15.2"
 
 [features]
 default = ["std"]
-std = ["common-types/std", "trie-db/std", "ethcore-builtin/std", "ethjson"]
+std = ["common-types/std", "trie-db/std", "ethcore-builtin/std", "ethjson", "maplit"]
 # Disables seal verification for mined blocks.
 # This allows you to submit any seal via RPC to test and benchmark
 # how fast pending block get's created while running on the mainnet.

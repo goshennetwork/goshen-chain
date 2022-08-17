@@ -1052,7 +1052,7 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         let sender = t.sender();
 
         // ensure EOA
-        let code_hash = self.state.code_hash(&sender).unwrap();
+        let code_hash = self.state.code_hash(&sender).unwrap().unwrap();
         if code_hash!= KECCAK_EMPTY && code_hash != H256::zero() {
             return Err(ExecutionError::SenderMustEoa);
         }

@@ -7,11 +7,11 @@ edition = "2018"
 
 [dependencies]
 parity-bytes = {version = "0.1", default-features = false }
-ethereum-types = {version = "0.13.1", default-features = false }
+ethereum-types = {version = "0.12.1", default-features = false }
 patricia-trie-ethereum = { path = "../../db/patricia-trie-ethereum", default-features = false }
 ethjson = { path = "../../ethjson", optional = true }
 rlp = { version = "0.5.1", default-features = false }
-keccak-hash = {version = "0.9.0", default-features = false }
+keccak-hash = {version = "0.8.0", default-features = false }
 hashbrown = { version = "0.11.2" }
 
 [features]
