@@ -826,7 +826,7 @@ impl Spec {
         ret.append(&header);
         ret.append_raw(&empty_list, 1);
         ret.append_raw(&empty_list, 1);
-        ret.out()
+        ret.out().to_vec()
     }
 
     /// Overwrite the genesis components.

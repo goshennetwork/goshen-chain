@@ -83,7 +83,7 @@ impl PodAccount {
             self.storage.iter().map(|(k, v)| (k, rlp::encode(&v.into_uint()))),
         ));
         stream.append(&keccak(&self.code.as_ref().unwrap_or(&vec![])));
-        stream.out()
+        stream.out().to_vec()
     }
 
     /// Place additional data into given hash DB.

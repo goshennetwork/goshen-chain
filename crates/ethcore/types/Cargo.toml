@@ -9,8 +9,8 @@ authors = [
 ]
 
 [dependencies]
-ethereum-types = {version = "0.13.1", default-features = false}
-keccak-hash = {version="0.9.0",default-features = false}
+ethereum-types = {version = "0.12.1", default-features = false}
+keccak-hash = {version="0.8.0",default-features = false}
 parity-bytes = {version = "0.1", default-features = false}
 crypto = {path = "../../crypto", default-features = false }
 rlp = { version = "0.5.1", default-features = false }
