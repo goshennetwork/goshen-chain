@@ -58,8 +58,6 @@ mod account;
 mod substate;
 
 pub mod backend;
-#[cfg(feature = "riscv")]
-pub mod riscv_db;
 
 pub use self::account::Account;
 pub use self::backend::Backend;
@@ -1407,7 +1405,7 @@ mod tests {
     use crate::machine::EthereumMachine;
     use crate::spec::*;
     use crate::test_helpers::{get_temp_state, get_temp_state_db};
-    use crate::trace::{trace, FlatTrace, TraceError};
+    use crate::trace::{FlatTrace, trace, TraceError};
     use alloc::sync::Arc;
     use core::str::FromStr;
     use crypto::publickey::Secret;

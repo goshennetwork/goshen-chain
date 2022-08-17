@@ -1929,6 +1929,7 @@ dependencies = [
  "ethcore-builtin",
  "ethereum-types",
  "hash-db 0.12.4",
+ "hashbrown 0.12.3",
  "keccak-hasher 0.1.1",
  "memory-db 0.11.0",
  "riscv-evm",

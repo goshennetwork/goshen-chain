@@ -8,7 +8,7 @@ use ethereum_types::H256;
 use rustc_hex::FromHex;
 
 use common_types::bytes::ToPretty;
-use ethcore::state::riscv_db::RiscvDB;
+use riscv_l2chain::riscv_db::RiscvDB;
 use hash_db::HashDB;
 use riscv_l2chain::state_transition_to_header;
 

@@ -11,7 +11,7 @@ use common_types::bytes::ToPretty;
 
 use common_types::header::Header;
 use ethcore::engines::L2Seal;
-use ethcore::miner::{generate_block, BlockGenInfo};
+use ethcore::miner::{BlockGenInfo, generate_block};
 use hash_db::HashDB;
 use input::RollupInput;
 use keccak_hasher::KeccakHasher;
@@ -25,6 +25,8 @@ use crate::input::load_last_hashes;
 mod consts;
 mod input;
 mod machine;
+#[cfg(feature = "riscv")]
+pub mod riscv_db;
 
 type HashDBOracle = dyn HashDB<KeccakHasher, DBValue>;
 
