@@ -18,7 +18,7 @@
 
 use crate::transaction::{error, Error};
 use crypto::hash::keccak;
-use crypto::publickey::{recover, Signature};
+use crypto::publickey::{Message, recover, Signature};
 use ethereum_types::{Address, BigEndianHash, H160, H256, U256};
 
 #[cfg(feature = "std")]
@@ -145,7 +145,7 @@ impl Transaction {
     fn encode(&self, chain_id: Option<u64>, signature: Option<&SignatureComponents>) -> Vec<u8> {
         let mut stream = RlpStream::new();
         self.encode_rlp(&mut stream, chain_id, signature);
-        stream.drain()
+        stream.out().to_vec()
     }
 
     pub fn rlp_append(
