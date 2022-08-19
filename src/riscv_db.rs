@@ -1,9 +1,11 @@
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 use core::cell::RefCell;
+use core::hash::Hash;
 
 use ethereum_types::{Address, H256};
 use hashbrown::HashSet;
+use riscv_evm::trie::keccak256;
 
 use hash_db::{AsHashDB, HashDB};
 use keccak_hasher::KeccakHasher;
@@ -24,24 +26,22 @@ impl RiscvDB {
 
 impl HashDB<KeccakHasher, DBValue> for RiscvDB {
     fn get(&self, key: &H256) -> Option<DBValue> {
-        if let Some(value) = self.0.get(key) {
-            return Some(value);
-        } else {
-            let value = riscv_evm::runtime::preimage(key.0);
-            return Some(DBValue::from_slice(value.as_slice()));
-        }
+        let value = riscv_evm::runtime::preimage(key.0);
+        return Some(DBValue::from_slice(value.as_slice()));
     }
 
     fn contains(&self, key: &H256) -> bool {
-        self.0.contains(key)
+        match self.get(key) {
+            Some(t) => true,
+            None => false
+        }
     }
 
     fn insert(&mut self, value: &[u8]) -> H256 {
-        self.0.insert(value)
+        keccak256(value)
     }
 
     fn emplace(&mut self, key: H256, value: DBValue) {
-        self.0.emplace(key, value)
     }
 
     fn remove(&mut self, _key: &H256) {}
