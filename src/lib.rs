@@ -60,6 +60,8 @@ pub fn state_transition_to_header(
         if let Some(block) = generate_block(db_clone, &engine, &info,
                                             batch.transactions, L2_CROSS_LAYER_WITNESS) {
             prev = block.header.clone();
+            #[cfg(feature = "riscv")]
+            riscv_evm::runtime::debug(block.header.hash().to_hex().as_str());
         } else {
             prev = info.parent_block_header;
         }
