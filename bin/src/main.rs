@@ -17,7 +17,7 @@ fn main() {
         db.insert(&data);
     }
     let hash =
-        H256::from_str("6929f9b018ab65ae845cefba93f41474d6e3a849c5cfb3ca7ab365832108842f").unwrap();
+        H256::from_str("afa4953bcc23074c310a44a01be1f17b9126b60e7d3b89c2fec36e90d6e738f5").unwrap();
     let header = state_transition(db, hash);
     println!("0x{}", header.to_hex());
 }

@@ -251,6 +251,8 @@ impl<'x> OpenBlock<'x> {
             self.block.traces.is_enabled(),
         )?;
 
+        // outcome.vm_trace.unwrap().print();
+
         // adjust difficulty
         let mut difficulty = self.block.header.difficulty();
         if t.is_enqueued() {

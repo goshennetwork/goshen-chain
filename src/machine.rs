@@ -5,7 +5,9 @@ use common_types::BlockNumber;
 use ethcore::machine::EthereumMachine;
 use ethcore::spec::CommonParams;
 use ethcore_builtin::{
-    Blake2F, Blake2FPricer, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, Modexp2565Pricer, Pricing, Ripemd160, Sha256
+    AltBn128ConstOperations, AltBn128PairingPricer, AltBn128PairingPrice, Blake2F, Blake2FPricer,
+    Bn128Add, Bn128Mul, Bn128Pairing, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp,
+    Modexp2565Pricer, Pricing, Ripemd160, Sha256, ModexpPricer
 };
 use ethereum_types::{Address, H160, U256};
 
@@ -56,11 +58,36 @@ fn create_builtins() -> BTreeMap<Address, Builtin> {
     map.insert(
         H160(address),
         Builtin {
-            pricer: BTreeMap::from([(0, Pricing::Modexp2565(Modexp2565Pricer {}))]),
+            pricer: BTreeMap::from([(0, Pricing::Modexp(ModexpPricer {divisor:20}))]),
             native: EthereumBuiltin::Modexp(Modexp),
         },
     );
-    // TODO: support alt_bn128_add, alt_bn128_mul, alt_bn128_pairing, bls12_381
+    address[19] = 6;
+    map.insert(
+        H160(address),
+        Builtin {
+            pricer: BTreeMap::from([(0, Pricing::AltBn128ConstOperations(AltBn128ConstOperations { price: 150 }))]),
+            native: EthereumBuiltin::Bn128Add(Bn128Add),
+        },
+    );
+    address[19] = 7;
+    map.insert(
+        H160(address),
+        Builtin {
+            pricer: BTreeMap::from([(0, Pricing::AltBn128ConstOperations(AltBn128ConstOperations {price: 6000}))]),
+            native: EthereumBuiltin::Bn128Mul(Bn128Mul),
+        },
+    );
+    address[19] = 8;
+    map.insert(
+        H160(address),
+        Builtin {
+            pricer: BTreeMap::from([(0, Pricing::AltBn128Pairing(AltBn128PairingPricer{ price: AltBn128PairingPrice{
+                base:45000, pair: 34000
+            } }))]),
+            native: EthereumBuiltin::Bn128Pairing(Bn128Pairing),
+        },
+    );
 
     address[19] = 9;
     map.insert(
