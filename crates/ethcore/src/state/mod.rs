@@ -370,19 +370,35 @@ impl<B: Backend> State<B> {
     pub fn from_existing(
         db: B, root: H256, account_start_nonce: U256, factories: Factories,
     ) -> TrieResult<State<B>> {
+
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("from_existing 1");
         if !db.as_hash_db().contains(&root) {
             return Err(Box::new(TrieError::InvalidStateRoot(root)));
         }
 
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("from_existing 2");
+        let new_map = HashMap::new();
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("from_existing 2.0");
+        let cache = RefCell::new(new_map);
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("from_existing 2.1");
+        let checkpoints = RefCell::new(Vec::new());
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("from_existing 2.2");
         let state = State {
             db: db,
             root: root,
-            cache: RefCell::new(HashMap::new()),
-            checkpoints: RefCell::new(Vec::new()),
+            cache: cache,
+            checkpoints: checkpoints,
             account_start_nonce: account_start_nonce,
             factories: factories,
         };
 
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("from_existing 3");
         Ok(state)
     }
 

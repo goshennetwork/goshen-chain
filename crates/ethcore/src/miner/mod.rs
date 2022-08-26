@@ -79,12 +79,19 @@ pub fn generate_block(
     txes: Vec<UnverifiedTransaction>, l2_witness_layer: Address,
 ) -> Option<SealedBlock> {
     let trie_factory = TrieFactory::new(TrieSpec::Secure);
+    #[cfg(feature = "riscv")]
+    riscv_evm::runtime::debug("new trie factory");
     let factories = Factories {
         vm: VmFactory::new(VMType::Interpreter, MB),
         trie: trie_factory,
         accountdb: Default::default(),
     };
+    #[cfg(feature = "riscv")]
+    riscv_evm::runtime::debug("factories");
     let state_db = StateDB::new(db, MB);
+
+    #[cfg(feature = "riscv")]
+    riscv_evm::runtime::debug("new state db");
 
     let mut open_block = OpenBlock::new(
         engine,
@@ -99,6 +106,9 @@ pub fn generate_block(
     )
         .ok()?;
 
+    #[cfg(feature = "riscv")]
+    riscv_evm::runtime::debug("open block");
+
     let block_number = open_block.header.number();
     let mut skipped_transactions = 0usize;
     let schedule = engine.schedule(block_number);
@@ -108,6 +118,9 @@ pub fn generate_block(
     let event_id = keccak(event_sig);
     let mut mmr_size: u64 = 0;
     let mut mmr_root = H256::zero();
+
+    #[cfg(feature = "riscv")]
+    riscv_evm::runtime::debug("start apply tx");
 
     for transaction in txes {
         let transaction = {
@@ -122,6 +135,9 @@ pub fn generate_block(
             .verify_transaction_basic(&transaction, &open_block.header)
             .map_err(|e| e.into())
             .and_then(|_| open_block.push_transaction(transaction, None));
+
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("applied one tx");
 
         match result {
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
@@ -169,13 +185,21 @@ pub fn generate_block(
         }
     }
 
+    #[cfg(feature = "riscv")]
+    riscv_evm::runtime::debug("start close block");
+
     if mmr_root != H256::zero() {
         open_block.update_mmr(mmr_size + 1, mmr_root);
     }
     let closed_block = open_block.close();
     match closed_block {
         Ok(t) => {
+            #[cfg(feature = "riscv")]
+            riscv_evm::runtime::debug("start seal block");
             let sealed_block = t.lock().try_seal(engine, Vec::new()).expect("seal failed");
+
+            #[cfg(feature = "riscv")]
+            riscv_evm::runtime::debug("sealed block");
             Some(sealed_block)
         }
         Err(e) => panic!("{}", e),

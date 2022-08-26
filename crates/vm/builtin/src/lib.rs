@@ -80,7 +80,6 @@ impl Pricer for Blake2FPricer {
 /// Pricing model
 #[derive(Debug)]
 pub enum Pricing {
-    #[cfg(feature = "std")]
     AltBn128Pairing(AltBn128PairingPricer),
     AltBn128ConstOperations(AltBn128ConstOperations),
     Blake2F(Blake2FPricer),
@@ -100,7 +99,6 @@ pub enum Pricing {
 impl Pricer for Pricing {
     fn cost(&self, input: &[u8]) -> U256 {
         match self {
-            #[cfg(feature = "std")]
             Pricing::AltBn128Pairing(inner) => inner.cost(input),
             Pricing::AltBn128ConstOperations(inner) => inner.cost(input),
             Pricing::Blake2F(inner) => inner.cost(input),
