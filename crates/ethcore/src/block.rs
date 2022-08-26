@@ -164,6 +164,8 @@ impl<'x> OpenBlock<'x> {
     ) -> Result<Self, Error> {
         let number = parent.number() + 1;
 
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("new block 1");
         // t_nb 8.1.1 get parent StateDB.
         let state = State::from_existing(
             db,
@@ -171,6 +173,9 @@ impl<'x> OpenBlock<'x> {
             engine.account_start_nonce(number),
             factories,
         )?;
+
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("new block 2");
         let mut r =
             OpenBlock { block: ExecutedBlock::new(state, last_hashes, tracing), engine: engine };
 
@@ -181,6 +186,8 @@ impl<'x> OpenBlock<'x> {
         r.block.header.set_extra_data(extra_data);
         r.block.header.set_base_fee(engine.calculate_base_fee(parent));
 
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("new block 3");
         let gas_floor_target = cmp::max(gas_range_target.0, engine.params().min_gas_limit);
         let gas_ceil_target = cmp::max(gas_range_target.1, gas_floor_target);
 
@@ -191,11 +198,17 @@ impl<'x> OpenBlock<'x> {
             gas_floor_target,
             gas_ceil_target,
         );
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("new block 4");
         // t_nb 8.1.3 this adds engine specific things
         engine.populate_from_parent(&mut r.block.header, parent);
 
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("new block 5");
         // t_nb 8.1.3 updating last hashes and the DAO fork, for ethash.
         engine.machine().on_new_block(&mut r.block)?;
+        #[cfg(feature = "riscv")]
+        riscv_evm::runtime::debug("new block 6");
         Ok(r)
     }
 
