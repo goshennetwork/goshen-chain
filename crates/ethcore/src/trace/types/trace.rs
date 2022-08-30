@@ -432,8 +432,8 @@ pub struct VMTrace {
     pub subs: Vec<VMTrace>,
 }
 
-#[cfg(feature = "std")]
 impl VMTrace {
+    #[cfg(feature = "std")]
     pub fn print(&self) {
         for op in self.operations.iter() {
             match &op.executed {
@@ -449,6 +449,25 @@ impl VMTrace {
         }
         for sub in self.subs.iter() {
             sub.print();
+        }
+    }
+
+    #[cfg(feature = "riscv")]
+    pub fn evm_print(&self) {
+        for op in self.operations.iter() {
+            match &op.executed {
+                Some(e) => riscv_evm::runtime::debug(alloc::format!(
+                    "{},{},{},{}",
+                    op.pc,
+                    Instruction::from_u8(op.instruction).unwrap().info().name,
+                    op.gas_cost + e.gas_used,
+                    op.gas_cost
+                ).as_str()),
+                None => (),
+            }
+        }
+        for sub in self.subs.iter() {
+            sub.evm_print();
         }
     }
 }
