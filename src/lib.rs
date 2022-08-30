@@ -3,6 +3,7 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
+use alloc::string::ToString;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
@@ -40,24 +41,16 @@ pub fn state_transition_to_header(
     db: impl HashDB<KeccakHasher, DBValue> + Clone + 'static, entry_hash: H256,
 ) -> Header {
     let input = RollupInput::load_from_hashdb(&db, entry_hash);
-    #[cfg(feature = "riscv")]
-    riscv_evm::runtime::debug("load from hash");
     let mut prev = input.prev_header;
     let batches = input.batches;
 
     let latest_hashes = load_last_hashes(&db, prev.hash(), prev.number());
     let machine = machine::create_l2_machine();
-    #[cfg(feature = "riscv")]
-    riscv_evm::runtime::debug("create machine");
     let mut engine = L2Seal::new(0, machine);
-    #[cfg(feature = "riscv")]
-    riscv_evm::runtime::debug("create engine");
     for batch in batches {
         let db_clone = Box::new(db.clone());
         engine.set_timestamp(batch.timestamp);
 
-        #[cfg(feature = "riscv")]
-        riscv_evm::runtime::debug("start gen block");
         let info = BlockGenInfo::new(
             prev,
             Arc::new(latest_hashes.clone()),
@@ -68,8 +61,6 @@ pub fn state_transition_to_header(
         if let Some(block) = generate_block(db_clone, &engine, &info,
                                             batch.transactions, L2_CROSS_LAYER_WITNESS) {
             prev = block.header.clone();
-            #[cfg(feature = "riscv")]
-            riscv_evm::runtime::debug(block.header.hash().to_hex().as_str());
         } else {
             prev = info.parent_block_header;
         }

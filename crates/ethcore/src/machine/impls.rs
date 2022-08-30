@@ -214,8 +214,6 @@ impl EthereumMachine {
     pub fn account_start_nonce(&self, block: u64) -> U256 {
         let params = self.params();
 
-        #[cfg(feature = "riscv")]
-        riscv_evm::runtime::debug("account_start_nonce");
         if block >= params.dust_protection_transition {
             U256::from(params.nonce_cap_increment) * U256::from(block)
         } else {

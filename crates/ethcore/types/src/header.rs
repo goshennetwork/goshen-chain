@@ -22,6 +22,7 @@ use core::iter::FromIterator;
 
 use ethereum_types::{Address, Bloom, H256, H64, U256};
 use keccak_hash::KECCAK_EMPTY;
+use parity_bytes::ToPretty;
 use rlp::{DecoderError, Encodable, Rlp, RlpStream};
 
 use crate::bytes::Bytes;
@@ -401,12 +402,17 @@ impl Header {
             s.append(&self.base_fee_per_gas.unwrap());
         }
     }
+
+    pub fn print(&self) -> alloc::string::String {
+        return alloc::format!("gas used {}, state root 0x{}, receipts root 0x{}",
+                              self.gas_used, self.state_root.to_hex(), self.receipts_root.to_hex());
+    }
 }
 
 /// Alter value of given field, reset memoised hash if changed.
 fn change_field<T>(hash: &mut Option<H256>, field: &mut T, value: T)
-where
-    T: PartialEq<T>,
+    where
+        T: PartialEq<T>,
 {
     if field != &value {
         *field = value;
