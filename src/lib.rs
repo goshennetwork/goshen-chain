@@ -19,9 +19,7 @@ use input::RollupInput;
 use keccak_hasher::KeccakHasher;
 use trie_db::DBValue;
 
-use crate::consts::{
-    L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_CROSS_LAYER_WITNESS, L2_FEE_COLLECTOR,
-};
+use crate::consts::{L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_CROSS_LAYER_WITNESS, L2_FEE_COLLECTOR};
 use crate::input::load_last_hashes;
 
 mod consts;
@@ -48,9 +46,12 @@ pub fn state_transition_to_header(
     let latest_hashes = load_last_hashes(&db, prev.hash(), prev.number());
     let machine = machine::create_l2_machine();
     let mut engine = L2Seal::new(0, machine);
-    for batch in batches {
+    for mut batch in batches {
         let db_clone = Box::new(db.clone());
         engine.set_timestamp(batch.timestamp);
+
+        // remove tx that's chain id is incorrectly
+        batch.transactions.retain(|t| t.chain_id.unwrap_or_default() == L2_CHAIN_ID);
 
         let info = BlockGenInfo::new(
             prev,
