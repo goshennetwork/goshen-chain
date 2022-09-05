@@ -28,7 +28,7 @@ use crate::state_db::StateDB;
 use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
-use bytes::Bytes;
+use bytes::{Bytes, ToPretty};
 use ethereum_types::{Address, BigEndianHash, H64, U256, U64};
 use hash::{H256, keccak};
 
@@ -153,7 +153,11 @@ pub fn generate_block(
                 //debug!(target: "miner", "Skipping non-allowed transaction for sender {:?}", hash);
             }
             Err(_e) => {
-                panic!("{}", _e);
+                #[cfg(not(feature = "riscv"))]
+                println!("push tx, {}", _e);
+
+                #[cfg(feature = "riscv")]
+                riscv_evm::runtime::debug(alloc::format!("push tx, {}", _e).as_str());
             }
             // imported ok
             Ok(receipt) => {
@@ -176,6 +180,14 @@ pub fn generate_block(
     match closed_block {
         Ok(t) => {
             let sealed_block = t.lock().try_seal(engine, Vec::new()).expect("seal failed");
+            #[cfg(not(feature = "riscv"))]
+            println!("{}: 0x{}, txNum: {}", sealed_block.header.number(),
+                     sealed_block.header.hash().to_hex(),
+                     sealed_block.transactions.len());
+            #[cfg(feature = "riscv")]
+            riscv_evm::runtime::debug(format!(
+                "{}: 0x{}", sealed_block.header.number(),
+                sealed_block.header.hash().to_hex()).as_str());
             Some(sealed_block)
         }
         Err(e) => panic!("{}", e),
