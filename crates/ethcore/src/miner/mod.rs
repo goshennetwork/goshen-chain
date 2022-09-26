@@ -185,9 +185,9 @@ pub fn generate_block(
                      sealed_block.header.hash().to_hex(),
                      sealed_block.transactions.len());
             #[cfg(feature = "riscv")]
-            riscv_evm::runtime::debug(format!(
-                "{}: 0x{}", sealed_block.header.number(),
-                sealed_block.header.hash().to_hex()).as_str());
+            riscv_evm::runtime::debug(alloc::format!(
+                "{}: 0x{}, txNum: {}", sealed_block.header.number(),
+                sealed_block.header.hash().to_hex(), sealed_block.transactions.len()).as_str());
             Some(sealed_block)
         }
         Err(e) => panic!("{}", e),

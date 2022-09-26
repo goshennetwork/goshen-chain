@@ -11,11 +11,15 @@ use rlp::Rlp;
 
 // format: queueNum(uint64) + queueStart(uint64) + batchNum(uint64) + batch0Time(uint64) +
 // batchLeftTimeDiff([]uint32) + batchesData
-fn load_batches_from_hashdb(db: &HashDBOracle, batch_hash: H256, queue_hash: H256) -> Vec<Batch> {
-    let raw = db.get(&batch_hash).expect("input not found");
-    let raw = raw.into_vec();
-    let queue_num = BigEndian::read_u64(&raw[..8]) as usize;
-    let batch_num = BigEndian::read_u64(&raw[16..24]) as usize;
+fn load_batches_from_hashdb(db: &HashDBOracle, batch_input_hash: H256) -> Vec<Batch> {
+    let raw_input = db.get(&batch_input_hash).expect("input not found");
+    let raw_input = raw_input.into_vec();
+    let batch_hash = H256::from_slice(&raw_input[..32]);
+    let queue_hash = H256::from_slice(&raw_input[32..64]);
+    let raw_batch = db.get(&batch_hash).expect("input batch not found");
+    let raw_batch = raw_batch.into_vec();
+    let queue_num = BigEndian::read_u64(&raw_batch[..8]) as usize;
+    let batch_num = BigEndian::read_u64(&raw_batch[16..24]) as usize;
     let mut batches = Vec::with_capacity(queue_num + batch_num);
     let mut timestamps = Vec::with_capacity(batch_num);
     let queue_txes = load_queue_txes(db, queue_hash);
@@ -27,8 +31,8 @@ fn load_batches_from_hashdb(db: &HashDBOracle, batch_hash: H256, queue_hash: H25
 
     if batch_num > 0 {
         let timeend = 24 + batch_num * 4 + 4;
-        let time_slice = &raw[24..timeend];
-        let batches_slice = &raw[timeend..raw.len()];
+        let time_slice = &raw_batch[24..timeend];
+        let batches_slice = &raw_batch[timeend..raw_batch.len()];
         let mut time = BigEndian::read_u64(&time_slice[..8]);
         timestamps.push(time);
         for i in 1..batch_num {
@@ -98,11 +102,10 @@ pub struct RollupInput {
 impl RollupInput {
     pub fn load_from_hashdb(db: &HashDBOracle, entry_hash: H256) -> RollupInput {
         let raw = db.get(&entry_hash).expect("input not found");
-        let prev_block_hash = H256::from_slice(&raw[..32]);
+        let batch_input_hash = H256::from_slice(&raw[..32]);
+        let batches = load_batches_from_hashdb(db, batch_input_hash);
+        let prev_block_hash = H256::from_slice(&raw[32..64]);
         let header = load_header(db, prev_block_hash);
-        let batch_hash = H256::from_slice(&raw[32..64]);
-        let queue_hash = H256::from_slice(&raw[64..96]);
-        let batches = load_batches_from_hashdb(db, batch_hash, queue_hash);
         RollupInput { prev_header: header, batches }
     }
 }
