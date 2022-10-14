@@ -34,5 +34,6 @@ lto = true
 # (i.e. pretty much only standalone CLI tools)
 members = [
 	"crates/crypto",
-	"crates/ethcore"
+	"crates/ethcore",
+	"crates/util/brotli"
 ]
