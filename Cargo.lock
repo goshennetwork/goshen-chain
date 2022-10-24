@@ -220,6 +220,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "buddy-alloc"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ff9f338986406db85e2b5deb40a9255b796ca03a194c7457403d215173f3fd5"
+
+[[package]]
 name = "byte-slice-cast"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1640,6 +1646,14 @@ dependencies = [
  "block-buffer",
  "digest",
  "opaque-debug",
+]
+
+[[package]]
+name = "riscv-evm"
+version = "0.1.0"
+dependencies = [
+ "buddy-alloc",
+ "cfg-if 1.0.0",
 ]
 
 [[package]]
