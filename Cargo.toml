@@ -27,6 +27,10 @@ opt-level = 3 # makes tests slower to compile, but faster to run
 [profile.release]
 debug = false
 lto = true
+panic = "abort"
+
+[profile.dev]
+panic = "abort"
 
 [workspace]
 # This should only list projects that are not
@@ -35,5 +39,6 @@ lto = true
 members = [
 	"crates/crypto",
 	"crates/ethcore",
-	"crates/util/brotli"
+	"crates/util/brotli",
+	"crates/util/riscv-evm"
 ]
