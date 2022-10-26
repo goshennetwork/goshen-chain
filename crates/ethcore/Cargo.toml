@@ -42,7 +42,7 @@ walkdir = { version = "2.3", optional = true }
 rayon = { version = "1.1", optional = true }
 regex = { version = "1.3.9", optional = true }
 hashbrown = "0.12.0"
-riscv-evm = { path = "../../../riscv-evm", default-features = false, optional = true }
+riscv-evm = { path = "../util/riscv-evm", default-features = false, optional = true }
 
 [dev-dependencies]
 rand = "0.7.3"
