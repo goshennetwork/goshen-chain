@@ -5,7 +5,7 @@ use core::hash::Hash;
 
 use ethereum_types::{Address, H256};
 use hashbrown::HashSet;
-use riscv_evm::trie::keccak256;
+use common_types::hash::{keccak, keccak256};
 
 use hash_db::{AsHashDB, HashDB};
 use keccak_hasher::KeccakHasher;
@@ -38,7 +38,7 @@ impl HashDB<KeccakHasher, DBValue> for RiscvDB {
     }
 
     fn insert(&mut self, value: &[u8]) -> H256 {
-        keccak256(value)
+        keccak(value)
     }
 
     fn emplace(&mut self, key: H256, value: DBValue) {
