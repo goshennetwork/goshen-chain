@@ -39,7 +39,11 @@ fn load_batches_from_hashdb(db: &HashDBOracle, batch_input_hash: H256) -> Vec<Ba
             time += BigEndian::read_u32(&time_slice[4 + i * 4..]) as u64;
             timestamps.push(time);
         }
-        batches.extend(decode_batches(batches_slice, timestamps));
+        let batch = decode_batches(batches_slice, timestamps);
+        if batch.is_some() {
+            // only extend right batch code
+            batches.extend(batch.unwrap());
+        }
     }
     batches.sort_by_key(|v| v.timestamp);
 
@@ -48,22 +52,43 @@ fn load_batches_from_hashdb(db: &HashDBOracle, batch_input_hash: H256) -> Vec<Ba
 
 // verison(byte) + data
 // v0: 0 + rlplist(rlplist(tx))
-fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
+pub fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Option<Vec<Batch>> {
     let version = data[0];
-    assert_eq!(version, 0, "unknown version");
-    let rlp = Rlp::new(&data[1..]);
-    assert!(rlp.is_list());
+    if version > 1 {
+        // invalid version
+        return Nonce;
+    }
+    let mut rlp = Rlp::new(&data[1..]);
+    let mut d: Vec<u8>;
+    if version == 1 {
+        // brotli version
+        let ret = brotli::decompress(&data[1..], 4 * 1024 * 1024); // Now limit is 4MB
+        if ret.is_ok() {
+            d = ret.unwrap();
+            rlp = Rlp::new(d.as_slice());
+        } else {
+            // decode failed, just return
+            return None;
+        }
+    }
+
+    if !rlp.is_list() {
+        //wrong rlp code
+        return None;
+    }
     let num_batches = rlp.item_count().expect("expect batch list");
     let mut batches = Vec::with_capacity(num_batches);
     for (batch, time) in rlp.iter().zip(timestamp) {
-        let batch = Batch {
-            timestamp: time,
-            transactions: TypedTransaction::decode_rlp_list(&batch).expect("decode batch err"),
-        };
+        let txs = TypedTransaction::decode_rlp_list(&batch);
+        if !txs.is_ok() {
+            //decode failed
+            return None;
+        }
+        let batch = Batch { timestamp: time, transactions: txs.unwrap() };
         batches.push(batch);
     }
 
-    batches
+    Option::Some(batches)
 }
 
 pub struct Batch {
