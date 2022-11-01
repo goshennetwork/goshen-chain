@@ -20,6 +20,7 @@ rlp = { version = "0.5.1", default-features = false }
 rustc-hex = { version = "2.1.0", default-features = false }
 riscv-evm = { path = "crates/util/riscv-evm", default-features = false, optional = true }
 hashbrown = "0.12.0"
+brotli = {path="crates/util/brotli",default-features = false}
 
 [features]
 json-tests = ["ethcore/json-tests"]
@@ -46,5 +47,6 @@ members = [
 	"crates/ethcore",
 	"crates/util/brotli",
 	"crates/util/riscv-evm",
-    "bin"
+    "bin",
+	"brotli-bin"
 ]
