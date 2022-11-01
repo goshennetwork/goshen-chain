@@ -56,7 +56,7 @@ pub fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Option<Vec<Batch>> {
     let version = data[0];
     if version > 1 {
         // invalid version
-        return Nonce;
+        return None;
     }
     let mut rlp = Rlp::new(&data[1..]);
     let mut d: Vec<u8>;
