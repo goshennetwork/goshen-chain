@@ -8,6 +8,7 @@ use ethcore::client::LastHashes;
 use ethereum_types::H256;
 use hash_db::HashDB;
 use rlp::Rlp;
+use common_types::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, L1_CROSS_LAYER_WITNESS};
 
 // format: queueNum(uint64) + queueStart(uint64) + batchNum(uint64) + batch0Time(uint64) +
 // batchLeftTimeDiff([]uint32) + batchesData
@@ -60,6 +61,16 @@ fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
             timestamp: time,
             transactions: TypedTransaction::decode_rlp_list(&batch).expect("decode batch err"),
         };
+        for tx in batch.transactions.iter() {
+            if tx.recover_sender().unwrap() == L1_CROSS_LAYER_WITNESS
+                || tx.tx().nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE {
+                #[cfg(not(feature = "riscv"))]
+                panic!("enqueued tx in batch");
+
+                #[cfg(feature = "riscv")]
+                riscv_evm::runtime::panic("enqueued tx in batch");
+            }
+        }
         batches.push(batch);
     }
 
