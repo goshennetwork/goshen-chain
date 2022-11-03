@@ -326,6 +326,7 @@ dependencies = [
  "hex",
  "keccak-hash",
  "parity-bytes",
+ "riscv-evm",
  "rlp",
  "rlp_derive",
  "serde",

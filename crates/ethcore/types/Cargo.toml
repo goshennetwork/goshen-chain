@@ -17,6 +17,7 @@ rlp = { version = "0.5.1", default-features = false }
 rlp_derive = { path = "../../util/rlp-derive" }
 unexpected = { path = "../../util/unexpected" }
 serde = {version="1.0",default-features=false}
+riscv-evm = { path = "../../util/riscv-evm", default-features = false, optional = true }
 
 
 [dev-dependencies]
@@ -25,3 +26,4 @@ hex = { version = "0.4", default-features = false }
 [features]
 std = ["crypto/std"]
 test-helpers = ["std"]
+riscv = ["riscv-evm"]

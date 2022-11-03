@@ -77,7 +77,7 @@ test-helpers = ["tempdir", "common-types/test-helpers", "walkdir",
 # Enables slow 'to-pod-full' method for use in tests and evmbin.
 to-pod-full = []
 
-riscv = ["riscv-evm", "crypto/riscv"]
+riscv = ["riscv-evm", "crypto/riscv","common-types/riscv"]
 
 [[bench]]
 name = "builtin"
