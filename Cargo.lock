@@ -631,7 +631,6 @@ dependencies = [
  "regex",
  "riscv-evm",
  "rlp",
- "rlp_compress",
  "rlp_derive",
  "serde",
  "serde_json",
@@ -1823,15 +1822,6 @@ checksum = "bb919243f34364b6bd2fc10ef797edbfa75f33c252e7998527479c6d6b47e1ec"
 dependencies = [
  "bytes",
  "rustc-hex",
-]
-
-[[package]]
-name = "rlp_compress"
-version = "0.1.0"
-dependencies = [
- "elastic-array",
- "lazy_static",
- "rlp",
 ]
 
 [[package]]
