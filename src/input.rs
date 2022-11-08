@@ -3,12 +3,12 @@ use alloc::format;
 use alloc::vec::Vec;
 use byteorder::{BigEndian, ByteOrder};
 use common_types::header::Header;
+use common_types::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, L1_CROSS_LAYER_WITNESS};
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
 use ethereum_types::H256;
 use hash_db::HashDB;
 use rlp::Rlp;
-use common_types::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, L1_CROSS_LAYER_WITNESS};
 
 // format: queueNum(uint64) + queueStart(uint64) + batchNum(uint64) + batch0Time(uint64) +
 // batchLeftTimeDiff([]uint32) + batchesData
@@ -63,7 +63,8 @@ fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
         };
         for tx in batch.transactions.iter() {
             if tx.recover_sender().unwrap() == L1_CROSS_LAYER_WITNESS
-                || tx.tx().nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE {
+                || tx.tx().nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE
+            {
                 #[cfg(not(feature = "riscv"))]
                 panic!("enqueued tx in batch");
 

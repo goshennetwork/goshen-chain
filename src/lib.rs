@@ -8,18 +8,20 @@ use alloc::string::ToString;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
-use ethereum_types::H256;
 use common_types::bytes::ToPretty;
+use ethereum_types::H256;
 
 use common_types::header::Header;
 use ethcore::engines::L2Seal;
-use ethcore::miner::{BlockGenInfo, generate_block};
+use ethcore::miner::{generate_block, BlockGenInfo};
 use hash_db::HashDB;
 use input::RollupInput;
 use keccak_hasher::KeccakHasher;
 use trie_db::DBValue;
 
-use crate::consts::{L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_CROSS_LAYER_WITNESS, L2_FEE_COLLECTOR};
+use crate::consts::{
+    L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_CROSS_LAYER_WITNESS, L2_FEE_COLLECTOR
+};
 use crate::input::load_last_hashes;
 
 mod consts;
@@ -60,8 +62,9 @@ pub fn state_transition_to_header(
             (L2_BLOCK_MIN_GAS_LIMIT.into(), L2_BLOCK_MAX_GAS_LIMIT.into()),
             Vec::new(),
         );
-        if let Some(block) = generate_block(db_clone, &engine, &info,
-                                            batch.transactions, L2_CROSS_LAYER_WITNESS) {
+        if let Some(block) =
+            generate_block(db_clone, &engine, &info, batch.transactions, L2_CROSS_LAYER_WITNESS)
+        {
             prev = block.header.clone();
         } else {
             prev = info.parent_block_header;

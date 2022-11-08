@@ -370,7 +370,6 @@ impl<B: Backend> State<B> {
     pub fn from_existing(
         db: B, root: H256, account_start_nonce: U256, factories: Factories,
     ) -> TrieResult<State<B>> {
-
         if !db.as_hash_db().contains(&root) {
             return Err(Box::new(TrieError::InvalidStateRoot(root)));
         }
@@ -657,9 +656,9 @@ impl<B: Backend> State<B> {
     fn storage_at_inner<FCachedStorageAt, FStorageAt>(
         &self, address: &Address, key: &H256, f_cached_at: FCachedStorageAt, f_at: FStorageAt,
     ) -> TrieResult<H256>
-        where
-            FCachedStorageAt: Fn(&Account, &H256) -> Option<H256>,
-            FStorageAt: Fn(&Account, &dyn HashDB<KeccakHasher, DBValue>, &H256) -> TrieResult<H256>,
+    where
+        FCachedStorageAt: Fn(&Account, &H256) -> Option<H256>,
+        FStorageAt: Fn(&Account, &dyn HashDB<KeccakHasher, DBValue>, &H256) -> TrieResult<H256>,
     {
         // Storage key search and update works like this:
         // 1. If there's an entry for the account in the local cache check for the key and return it if found.
@@ -822,7 +821,7 @@ impl<B: Backend> State<B> {
             || Account::new_contract(0.into(), self.account_start_nonce, KECCAK_NULL_RLP),
             |_| {},
         )?
-            .init_code(code);
+        .init_code(code);
         Ok(())
     }
 
@@ -834,7 +833,7 @@ impl<B: Backend> State<B> {
             || Account::new_contract(0.into(), self.account_start_nonce, KECCAK_NULL_RLP),
             |_| {},
         )?
-            .reset_code(code);
+        .reset_code(code);
         Ok(())
     }
 
@@ -858,9 +857,9 @@ impl<B: Backend> State<B> {
         &mut self, env_info: &EnvInfo, machine: &Machine, t: &SignedTransaction, tracer: T,
         vm_tracer: V,
     ) -> ApplyResult<T::Output, V::Output>
-        where
-            T: trace::Tracer,
-            V: trace::VMTracer,
+    where
+        T: trace::Tracer,
+        V: trace::VMTracer,
     {
         let options = TransactOptions::new(tracer, vm_tracer);
         let e = self.execute(env_info, machine, t, options, false)?;
@@ -869,7 +868,7 @@ impl<B: Backend> State<B> {
         let eip658 = env_info.number >= params.eip658_transition;
         let no_intermediate_commits = eip658
             || (env_info.number >= params.eip98_transition
-            && env_info.number >= params.validate_receipts_transition);
+                && env_info.number >= params.validate_receipts_transition);
 
         let outcome = if no_intermediate_commits {
             if eip658 {
@@ -899,9 +898,9 @@ impl<B: Backend> State<B> {
         &mut self, env_info: &EnvInfo, machine: &Machine, t: &SignedTransaction,
         options: TransactOptions<T, V>, virt: bool,
     ) -> Result<Executed<T::Output, V::Output>, ExecutionError>
-        where
-            T: trace::Tracer,
-            V: trace::VMTracer,
+    where
+        T: trace::Tracer,
+        V: trace::VMTracer,
     {
         let schedule = machine.schedule(env_info.number);
         let mut e = Executive::new(self, env_info, machine, &schedule);
@@ -1107,16 +1106,16 @@ impl<B: Backend> State<B> {
                                 acc.storage_changes().keys().cloned().collect::<BTreeSet<_>>();
 
                             if let Some(ref query_storage) =
-                            query.cache.borrow().get(&address).and_then(|opt| {
-                                Some(
-                                    opt.account
-                                        .as_ref()?
-                                        .storage_changes()
-                                        .keys()
-                                        .cloned()
-                                        .collect::<BTreeSet<_>>(),
-                                )
-                            })
+                                query.cache.borrow().get(&address).and_then(|opt| {
+                                    Some(
+                                        opt.account
+                                            .as_ref()?
+                                            .storage_changes()
+                                            .keys()
+                                            .cloned()
+                                            .collect::<BTreeSet<_>>(),
+                                    )
+                                })
                             {
                                 self_keys.union(&query_storage).cloned().collect::<Vec<_>>()
                             } else {
@@ -1198,8 +1197,8 @@ impl<B: Backend> State<B> {
     /// First searches for account in the local, then the shared cache.
     /// Populates local cache if nothing found.
     fn ensure_cached<F, U>(&self, a: &Address, require: RequireCache, f: F) -> TrieResult<U>
-        where
-            F: Fn(Option<&Account>) -> U,
+    where
+        F: Fn(Option<&Account>) -> U,
     {
         // check local cache first
         if let Some(ref mut maybe_acc) = self.cache.borrow_mut().get_mut(a) {
@@ -1273,9 +1272,9 @@ impl<B: Backend> State<B> {
     fn require_or_from<'a, F, G>(
         &'a self, a: &Address, require_code: bool, default: F, not_default: G,
     ) -> TrieResult<RefMut<'a, Account>>
-        where
-            F: FnOnce() -> Account,
-            G: FnOnce(&mut Account),
+    where
+        F: FnOnce() -> Account,
+        G: FnOnce(&mut Account),
     {
         let contains_key = self.cache.borrow().contains_key(a);
         if !contains_key {
@@ -1409,7 +1408,7 @@ mod tests {
     use crate::machine::EthereumMachine;
     use crate::spec::*;
     use crate::test_helpers::{get_temp_state, get_temp_state_db};
-    use crate::trace::{FlatTrace, trace, TraceError};
+    use crate::trace::{trace, FlatTrace, TraceError};
     use alloc::sync::Arc;
     use core::str::FromStr;
     use crypto::publickey::Secret;
@@ -1449,7 +1448,7 @@ mod tests {
             data: FromHex::from_hex("601080600c6000396000f3006000355415600957005b60203560003555")
                 .unwrap(),
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state.add_balance(&t.sender(), &(100.into()), CleanupMode::NoEmpty).unwrap();
         let result = state.apply(&info, &machine, &t, true).unwrap();
@@ -1493,7 +1492,7 @@ mod tests {
             value: 100.into(),
             data: FromHex::from_hex("5b600056").unwrap(),
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state.add_balance(&t.sender(), &(100.into()), CleanupMode::NoEmpty).unwrap();
         let result = state.apply(&info, &machine, &t, true).unwrap();
@@ -1530,7 +1529,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(&Address::from_low_u64_be(0xa), FromHex::from_hex("6000").unwrap())
@@ -1575,7 +1574,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state.add_balance(&t.sender(), &(100.into()), CleanupMode::NoEmpty).unwrap();
         let result = state.apply(&info, &machine, &t, true).unwrap();
@@ -1617,7 +1616,7 @@ mod tests {
             value: 0.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         let result = state.apply(&info, &machine, &t, true).unwrap();
 
@@ -1659,7 +1658,7 @@ mod tests {
             value: 0.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -1707,7 +1706,7 @@ mod tests {
             value: 0.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -1774,7 +1773,7 @@ mod tests {
             value: 0.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -1846,7 +1845,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(&Address::from_low_u64_be(0xa), FromHex::from_hex("5b600056").unwrap())
@@ -1888,7 +1887,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -1958,7 +1957,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -2021,7 +2020,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -2069,7 +2068,7 @@ mod tests {
             value: 100.into(),
             data: vec![], //600480600b6000396000f35b600056
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -2135,7 +2134,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -2226,7 +2225,7 @@ mod tests {
             value: 100.into(),
             data: vec![], //600480600b6000396000f35b600056
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(
@@ -2315,7 +2314,7 @@ mod tests {
             value: 100.into(),
             data: vec![],
         })
-            .sign(&secret(), None);
+        .sign(&secret(), None);
 
         state
             .init_code(

@@ -1359,13 +1359,13 @@ mod tests {
     use ethjson::spec::builtin::{
         AltBn128Pairing as JsonAltBn128PairingPricing, Builtin as JsonBuiltin, Linear as JsonLinearPricing, Pricing as JsonPricing, PricingAt
     };
+    use hex::FromHex;
     use hex_literal::hex;
     use macros::map;
     use maplit::btreemap;
     use num_bigint::BigUint;
     use num_traits::{One, Zero};
     use parity_bytes::BytesRef;
-    use hex::FromHex;
     use std::convert::TryFrom;
 
     #[test]

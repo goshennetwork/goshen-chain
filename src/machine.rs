@@ -5,9 +5,7 @@ use common_types::BlockNumber;
 use ethcore::machine::EthereumMachine;
 use ethcore::spec::CommonParams;
 use ethcore_builtin::{
-    AltBn128ConstOperations, AltBn128PairingPricer, AltBn128PairingPrice, Blake2F, Blake2FPricer,
-    Bn128Add, Bn128Mul, Bn128Pairing, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp,
-    Modexp2565Pricer, Pricing, Ripemd160, Sha256, ModexpPricer
+    AltBn128ConstOperations, AltBn128PairingPrice, AltBn128PairingPricer, Blake2F, Blake2FPricer, Bn128Add, Bn128Mul, Bn128Pairing, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, Modexp2565Pricer, ModexpPricer, Pricing, Ripemd160, Sha256
 };
 use ethereum_types::{Address, H160, U256};
 
@@ -58,7 +56,7 @@ fn create_builtins() -> BTreeMap<Address, Builtin> {
     map.insert(
         H160(address),
         Builtin {
-            pricer: BTreeMap::from([(0, Pricing::Modexp(ModexpPricer {divisor:20}))]),
+            pricer: BTreeMap::from([(0, Pricing::Modexp(ModexpPricer { divisor: 20 }))]),
             native: EthereumBuiltin::Modexp(Modexp),
         },
     );
@@ -66,7 +64,10 @@ fn create_builtins() -> BTreeMap<Address, Builtin> {
     map.insert(
         H160(address),
         Builtin {
-            pricer: BTreeMap::from([(0, Pricing::AltBn128ConstOperations(AltBn128ConstOperations { price: 150 }))]),
+            pricer: BTreeMap::from([(
+                0,
+                Pricing::AltBn128ConstOperations(AltBn128ConstOperations { price: 150 }),
+            )]),
             native: EthereumBuiltin::Bn128Add(Bn128Add),
         },
     );
@@ -74,7 +75,10 @@ fn create_builtins() -> BTreeMap<Address, Builtin> {
     map.insert(
         H160(address),
         Builtin {
-            pricer: BTreeMap::from([(0, Pricing::AltBn128ConstOperations(AltBn128ConstOperations {price: 6000}))]),
+            pricer: BTreeMap::from([(
+                0,
+                Pricing::AltBn128ConstOperations(AltBn128ConstOperations { price: 6000 }),
+            )]),
             native: EthereumBuiltin::Bn128Mul(Bn128Mul),
         },
     );
@@ -82,9 +86,12 @@ fn create_builtins() -> BTreeMap<Address, Builtin> {
     map.insert(
         H160(address),
         Builtin {
-            pricer: BTreeMap::from([(0, Pricing::AltBn128Pairing(AltBn128PairingPricer{ price: AltBn128PairingPrice{
-                base:45000, pair: 34000
-            } }))]),
+            pricer: BTreeMap::from([(
+                0,
+                Pricing::AltBn128Pairing(AltBn128PairingPricer {
+                    price: AltBn128PairingPrice { base: 45000, pair: 34000 },
+                }),
+            )]),
             native: EthereumBuiltin::Bn128Pairing(Bn128Pairing),
         },
     );

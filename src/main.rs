@@ -1,8 +1,8 @@
 #![no_std]
 #![no_main]
 
-extern crate riscv_evm;
 extern crate alloc;
+extern crate riscv_evm;
 
 use alloc::format;
 use core::str::FromStr;
@@ -10,8 +10,8 @@ use ethereum_types::H256;
 use rustc_hex::FromHex;
 
 use common_types::bytes::ToPretty;
-use riscv_l2chain::riscv_db::RiscvDB;
 use hash_db::HashDB;
+use riscv_l2chain::riscv_db::RiscvDB;
 use riscv_l2chain::{state_transition, state_transition_to_header};
 
 #[no_mangle]

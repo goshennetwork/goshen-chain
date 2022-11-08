@@ -3,17 +3,17 @@ use alloc::vec::Vec;
 use core::cell::RefCell;
 use core::hash::Hash;
 
+use common_types::hash::{keccak, keccak256};
 use ethereum_types::{Address, H256};
 use hashbrown::HashSet;
-use common_types::hash::{keccak, keccak256};
 
 use hash_db::{AsHashDB, HashDB};
 use keccak_hasher::KeccakHasher;
 use memory_db::MemoryDB;
 use trie_db::DBValue;
 
-use ethcore::state::{Account, Backend};
 use ethcore::state::backend::ProofCheck;
+use ethcore::state::{Account, Backend};
 
 #[derive(Clone, PartialEq)]
 pub struct RiscvDB(ProofCheck);
@@ -33,7 +33,7 @@ impl HashDB<KeccakHasher, DBValue> for RiscvDB {
     fn contains(&self, key: &H256) -> bool {
         match self.get(key) {
             Some(t) => true,
-            None => false
+            None => false,
         }
     }
 
@@ -41,8 +41,7 @@ impl HashDB<KeccakHasher, DBValue> for RiscvDB {
         keccak(value)
     }
 
-    fn emplace(&mut self, key: H256, value: DBValue) {
-    }
+    fn emplace(&mut self, key: H256, value: DBValue) {}
 
     fn remove(&mut self, _key: &H256) {}
 }
@@ -69,8 +68,8 @@ impl Backend for RiscvDB {
         None
     }
     fn get_cached<F, U>(&self, _a: &Address, _f: F) -> Option<U>
-        where
-            F: FnOnce(Option<&mut Account>) -> U,
+    where
+        F: FnOnce(Option<&mut Account>) -> U,
     {
         None
     }

@@ -21,8 +21,8 @@ extern crate criterion;
 extern crate bit_set;
 extern crate ethereum_types;
 extern crate evm;
-extern crate parity_bytes as bytes;
 extern crate hex;
+extern crate parity_bytes as bytes;
 extern crate vm;
 
 use bytes::Bytes;

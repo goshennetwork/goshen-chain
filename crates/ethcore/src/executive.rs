@@ -38,7 +38,7 @@ use hash::{keccak, KECCAK_EMPTY};
 use types::l2_cfg::L1_CROSS_LAYER_WITNESS;
 use types::transaction::{Action, SignedTransaction, TypedTransaction};
 use vm::{
-    self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError,
+    self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError
 };
 
 #[cfg(any(test, feature = "test-helpers"))]
@@ -193,7 +193,7 @@ impl TransactOptions<trace::NoopTracer, trace::NoopVMTracer> {
 
 /// Trap result returned by executive.
 pub type ExecutiveTrapResult<'a, T> =
-vm::TrapResult<T, CallCreateExecutive<'a>, CallCreateExecutive<'a>>;
+    vm::TrapResult<T, CallCreateExecutive<'a>, CallCreateExecutive<'a>>;
 /// Trap error for executive.
 pub type ExecutiveTrapError<'a> = vm::TrapError<CallCreateExecutive<'a>, CallCreateExecutive<'a>>;
 
@@ -416,9 +416,9 @@ impl<'a> CallCreateExecutive<'a> {
         origin_info: &'any OriginInfo, substate: &'any mut Substate, output: OutputPolicy,
         tracer: &'any mut T, vm_tracer: &'any mut V,
     ) -> Externalities<'any, T, V, B>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         Externalities::new(
             state,
@@ -468,8 +468,8 @@ impl<'a> CallCreateExecutive<'a> {
                         .machine
                         .builtin(&params.code_address, self.info.number)
                         .expect(
-                            "Builtin is_some is checked when creating this kind in new_call_raw; qed",
-                        );
+                        "Builtin is_some is checked when creating this kind in new_call_raw; qed",
+                    );
 
                     Self::check_static_flag(&params, self.static_flag, self.is_create)?;
                     state.checkpoint();
@@ -985,9 +985,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn transact<T, V>(
         &'a mut self, t: &SignedTransaction, options: TransactOptions<T, V>,
     ) -> Result<Executed<T::Output, V::Output>, ExecutionError>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         self.transact_with_tracer(
             t,
@@ -1004,9 +1004,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn transact_virtual<T, V>(
         &'a mut self, t: &SignedTransaction, options: TransactOptions<T, V>,
     ) -> Result<Executed<T::Output, V::Output>, ExecutionError>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         let sender = t.sender();
         let balance = self.state.balance(&sender)?;
@@ -1025,9 +1025,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         &'a mut self, t: &SignedTransaction, check_nonce: bool, output_from_create: bool,
         mut tracer: T, mut vm_tracer: V,
     ) -> Result<Executed<T::Output, V::Output>, ExecutionError>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         let schedule = self.schedule;
 
@@ -1057,10 +1057,11 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
             let info = alloc::format!("ill sender: 0x{}", sender.to_hex());
             let code_hash = self.state.code_hash(&sender).expect(info.as_str());
             match code_hash {
-                Some(hash) =>
+                Some(hash) => {
                     if hash != KECCAK_EMPTY && hash != H256::zero() {
                         return Err(ExecutionError::SenderMustEoa);
                     }
+                }
                 None => (),
             };
         }
@@ -1240,9 +1241,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         &mut self, params: ActionParams, substate: &mut Substate, stack_depth: usize,
         tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         tracer.prepare_trace_call(
             &params,
@@ -1265,7 +1266,7 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
             stack_depth,
             self.static_flag,
         )
-            .consume(self.state, substate, tracer, vm_tracer);
+        .consume(self.state, substate, tracer, vm_tracer);
 
         match result {
             Ok(ref val) if val.apply_state => {
@@ -1287,9 +1288,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn call<T, V>(
         &mut self, params: ActionParams, substate: &mut Substate, tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         self.call_with_stack_depth(params, substate, 0, tracer, vm_tracer)
     }
@@ -1301,9 +1302,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         &mut self, params: ActionParams, substate: &mut Substate, stack_depth: usize,
         tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         tracer.prepare_trace_create(&params);
         vm_tracer
@@ -1323,7 +1324,7 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
             stack_depth,
             self.static_flag,
         )
-            .consume(self.state, substate, tracer, vm_tracer);
+        .consume(self.state, substate, tracer, vm_tracer);
 
         match result {
             Ok(ref val) if val.apply_state => {
@@ -1345,9 +1346,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
     pub fn create<T, V>(
         &mut self, params: ActionParams, substate: &mut Substate, tracer: &mut T, vm_tracer: &mut V,
     ) -> vm::Result<FinalizationResult>
-        where
-            T: Tracer,
-            V: VMTracer,
+    where
+        T: Tracer,
+        V: VMTracer,
     {
         self.create_with_stack_depth(params, substate, 0, tracer, vm_tracer)
     }
@@ -1497,7 +1498,7 @@ mod tests {
     use crate::state::{CleanupMode, Substate};
     use crate::test_helpers::{get_temp_state, get_temp_state_with_factory};
     use crate::trace::{
-        trace, ExecutiveTracer, ExecutiveVMTracer, FlatTrace, MemoryDiff, NoopTracer, NoopVMTracer, StorageDiff, Tracer, VMExecutedOperation, VMOperation, VMTrace, VMTracer,
+        trace, ExecutiveTracer, ExecutiveVMTracer, FlatTrace, MemoryDiff, NoopTracer, NoopVMTracer, StorageDiff, Tracer, VMExecutedOperation, VMOperation, VMTrace, VMTracer
     };
     use alloc::sync::Arc;
     use bytes::Bytes;
@@ -1507,7 +1508,7 @@ mod tests {
     use evm::{evm_test, evm_test_ignore, Factory, VMType};
     use hex::FromHex;
     use types::transaction::{
-        AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction,
+        AccessListTx, Action, EIP1559TransactionTx, Transaction, TypedTransaction
     };
     use vm::{ActionParams, ActionValue, CallType, CreateContractAddress, EnvInfo};
 
@@ -1542,7 +1543,7 @@ mod tests {
                 &U256::from(88),
                 &[],
             )
-                .0
+            .0
         );
     }
 
@@ -1556,7 +1557,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.sender = sender.clone();
@@ -1620,7 +1621,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -1761,7 +1762,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -1891,7 +1892,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.code_address = address.clone();
@@ -1972,7 +1973,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -2145,7 +2146,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();
@@ -2207,14 +2208,14 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         let next_address = contract_address(
             CreateContractAddress::FromSenderAndNonce,
             &address,
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.sender = sender.clone();
@@ -2339,7 +2340,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         let mut params = ActionParams::default();
         params.address = address.clone();
         params.gas = U256::from(100_000u64);
@@ -2380,7 +2381,7 @@ mod tests {
             gas_price: U256::zero(),
             nonce: U256::zero(),
         })
-            .sign(keypair.secret(), None);
+        .sign(keypair.secret(), None);
         let sender = t.sender();
         let contract = contract_address(
             CreateContractAddress::FromSenderAndNonce,
@@ -2388,7 +2389,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
 
         let mut state = get_temp_state_with_factory(factory);
         state.add_balance(&sender, &U256::from(18), CleanupMode::NoEmpty).unwrap();
@@ -2429,7 +2430,7 @@ mod tests {
             gas_price: U256::zero(),
             nonce: U256::one(),
         })
-            .sign(keypair.secret(), None);
+        .sign(keypair.secret(), None);
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
@@ -2447,10 +2448,10 @@ mod tests {
 
         match res {
             Err(ExecutionError::InvalidNonce { expected, got })
-            if expected == U256::zero() && got == U256::one() =>
-                {
-                    ()
-                }
+                if expected == U256::zero() && got == U256::one() =>
+            {
+                ()
+            }
             _ => assert!(false, "Expected invalid nonce error."),
         }
     }
@@ -2466,7 +2467,7 @@ mod tests {
             gas_price: U256::zero(),
             nonce: U256::zero(),
         })
-            .sign(keypair.secret(), None);
+        .sign(keypair.secret(), None);
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
@@ -2485,12 +2486,12 @@ mod tests {
 
         match res {
             Err(ExecutionError::BlockGasLimitReached { gas_limit, gas_used, gas })
-            if gas_limit == U256::from(100_000)
-                && gas_used == U256::from(20_000)
-                && gas == U256::from(80_001) =>
-                {
-                    ()
-                }
+                if gas_limit == U256::from(100_000)
+                    && gas_used == U256::from(20_000)
+                    && gas == U256::from(80_001) =>
+            {
+                ()
+            }
             _ => assert!(false, "Expected block gas limit error."),
         }
     }
@@ -2518,7 +2519,7 @@ mod tests {
             ),
             max_priority_fee_per_gas: U256::from(30),
         })
-            .sign(keypair.secret(), None);
+        .sign(keypair.secret(), None);
 
         let sender = t.sender();
 
@@ -2551,7 +2552,7 @@ mod tests {
             gas_price: U256::one(),
             nonce: U256::zero(),
         })
-            .sign(keypair.secret(), None);
+        .sign(keypair.secret(), None);
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
@@ -2569,10 +2570,10 @@ mod tests {
 
         match res {
             Err(ExecutionError::NotEnoughCash { required, got })
-            if required == U512::from(100_018) && got == U512::from(100_017) =>
-                {
-                    ()
-                }
+                if required == U512::from(100_018) && got == U512::from(100_017) =>
+            {
+                ()
+            }
             _ => assert!(false, "Expected not enough cash error. {:?}", res),
         }
     }
@@ -2604,7 +2605,7 @@ mod tests {
             ),
             max_priority_fee_per_gas,
         })
-            .sign(keypair.secret(), None);
+        .sign(keypair.secret(), None);
 
         let sender = t.sender();
 
@@ -2624,13 +2625,13 @@ mod tests {
 
         match res {
             Err(ExecutionError::NotEnoughCash { required, got })
-            if required
-                == U512::from(max_priority_fee_per_gas) * U512::from(100_000)
-                + U512::from(17)
-                && got == U512::from(15000017) =>
-                {
-                    ()
-                }
+                if required
+                    == U512::from(max_priority_fee_per_gas) * U512::from(100_000)
+                        + U512::from(17)
+                    && got == U512::from(15000017) =>
+            {
+                ()
+            }
             _ => assert!(false, "Expected not enough cash error. {:?}", res),
         }
     }
@@ -2662,7 +2663,7 @@ mod tests {
             ),
             max_priority_fee_per_gas,
         })
-            .sign(keypair.secret(), None);
+        .sign(keypair.secret(), None);
 
         let sender = t.sender();
 
@@ -2682,10 +2683,10 @@ mod tests {
 
         match res {
             Err(ExecutionError::TransactionMalformed(err))
-            if err.contains("maxPriorityFeePerGas higher than maxFeePerGas") =>
-                {
-                    ()
-                }
+                if err.contains("maxPriorityFeePerGas higher than maxFeePerGas") =>
+            {
+                ()
+            }
             _ => assert!(
                 false,
                 "Expected maxPriorityFeePerGas higher than maxFeePerGas error. {:?}",
@@ -2705,7 +2706,7 @@ mod tests {
             &U256::zero(),
             &[],
         )
-            .0;
+        .0;
         // TODO: add tests for 'callcreate'
         //let next_address = contract_address(&address, &U256::zero());
         let mut params = ActionParams::default();

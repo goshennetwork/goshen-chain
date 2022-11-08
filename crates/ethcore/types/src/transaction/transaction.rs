@@ -18,7 +18,7 @@
 
 use crate::transaction::{error, Error};
 use crypto::hash::keccak;
-use crypto::publickey::{Message, recover, Signature};
+use crypto::publickey::{recover, Message, Signature};
 use ethereum_types::{Address, BigEndianHash, H160, H256, U256};
 
 #[cfg(feature = "std")]
@@ -288,7 +288,7 @@ impl AccessListTx {
             signature,
             H256::zero(),
         )
-            .compute_hash())
+        .compute_hash())
     }
 
     fn encode_payload(
@@ -413,7 +413,7 @@ impl EIP1559TransactionTx {
             signature,
             H256::zero(),
         )
-            .compute_hash())
+        .compute_hash())
     }
 
     fn encode_payload(
@@ -518,7 +518,7 @@ impl TypedTransaction {
             },
             hash: H256::zero(),
         }
-            .compute_hash()
+        .compute_hash()
     }
 
     /// Specify the sender; this won't survive the serialize/deserialize process, but can be cloned.
@@ -530,7 +530,7 @@ impl TypedTransaction {
                 signature: SignatureComponents { r: U256::one(), s: U256::one(), standard_v: 4 },
                 hash: H256::zero(),
             }
-                .compute_hash(),
+            .compute_hash(),
             sender: from,
         }
     }
@@ -546,7 +546,7 @@ impl TypedTransaction {
                 signature: SignatureComponents { r: U256::zero(), s: U256::zero(), standard_v: 0 },
                 hash: H256::zero(),
             }
-                .compute_hash(),
+            .compute_hash(),
             sender: UNSIGNED_SENDER,
         }
     }
@@ -560,7 +560,7 @@ impl TypedTransaction {
             signature: SignatureComponents { r: U256::one(), s: U256::one(), standard_v: 0 },
             hash: H256::zero(),
         }
-            .compute_hash()
+        .compute_hash()
     }
 
     // Next functions are for encoded/decode
@@ -670,15 +670,15 @@ impl TypedTransaction {
         for tx in rlp.iter() {
             let decoded_tx = Self::decode_rlp(&tx);
             match decoded_tx {
-                Ok(t) => {
-                    output.push(t)
-                }
+                Ok(t) => output.push(t),
                 Err(error) => {
                     #[cfg(not(feature = "riscv"))]
-                    println!("decode batch tx failed: {}",error.to_string());
+                    println!("decode batch tx failed: {}", error.to_string());
 
                     #[cfg(feature = "riscv")]
-                    riscv_evm::runtime::debug(alloc::format!("decode batch tx failed: {}", error).as_str());
+                    riscv_evm::runtime::debug(
+                        alloc::format!("decode batch tx failed: {}", error).as_str(),
+                    );
                 }
             }
         }
@@ -1073,7 +1073,7 @@ mod tests {
             value: U256::from(1u32),
             data: b"Hello!".to_vec(),
         })
-            .sign(&key.secret(), None);
+        .sign(&key.secret(), None);
         assert_eq!(Address::from(keccak(key.public())), t.sender());
         assert_eq!(t.chain_id(), None);
     }
@@ -1088,7 +1088,7 @@ mod tests {
             value: U256::from(1u32),
             data: b"Hello!".to_vec(),
         })
-            .fake_sign(Address::from_low_u64_be(0x69));
+        .fake_sign(Address::from_low_u64_be(0x69));
         assert_eq!(Address::from_low_u64_be(0x69), t.sender());
         assert_eq!(t.chain_id(), None);
 
@@ -1110,7 +1110,7 @@ mod tests {
             value: U256::from(1u32),
             data: vec![],
         })
-            .null_sign(1);
+        .null_sign(1);
 
         let res = SignedTransaction::new(t.transaction);
         match res {
@@ -1130,7 +1130,7 @@ mod tests {
             value: U256::from(1),
             data: b"Hello!".to_vec(),
         })
-            .sign(&key.secret(), Some(69));
+        .sign(&key.secret(), Some(69));
         assert_eq!(Address::from(keccak(key.public())), t.sender());
         assert_eq!(t.chain_id(), Some(69));
     }
@@ -1155,7 +1155,7 @@ mod tests {
                 (H160::from_low_u64_be(400), vec![]),
             ],
         ))
-            .sign(&key.secret(), Some(69));
+        .sign(&key.secret(), Some(69));
         let encoded = t.encode();
 
         let t_new =
@@ -1188,7 +1188,7 @@ mod tests {
             ),
             max_priority_fee_per_gas: U256::from(100u32),
         })
-            .sign(&key.secret(), Some(69));
+        .sign(&key.secret(), Some(69));
         let encoded = t.encode();
 
         let t_new =
@@ -1296,7 +1296,7 @@ mod tests {
             ),
             max_priority_fee_per_gas: gas_price,
         })
-            .sign(&key.secret(), Some(69));
+        .sign(&key.secret(), Some(69));
 
         let result = t.transaction.effective_gas_price(Some(124.into()));
         assert_eq!(

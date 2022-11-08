@@ -22,8 +22,7 @@ use rlp::{Decodable, DecoderError, Encodable, Rlp, RlpStream};
 
 use super::error::Error;
 use alloc::vec::Vec;
-use evm::CallType;
-use evm::Instruction;
+use evm::{CallType, Instruction};
 use vm::ActionParams;
 
 /// `Call` result.
@@ -456,13 +455,16 @@ impl VMTrace {
     pub fn evm_print(&self) {
         for op in self.operations.iter() {
             match &op.executed {
-                Some(e) => riscv_evm::runtime::debug(alloc::format!(
-                    "{},{},{},{}",
-                    op.pc,
-                    Instruction::from_u8(op.instruction).unwrap().info().name,
-                    op.gas_cost + e.gas_used,
-                    op.gas_cost
-                ).as_str()),
+                Some(e) => riscv_evm::runtime::debug(
+                    alloc::format!(
+                        "{},{},{},{}",
+                        op.pc,
+                        Instruction::from_u8(op.instruction).unwrap().info().name,
+                        op.gas_cost + e.gas_used,
+                        op.gas_cost
+                    )
+                    .as_str(),
+                ),
                 None => (),
             }
         }

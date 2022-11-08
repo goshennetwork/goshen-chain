@@ -30,7 +30,7 @@ use alloc::sync::Arc;
 use alloc::vec::Vec;
 use bytes::{Bytes, ToPretty};
 use ethereum_types::{Address, BigEndianHash, H64, U256, U64};
-use hash::{H256, keccak};
+use hash::{keccak, H256};
 
 use ethtrie::TrieFactory;
 use evm::VMType;
@@ -97,7 +97,7 @@ pub fn generate_block(
         info.gas_range_target,
         info.extra_data.clone(),
     )
-        .ok()?;
+    .ok()?;
 
     let block_number = open_block.header.number();
     let mut skipped_transactions = 0usize;
@@ -125,10 +125,10 @@ pub fn generate_block(
 
         match result {
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
-                                     gas_limit,
-                                     gas_used,
-                                     gas,
-                                 })) => {
+                gas_limit,
+                gas_used,
+                gas,
+            })) => {
                 //debug!(target: "miner", "Skipping adding transaction to block because of gas limit: {:?} (limit: {:?}, used: {:?}, gas: {:?})", hash, gas_limit, gas_used, gas);
                 // Exit early if gas left is smaller then min_tx_gas
                 let gas_left = gas_limit - gas_used;
@@ -181,13 +181,22 @@ pub fn generate_block(
         Ok(t) => {
             let sealed_block = t.lock().try_seal(engine, Vec::new()).expect("seal failed");
             #[cfg(not(feature = "riscv"))]
-            println!("{}: 0x{}, txNum: {}", sealed_block.header.number(),
-                     sealed_block.header.hash().to_hex(),
-                     sealed_block.transactions.len());
+            println!(
+                "{}: 0x{}, txNum: {}",
+                sealed_block.header.number(),
+                sealed_block.header.hash().to_hex(),
+                sealed_block.transactions.len()
+            );
             #[cfg(feature = "riscv")]
-            riscv_evm::runtime::debug(alloc::format!(
-                "{}: 0x{}, txNum: {}", sealed_block.header.number(),
-                sealed_block.header.hash().to_hex(), sealed_block.transactions.len()).as_str());
+            riscv_evm::runtime::debug(
+                alloc::format!(
+                    "{}: 0x{}, txNum: {}",
+                    sealed_block.header.number(),
+                    sealed_block.header.hash().to_hex(),
+                    sealed_block.transactions.len()
+                )
+                .as_str(),
+            );
             Some(sealed_block)
         }
         Err(e) => panic!("{}", e),

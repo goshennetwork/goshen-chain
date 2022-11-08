@@ -20,8 +20,8 @@ extern crate criterion;
 extern crate ethcore;
 extern crate ethcore_builtin;
 extern crate ethereum_types;
-extern crate parity_bytes as bytes;
 extern crate hex;
+extern crate parity_bytes as bytes;
 
 use std::str::FromStr;
 

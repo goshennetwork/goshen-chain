@@ -404,15 +404,19 @@ impl Header {
     }
 
     pub fn print(&self) -> alloc::string::String {
-        return alloc::format!("gas used {}, state root 0x{}, receipts root 0x{}",
-                              self.gas_used, self.state_root.to_hex(), self.receipts_root.to_hex());
+        return alloc::format!(
+            "gas used {}, state root 0x{}, receipts root 0x{}",
+            self.gas_used,
+            self.state_root.to_hex(),
+            self.receipts_root.to_hex()
+        );
     }
 }
 
 /// Alter value of given field, reset memoised hash if changed.
 fn change_field<T>(hash: &mut Option<H256>, field: &mut T, value: T)
-    where
-        T: PartialEq<T>,
+where
+    T: PartialEq<T>,
 {
     if field != &value {
         *field = value;
@@ -488,8 +492,8 @@ impl ExtendedHeader {
 #[cfg(test)]
 mod tests {
     use ethereum_types::U256;
-    use rlp::{self, Rlp};
     use hex::FromHex;
+    use rlp::{self, Rlp};
 
     use crate::BlockNumber;
 
