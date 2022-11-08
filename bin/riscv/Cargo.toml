@@ -14,9 +14,10 @@ keccak-hasher = { path = "../../crates/util/keccak-hasher", default-features = f
 ethereum-types = { version = "0.12.1", features = ["rlp"], default-features = false }
 ethcore-builtin = { path = "../../crates/vm/builtin", default-features = false }
 byteorder = { version = "1.3.2", default-features = false }
-common-types = { path = "../../crates/ethcore/types", default-features = false }
+common-types = { path = "../../crates/ethcore/types", default-features = false}
 rlp = { version = "0.5.1", default-features = false }
 rustc-hex = { version = "2.1.0", default-features = false }
 riscv-evm = { path = "../../crates/util/riscv-evm", default-features = true }
 hashbrown = "0.12.0"
 goshen-chain = { path = "../../", default-features = false }
+buddy-alloc = "0.4.1"

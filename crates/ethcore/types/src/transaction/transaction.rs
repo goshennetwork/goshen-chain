@@ -672,10 +672,10 @@ impl TypedTransaction {
             match decoded_tx {
                 Ok(t) => output.push(t),
                 Err(error) => {
-                    #[cfg(not(feature = "riscv"))]
+                    #[cfg(feature = "std")]
                     println!("decode batch tx failed: {}", error.to_string());
 
-                    #[cfg(feature = "riscv")]
+					#[cfg(not(feature = "std"))]
                     riscv_evm::runtime::debug(
                         alloc::format!("decode batch tx failed: {}", error).as_str(),
                     );

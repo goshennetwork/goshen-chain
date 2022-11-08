@@ -153,10 +153,10 @@ pub fn generate_block(
                 //debug!(target: "miner", "Skipping non-allowed transaction for sender {:?}", hash);
             }
             Err(_e) => {
-                #[cfg(not(feature = "riscv"))]
+				#[cfg(feature = "std")]
                 println!("push tx, {}", _e);
 
-                #[cfg(feature = "riscv")]
+				#[cfg(not(feature = "std"))]
                 riscv_evm::runtime::debug(alloc::format!("push tx, {}", _e).as_str());
             }
             // imported ok
@@ -180,14 +180,14 @@ pub fn generate_block(
     match closed_block {
         Ok(t) => {
             let sealed_block = t.lock().try_seal(engine, Vec::new()).expect("seal failed");
-            #[cfg(not(feature = "riscv"))]
+            #[cfg(feature = "std")]
             println!(
                 "{}: 0x{}, txNum: {}",
                 sealed_block.header.number(),
                 sealed_block.header.hash().to_hex(),
                 sealed_block.transactions.len()
             );
-            #[cfg(feature = "riscv")]
+			#[cfg(not(feature = "std"))]
             riscv_evm::runtime::debug(
                 alloc::format!(
                     "{}: 0x{}, txNum: {}",

@@ -5,7 +5,6 @@ use alloc::string::String;
 use core::fmt;
 use core::hash::{Hash, Hasher};
 use core::ops::{Deref, DerefMut};
-use core::str::FromStr;
 use ethereum_types::{Address, H256, H520};
 use rustc_hex::ToHex;
 
@@ -177,9 +176,7 @@ impl DerefMut for Signature {
     }
 }
 
-#[cfg(feature = "riscv")]
 use riscv_evm::runtime::ecrecover;
-#[cfg(feature = "riscv")]
 pub fn recover(signature: &Signature, message: &Message) -> Option<Address> {
     let r = signature.r();
     let s = signature.s();

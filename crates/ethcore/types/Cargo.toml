@@ -9,7 +9,7 @@ authors = [
 ]
 
 [dependencies]
-ethereum-types = {version = "0.12.1", default-features = false}
+ethereum-types = {version = "0.12.1", default-features = false, features = ["rlp"]}
 keccak-hash = {version="0.8.0",default-features = false}
 parity-bytes = {version = "0.1", default-features = false}
 crypto = {path = "../../crypto", default-features = false }
@@ -17,8 +17,7 @@ rlp = { version = "0.5.1", default-features = false }
 rlp_derive = { path = "../../util/rlp-derive" }
 unexpected = { path = "../../util/unexpected" }
 serde = {version="1.0",default-features=false}
-riscv-evm = { path = "../../util/riscv-evm", default-features = false, optional = true }
-
+riscv-evm = { path = "../../util/riscv-evm", default-features = false}
 
 [dev-dependencies]
 hex = { version = "0.4", default-features = false }
@@ -26,4 +25,3 @@ hex = { version = "0.4", default-features = false }
 [features]
 std = ["crypto/std"]
 test-helpers = ["std"]
-riscv = ["riscv-evm"]
