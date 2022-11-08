@@ -675,7 +675,7 @@ impl TypedTransaction {
                     #[cfg(feature = "std")]
                     println!("decode batch tx failed: {}", error.to_string());
 
-					#[cfg(not(feature = "std"))]
+                    #[cfg(not(feature = "std"))]
                     riscv_evm::runtime::debug(
                         alloc::format!("decode batch tx failed: {}", error).as_str(),
                     );

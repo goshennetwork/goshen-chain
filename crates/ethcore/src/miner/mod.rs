@@ -153,10 +153,10 @@ pub fn generate_block(
                 //debug!(target: "miner", "Skipping non-allowed transaction for sender {:?}", hash);
             }
             Err(_e) => {
-				#[cfg(feature = "std")]
+                #[cfg(feature = "std")]
                 println!("push tx, {}", _e);
 
-				#[cfg(not(feature = "std"))]
+                #[cfg(not(feature = "std"))]
                 riscv_evm::runtime::debug(alloc::format!("push tx, {}", _e).as_str());
             }
             // imported ok
@@ -187,7 +187,7 @@ pub fn generate_block(
                 sealed_block.header.hash().to_hex(),
                 sealed_block.transactions.len()
             );
-			#[cfg(not(feature = "std"))]
+            #[cfg(not(feature = "std"))]
             riscv_evm::runtime::debug(
                 alloc::format!(
                     "{}: 0x{}, txNum: {}",
