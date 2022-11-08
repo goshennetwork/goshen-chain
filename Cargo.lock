@@ -827,6 +827,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "goshen-chain"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "common-types",
+ "ethcore",
+ "ethcore-builtin",
+ "ethereum-types",
+ "hash-db 0.12.4",
+ "hashbrown 0.12.3",
+ "keccak-hasher 0.1.1",
+ "memory-db 0.11.0",
+ "rlp",
+ "rustc-hex",
+ "trie-db",
+]
+
+[[package]]
 name = "hash-db"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1786,10 +1804,10 @@ dependencies = [
  "ethcore",
  "ethcore-builtin",
  "ethereum-types",
+ "goshen-chain",
  "hash-db 0.12.4",
  "keccak-hasher 0.1.1",
  "memory-db 0.11.0",
- "riscv-l2chain",
  "rlp",
  "rustc-hex",
  "trie-db",
@@ -1804,6 +1822,7 @@ dependencies = [
  "ethcore",
  "ethcore-builtin",
  "ethereum-types",
+ "goshen-chain",
  "hash-db 0.12.4",
  "hashbrown 0.12.3",
  "keccak-hasher 0.1.1",

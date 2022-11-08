@@ -27,8 +27,6 @@ use crate::input::load_last_hashes;
 mod consts;
 mod input;
 mod machine;
-#[cfg(feature = "riscv")]
-pub mod riscv_db;
 
 type HashDBOracle = dyn HashDB<KeccakHasher, DBValue>;
 
@@ -68,8 +66,6 @@ pub fn state_transition_to_header(
             prev = block.header.clone();
         } else {
             prev = info.parent_block_header;
-            #[cfg(feature = "riscv")]
-            riscv_evm::runtime::panic(format!("halt at {}", prev.number() + 1).as_str());
         }
     }
 

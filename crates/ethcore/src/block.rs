@@ -244,8 +244,8 @@ impl<'x> OpenBlock<'x> {
         }
 
         // adjust difficulty
-        let mut difficulty = self.block.header.difficulty();
         if t.is_enqueued() {
+            let mut difficulty = self.block.header.difficulty();
             self.block.header.set_difficulty(*difficulty + 1);
         }
 

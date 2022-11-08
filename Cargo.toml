@@ -1,6 +1,6 @@
 [package]
 description = "Riscv L2 Chain"
-name = "riscv-l2chain"
+name = "goshen-chain"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,18 +12,16 @@ hash-db = { path = "crates/db/hash-db-0.12.4", default-features = false }
 memory-db = { path = "crates/db/memory-db", default-features = false }
 trie-db = { path = "crates/db/trie-db-0.12.4", default-features = false }
 keccak-hasher = { path = "crates/util/keccak-hasher", default-features = false }
-ethereum-types = { version = "0.12.1",features=["rlp"], default-features = false }
+ethereum-types = { version = "0.12.1", features = ["rlp"], default-features = false }
 ethcore-builtin = { path = "crates/vm/builtin", default-features = false }
 byteorder = { version = "1.3.2", default-features = false }
 common-types = { path = "./crates/ethcore/types", default-features = false }
 rlp = { version = "0.5.1", default-features = false }
 rustc-hex = { version = "2.1.0", default-features = false }
-riscv-evm = { path = "crates/util/riscv-evm", default-features = false, optional = true }
 hashbrown = "0.12.0"
 
 [features]
 json-tests = ["ethcore/json-tests"]
-riscv = ["riscv-evm","ethcore/riscv"]
 
 [profile.test]
 lto = false
@@ -42,9 +40,10 @@ panic = "abort"
 # in the dependency tree in any other way
 # (i.e. pretty much only standalone CLI tools)
 members = [
-	"crates/crypto",
-	"crates/ethcore",
-	"crates/util/brotli",
-	"crates/util/riscv-evm",
-    "bin"
+    "crates/crypto",
+    "crates/ethcore",
+    "crates/util/brotli",
+    "crates/util/riscv-evm",
+    "bin/std",
+    "bin/riscv"
 ]

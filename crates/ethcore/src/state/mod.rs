@@ -1235,7 +1235,7 @@ impl<B: Backend> State<B> {
                 let db = &self.db.as_hash_db();
                 let db = self.factories.trie.readonly(db, &self.root)?;
                 let from_rlp = |b: &[u8]| Account::from_rlp(b).expect("decoding db value failed");
-                let mut maybe_acc = db.get_with(a.as_bytes(), from_rlp).unwrap();
+                let mut maybe_acc = db.get_with(a.as_bytes(), from_rlp)?;
                 if let Some(ref mut account) = maybe_acc.as_mut() {
                     let accountdb = self
                         .factories
