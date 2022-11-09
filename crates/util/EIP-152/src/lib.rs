@@ -188,7 +188,7 @@ mod tests {
 		];
         for (hex, output) in vec {
             let hex = hex;
-            let bytes: Vec<u8> = hex.from_hex().unwrap();
+            let bytes: Vec<u8> = FromHex::from_hex(hex).unwrap();
 
             assert_eq!(bytes.len(), 213);
 
@@ -209,7 +209,7 @@ mod tests {
 
             compress(&mut h, m, t, f, rounds as usize);
 
-            let output: Vec<u8> = output.from_hex().unwrap();
+            let output: Vec<u8> = FromHex::from_hex(output).unwrap();
 
             let mut out = [0u64; 8];
             to_u64_slice(&output[..], &mut out);
