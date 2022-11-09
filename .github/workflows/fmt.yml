@@ -22,12 +22,7 @@ jobs:
         uses:                   actions-rs/cargo@v1
         with:
           command:              check
-          args:                 --locked --no-default-features --all
-      - name:                   Run cargo check 2
-        uses:                   actions-rs/cargo@v1
-        with:
-          command:              check
-          args:                 --locked --all
+          args:                 --locked --no-default-features --all --exclude riscv-l2chain
       - name:                   Run cargo check benches
         uses:                   actions-rs/cargo@v1
         with:
