@@ -1436,13 +1436,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Create,
             value: 100.into(),
             data: FromHex::from_hex("601080600c6000396000f3006000355415600957005b60203560003555")
@@ -1458,7 +1458,7 @@ mod tests {
             action: trace::Action::Create(trace::Create {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 value: 100.into(),
-                gas: 77412.into(),
+                gas: 371800.into(),
                 init: vec![
                     96, 16, 128, 96, 12, 96, 0, 57, 96, 0, 243, 0, 96, 0, 53, 84, 21, 96, 9, 87, 0,
                     91, 96, 32, 53, 96, 0, 53, 85,
@@ -1481,13 +1481,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Create,
             value: 100.into(),
             data: FromHex::from_hex("5b600056").unwrap(),
@@ -1501,7 +1501,7 @@ mod tests {
             action: trace::Action::Create(trace::Create {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 value: 100.into(),
-                gas: 78792.into(),
+                gas: 509800.into(),
                 init: vec![91, 96, 0, 86],
             }),
             result: trace::Res::FailedCreate(TraceError::OutOfGas),
@@ -1518,13 +1518,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -1542,7 +1542,7 @@ mod tests {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 to: Address::from_low_u64_be(0xa),
                 value: 100.into(),
-                gas: 79000.into(),
+                gas: 530600.into(),
                 input: vec![],
                 call_type: CallType::Call,
             }),
@@ -1563,13 +1563,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -1584,7 +1584,7 @@ mod tests {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 to: Address::from_low_u64_be(0xa),
                 value: 100.into(),
-                gas: 79000.into(),
+                gas: 530600.into(),
                 input: vec![],
                 call_type: CallType::Call,
             }),
@@ -1605,13 +1605,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = Spec::new_test_machine();
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0x1)),
             value: 0.into(),
             data: vec![],
@@ -1626,7 +1626,7 @@ mod tests {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 to: Address::from_str("0000000000000000000000000000000000000001").unwrap(),
                 value: 0.into(),
-                gas: 79_000.into(),
+                gas: 530600.into(),
                 input: vec![],
                 call_type: CallType::Call,
             }),
@@ -1647,13 +1647,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = Spec::new_test_machine();
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 0.into(),
             data: vec![],
@@ -1674,7 +1674,7 @@ mod tests {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 to: Address::from_low_u64_be(0xa),
                 value: 0.into(),
-                gas: 79000.into(),
+                gas: 530600.into(),
                 input: vec![],
                 call_type: CallType::Call,
             }),
@@ -1695,13 +1695,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = Spec::new_test_machine();
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 0.into(),
             data: vec![],
@@ -1727,7 +1727,7 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 0.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -1761,14 +1761,14 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         info.number = 0x789b0;
         let machine = Spec::new_test_machine();
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 0.into(),
             data: vec![],
@@ -1797,7 +1797,7 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 0.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -1834,13 +1834,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -1858,7 +1858,7 @@ mod tests {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 to: Address::from_low_u64_be(0xa),
                 value: 100.into(),
-                gas: 79000.into(),
+                gas: 530600.into(),
                 input: vec![],
                 call_type: CallType::Call,
             }),
@@ -1876,13 +1876,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -1909,7 +1909,7 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 100.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -1925,7 +1925,7 @@ mod tests {
                     from: Address::from_low_u64_be(0xa),
                     to: Address::from_low_u64_be(0xb),
                     value: 0.into(),
-                    gas: 78934.into(),
+                    gas: 530534.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -1946,13 +1946,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -1975,7 +1975,7 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 100.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -2009,13 +2009,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -2037,7 +2037,7 @@ mod tests {
                 from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                 to: Address::from_low_u64_be(0xa),
                 value: 100.into(),
-                gas: 79000.into(),
+                gas: 530600.into(),
                 input: vec![],
                 call_type: CallType::Call,
             }),
@@ -2057,13 +2057,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![], //600480600b6000396000f35b600056
@@ -2089,12 +2089,12 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 100.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
                 result: trace::Res::Call(trace::CallResult {
-                    gas_used: U256::from(79_000u32),
+                    gas_used: U256::from(530600u32),
                     output: vec![],
                 }),
             },
@@ -2105,7 +2105,7 @@ mod tests {
                     from: Address::from_low_u64_be(0xa),
                     to: Address::from_low_u64_be(0xb),
                     value: 0.into(),
-                    gas: 78934.into(),
+                    gas: 530534.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -2123,13 +2123,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -2161,7 +2161,7 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 100.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -2177,7 +2177,7 @@ mod tests {
                     from: Address::from_low_u64_be(0xa),
                     to: Address::from_low_u64_be(0xb),
                     value: 0.into(),
-                    gas: 78934.into(),
+                    gas: 530534.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -2193,7 +2193,7 @@ mod tests {
                     from: Address::from_low_u64_be(0xb),
                     to: Address::from_low_u64_be(0xc),
                     value: 0.into(),
-                    gas: 78868.into(),
+                    gas: 530468.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -2214,13 +2214,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![], //600480600b6000396000f35b600056
@@ -2253,12 +2253,12 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 100.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
                 result: trace::Res::Call(trace::CallResult {
-                    gas_used: U256::from(79_000u32),
+                    gas_used: U256::from(530600u32),
                     output: vec![],
                 }),
             },
@@ -2269,7 +2269,7 @@ mod tests {
                     from: Address::from_low_u64_be(0xa),
                     to: Address::from_low_u64_be(0xb),
                     value: 0.into(),
-                    gas: 78934.into(),
+                    gas: 530534.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),
@@ -2282,7 +2282,7 @@ mod tests {
                     from: Address::from_low_u64_be(0xb),
                     to: Address::from_low_u64_be(0xc),
                     value: 0.into(),
-                    gas: 78868.into(),
+                    gas: 530468.into(),
                     call_type: CallType::Call,
                     input: vec![],
                 }),
@@ -2303,13 +2303,13 @@ mod tests {
         let mut state = get_temp_state();
 
         let mut info = EnvInfo::default();
-        info.gas_limit = 1_000_000.into();
+        info.gas_limit = 3_000_000.into();
         let machine = make_frontier_machine(5);
 
         let t = TypedTransaction::Legacy(Transaction {
             nonce: 0.into(),
             gas_price: 0.into(),
-            gas: 100_000.into(),
+            gas: 2_000_000.into(),
             action: Action::Call(Address::from_low_u64_be(0xa)),
             value: 100.into(),
             data: vec![],
@@ -2335,7 +2335,7 @@ mod tests {
                     from: Address::from_str("9cce34f7ab185c7aba1b7c8140d620b4bda941d6").unwrap(),
                     to: Address::from_low_u64_be(0xa),
                     value: 100.into(),
-                    gas: 79000.into(),
+                    gas: 530600.into(),
                     input: vec![],
                     call_type: CallType::Call,
                 }),

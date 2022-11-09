@@ -315,11 +315,6 @@ impl<'x> OpenBlock<'x> {
         }
     }
 
-    pub fn update_mmr(&mut self, size: u64, root: H256) {
-        self.block.header.set_nonce(H64::from_low_u64_be(size));
-        self.block.header.set_mix_hash(root);
-    }
-
     /// Turn this into a `ClosedBlock`.
     pub fn close(self) -> Result<ClosedBlock, Error> {
         let locked = self.close_and_lock()?;

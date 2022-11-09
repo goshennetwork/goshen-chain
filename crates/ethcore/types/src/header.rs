@@ -75,11 +75,6 @@ pub struct Header {
     uncles_hash: H256,
     /// Block extra data.
     extra_data: Bytes,
-
-    mix_hash: H256,
-
-    nonce: H64,
-
     /// State root.
     state_root: H256,
     /// Block receipts root.
@@ -140,9 +135,6 @@ impl Default for Header {
             uncles_hash: KECCAK_EMPTY_LIST_RLP,
             extra_data: vec![],
 
-            mix_hash: KECCAK_EMPTY,
-            nonce: H64::zero(),
-
             state_root: KECCAK_NULL_RLP,
             receipts_root: KECCAK_NULL_RLP,
             log_bloom: Bloom::default(),
@@ -186,16 +178,6 @@ impl Header {
     /// Get the extra data field of the header.
     pub fn extra_data(&self) -> &Bytes {
         &self.extra_data
-    }
-
-    /// Get the extra data field of the header.
-    pub fn mix_hash(&self) -> &H256 {
-        &self.mix_hash
-    }
-
-    /// Get the nonce field of the header.
-    pub fn nonce(&self) -> &H64 {
-        &self.nonce
     }
 
     /// Get the state root field of the header.
@@ -302,16 +284,6 @@ impl Header {
         change_field(&mut self.hash, &mut self.extra_data, a);
     }
 
-    /// Set the mix hash field of the header.
-    pub fn set_mix_hash(&mut self, a: H256) {
-        change_field(&mut self.hash, &mut self.mix_hash, a);
-    }
-
-    /// Set the nonce field of the header.
-    pub fn set_nonce(&mut self, a: H64) {
-        change_field(&mut self.hash, &mut self.nonce, a);
-    }
-
     /// Set the gas used field of the header.
     pub fn set_gas_used(&mut self, a: U256) {
         change_field(&mut self.hash, &mut self.gas_used, a);
@@ -368,7 +340,7 @@ impl Header {
 
     /// Place this header into an RLP stream `s`, optionally `with_seal`.
     fn stream_rlp(&self, s: &mut RlpStream, with_seal: Seal) {
-        let stream_length_without_seal = if self.base_fee_per_gas.is_some() { 16 } else { 15 };
+        let stream_length_without_seal = if self.base_fee_per_gas.is_some() { 14 } else { 13 };
 
         if let Seal::With = with_seal {
             s.begin_list(stream_length_without_seal + self.seal.len());
@@ -389,8 +361,6 @@ impl Header {
         s.append(&self.gas_used);
         s.append(&self.timestamp);
         s.append(&self.extra_data);
-        s.append(&self.mix_hash);
-        s.append(&self.nonce);
 
         if let Seal::With = with_seal {
             for b in &self.seal {
@@ -440,8 +410,6 @@ impl Header {
             gas_used: r.val_at(10)?,
             timestamp: r.val_at(11)?,
             extra_data: r.val_at(12)?,
-            mix_hash: r.val_at(13)?,
-            nonce: r.val_at(14)?,
             seal: vec![],
             hash: keccak(r.as_raw()).into(),
             base_fee_per_gas: None,

@@ -21,6 +21,7 @@
 
 use crate::block::{OpenBlock, SealedBlock};
 use crate::engines::EthEngine;
+use crate::ethereum::ethash::Seal;
 use crate::error::Error;
 use crate::executed::ExecutionError;
 use crate::factory::{Factories, VmFactory};
@@ -31,6 +32,7 @@ use alloc::vec::Vec;
 use bytes::{Bytes, ToPretty};
 use ethereum_types::{Address, BigEndianHash, H64, U256, U64};
 use hash::{keccak, H256};
+use rlp::RlpStream;
 
 use ethtrie::TrieFactory;
 use evm::VMType;
@@ -97,7 +99,7 @@ pub fn generate_block(
         info.gas_range_target,
         info.extra_data.clone(),
     )
-    .ok()?;
+        .ok()?;
 
     let block_number = open_block.header.number();
     let mut skipped_transactions = 0usize;
@@ -106,8 +108,7 @@ pub fn generate_block(
 
     let event_sig = "MessageSent(uint64,address,address,bytes32,bytes)".as_bytes();
     let event_id = keccak(event_sig);
-    let mut mmr_size: u64 = 0;
-    let mut mmr_root = H256::zero();
+    let mut seal = Seal::parse_seal(info.parent_block_header.seal()).unwrap();
 
     for transaction in txes {
         let transaction = {
@@ -125,10 +126,10 @@ pub fn generate_block(
 
         match result {
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
-                gas_limit,
-                gas_used,
-                gas,
-            })) => {
+                                     gas_limit,
+                                     gas_used,
+                                     gas,
+                                 })) => {
                 //debug!(target: "miner", "Skipping adding transaction to block because of gas limit: {:?} (limit: {:?}, used: {:?}, gas: {:?})", hash, gas_limit, gas_used, gas);
                 // Exit early if gas left is smaller then min_tx_gas
                 let gas_left = gas_limit - gas_used;
@@ -164,8 +165,8 @@ pub fn generate_block(
                 for log in receipt.logs.iter() {
                     if log.address == l2_witness_layer {
                         if log.topics[0] == event_id {
-                            mmr_size = U256::from(log.topics[1].as_bytes()).as_u64();
-                            mmr_root = H256::from_slice(&log.data[0..32]);
+                            seal.nonce = H64::from_low_u64_be(U256::from(log.topics[1].as_bytes()).as_u64());
+                            seal.mix_hash = H256::from_slice(&log.data[0..32]);
                         }
                     }
                 }
@@ -173,13 +174,13 @@ pub fn generate_block(
         }
     }
 
-    if mmr_root != H256::zero() {
-        open_block.update_mmr(mmr_size + 1, mmr_root);
-    }
     let closed_block = open_block.close();
     match closed_block {
         Ok(t) => {
-            let sealed_block = t.lock().try_seal(engine, Vec::new()).expect("seal failed");
+            let sealed_block =
+                t.lock().try_seal(engine, alloc::vec![
+                    ::rlp::encode(&seal.mix_hash).to_vec(),
+                    ::rlp::encode(&seal.nonce).to_vec()]).expect("seal failed");
             #[cfg(feature = "std")]
             println!(
                 "{}: 0x{}, txNum: {}",
@@ -195,7 +196,7 @@ pub fn generate_block(
                     sealed_block.header.hash().to_hex(),
                     sealed_block.transactions.len()
                 )
-                .as_str(),
+                    .as_str(),
             );
             Some(sealed_block)
         }

@@ -1075,17 +1075,19 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
                     access_list.insert_address(*address);
                 }
             }
-
+            let mut intrinsic_gas_factor: usize = INTRINSIC_GAS_FACTOR;
+            #[cfg(any(test,feature = "test-helpers"))]
+            intrinsic_gas_factor = 1;
             if let Some(al) = t.access_list() {
                 for item in al.iter() {
                     access_list.insert_address(item.0);
                     base_gas_required += (vm::schedule::EIP2930_ACCESS_LIST_ADDRESS_COST
-                        * INTRINSIC_GAS_FACTOR)
+                        * intrinsic_gas_factor)
                         .into();
                     for key in item.1.iter() {
                         access_list.insert_storage_key(item.0, *key);
                         base_gas_required += (vm::schedule::EIP2930_ACCESS_LIST_STORAGE_KEY_COST
-                            * INTRINSIC_GAS_FACTOR)
+                            * intrinsic_gas_factor)
                             .into();
                     }
                 }
@@ -1129,6 +1131,13 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
                 gas_used: self.info.gas_used,
                 gas: t.tx().gas,
             });
+        }
+
+        // verify that transaction max_fee_per_gas is higher or equal to max_priority_fee_per_gas
+        if t.tx().gas_price < t.max_priority_fee_per_gas() {
+            return Err(ExecutionError::TransactionMalformed(
+                "maxPriorityFeePerGas higher than maxFeePerGas".into(),
+            ));
         }
 
         // TODO: we might need bigints here, or at least check overflows.
@@ -2364,7 +2373,7 @@ mod tests {
             action: Action::Create,
             value: U256::from(17),
             data: FromHex::from_hex("3331600055").unwrap(),
-            gas: U256::from(100_000),
+            gas: U256::from(2_000_000),
             gas_price: U256::zero(),
             nonce: U256::zero(),
         })
@@ -2381,7 +2390,7 @@ mod tests {
         let mut state = get_temp_state_with_factory(factory);
         state.add_balance(&sender, &U256::from(18), CleanupMode::NoEmpty).unwrap();
         let mut info = EnvInfo::default();
-        info.gas_limit = U256::from(100_000);
+        info.gas_limit = U256::from(3_000_000);
         let machine = make_frontier_machine(0);
         let schedule = machine.schedule(info.number);
 
@@ -2413,7 +2422,7 @@ mod tests {
             action: Action::Create,
             value: U256::from(17),
             data: FromHex::from_hex("3331600055").unwrap(),
-            gas: U256::from(100_000),
+            gas: U256::from(2_000_000),
             gas_price: U256::zero(),
             nonce: U256::one(),
         })
@@ -2423,7 +2432,7 @@ mod tests {
         let mut state = get_temp_state_with_factory(factory);
         state.add_balance(&sender, &U256::from(17), CleanupMode::NoEmpty).unwrap();
         let mut info = EnvInfo::default();
-        info.gas_limit = U256::from(100_000);
+        info.gas_limit = U256::from(3_000_000);
         let machine = make_frontier_machine(0);
         let schedule = machine.schedule(info.number);
 
@@ -2450,7 +2459,7 @@ mod tests {
             action: Action::Create,
             value: U256::from(17),
             data: FromHex::from_hex("3331600055").unwrap(),
-            gas: U256::from(80_001),
+            gas: U256::from(2_080_001),
             gas_price: U256::zero(),
             nonce: U256::zero(),
         })
@@ -2460,8 +2469,8 @@ mod tests {
         let mut state = get_temp_state_with_factory(factory);
         state.add_balance(&sender, &U256::from(17), CleanupMode::NoEmpty).unwrap();
         let mut info = EnvInfo::default();
-        info.gas_used = U256::from(20_000);
-        info.gas_limit = U256::from(100_000);
+        info.gas_used = U256::from(920_000);
+        info.gas_limit = U256::from(3_000_000);
         let machine = make_frontier_machine(0);
         let schedule = machine.schedule(info.number);
 
@@ -2473,9 +2482,9 @@ mod tests {
 
         match res {
             Err(ExecutionError::BlockGasLimitReached { gas_limit, gas_used, gas })
-                if gas_limit == U256::from(100_000)
-                    && gas_used == U256::from(20_000)
-                    && gas == U256::from(80_001) =>
+                if gas_limit == U256::from(3_000_000)
+                    && gas_used == U256::from(920_000)
+                    && gas == U256::from(2_080_001) =>
             {
                 ()
             }
@@ -2492,7 +2501,7 @@ mod tests {
                     action: Action::Create,
                     value: U256::from(17),
                     data: FromHex::from_hex("3331600055").unwrap(),
-                    gas: U256::from(100_000),
+                    gas: U256::from(2_000_000),
                     gas_price: U256::from(150),
                     nonce: U256::zero(),
                 },
@@ -2511,9 +2520,9 @@ mod tests {
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
-        state.add_balance(&sender, &U256::from(15000017), CleanupMode::NoEmpty).unwrap();
+        state.add_balance(&sender, &U256::from(300000017), CleanupMode::NoEmpty).unwrap();
         let mut info = EnvInfo::default();
-        info.gas_limit = U256::from(100_000);
+        info.gas_limit = U256::from(3_000_000);
         info.base_fee = Some(U256::from(100));
         let machine = make_london_machine(0);
         let schedule = machine.schedule(info.number);
@@ -2524,8 +2533,8 @@ mod tests {
             ex.transact(&t, opts).unwrap()
         };
 
-        assert_eq!(res.gas, U256::from(100_000));
-        assert_eq!(res.gas_used, U256::from(83873));
+        assert_eq!(res.gas, U256::from(2_000_000));
+        assert_eq!(res.gas_used, U256::from(1282805));
     }
 
     evm_test! {test_not_enough_cash: test_not_enough_cash_int}
@@ -2535,7 +2544,7 @@ mod tests {
             action: Action::Create,
             value: U256::from(18),
             data: FromHex::from_hex("3331600055").unwrap(),
-            gas: U256::from(100_000),
+            gas: U256::from(2_000_000),
             gas_price: U256::one(),
             nonce: U256::zero(),
         })
@@ -2543,9 +2552,9 @@ mod tests {
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
-        state.add_balance(&sender, &U256::from(100_017), CleanupMode::NoEmpty).unwrap();
+        state.add_balance(&sender, &U256::from(2000017), CleanupMode::NoEmpty).unwrap();
         let mut info = EnvInfo::default();
-        info.gas_limit = U256::from(100_000);
+        info.gas_limit = U256::from(3_000_000);
         let machine = make_frontier_machine(0);
         let schedule = machine.schedule(info.number);
 
@@ -2557,7 +2566,7 @@ mod tests {
 
         match res {
             Err(ExecutionError::NotEnoughCash { required, got })
-                if required == U512::from(100_018) && got == U512::from(100_017) =>
+                if required == U512::from(2000018) && got == U512::from(2000017) =>
             {
                 ()
             }
@@ -2578,7 +2587,7 @@ mod tests {
                     action: Action::Create,
                     value: U256::from(17),
                     data: FromHex::from_hex("3331600055").unwrap(),
-                    gas: U256::from(100_000),
+                    gas: U256::from(2_000_000),
                     gas_price: max_priority_fee_per_gas,
                     nonce: U256::zero(),
                 },
@@ -2599,7 +2608,7 @@ mod tests {
         let mut state = get_temp_state_with_factory(factory);
         state.add_balance(&sender, &U256::from(15000017), CleanupMode::NoEmpty).unwrap();
         let mut info = EnvInfo::default();
-        info.gas_limit = U256::from(100_000);
+        info.gas_limit = U256::from(3_000_000);
         info.base_fee = Some(U256::from(100));
         let machine = make_london_machine(0);
         let schedule = machine.schedule(info.number);
@@ -2613,7 +2622,7 @@ mod tests {
         match res {
             Err(ExecutionError::NotEnoughCash { required, got })
                 if required
-                    == U512::from(max_priority_fee_per_gas) * U512::from(100_000)
+                    == U512::from(max_priority_fee_per_gas) * U512::from(2_000_000)
                         + U512::from(17)
                     && got == U512::from(15000017) =>
             {
@@ -2636,7 +2645,7 @@ mod tests {
                     action: Action::Create,
                     value: U256::from(17),
                     data: FromHex::from_hex("3331600055").unwrap(),
-                    gas: U256::from(100_000),
+                    gas: U256::from(2_000_000),
                     gas_price: U256::from(150),
                     nonce: U256::zero(),
                 },
@@ -2655,9 +2664,9 @@ mod tests {
         let sender = t.sender();
 
         let mut state = get_temp_state_with_factory(factory);
-        state.add_balance(&sender, &U256::from(15000017), CleanupMode::NoEmpty).unwrap();
+        state.add_balance(&sender, &U256::from(300000017), CleanupMode::NoEmpty).unwrap();
         let mut info = EnvInfo::default();
-        info.gas_limit = U256::from(100_000);
+        info.gas_limit = U256::from(3_000_000);
         info.base_fee = Some(U256::from(100));
         let machine = make_london_machine(0);
         let schedule = machine.schedule(info.number);

@@ -140,8 +140,6 @@ impl EthereumMachine {
         &self, header: &mut Header, parent: &Header, gas_floor_target: U256, gas_ceil_target: U256,
     ) {
         header.set_difficulty(parent.difficulty().clone());
-        header.set_mix_hash(parent.mix_hash().clone());
-        header.set_nonce(parent.nonce().clone());
 
         let gas_limit = parent.gas_limit() * self.schedule(header.number()).eip1559_gas_limit_bump;
         assert!(!gas_limit.is_zero(), "Gas limit should be > 0");

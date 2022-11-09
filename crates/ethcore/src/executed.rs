@@ -194,7 +194,7 @@ impl fmt::Display for ExecutionError {
             SenderMustEoa => "Sender not an eoa".to_owned(),
             Internal(ref msg) => msg.clone(),
             TransactionMalformed(ref err) => format!("Malformed transaction: {}", err),
-            ExceedExecLimit=>"Transaction exec gas is too many",
+            ExceedExecLimit => "Transaction exec gas is too many".to_owned(),
         };
 
         f.write_fmt(format_args!("Transaction execution error ({}).", msg))
