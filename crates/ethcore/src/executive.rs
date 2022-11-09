@@ -1053,18 +1053,16 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         let sender = t.sender();
 
         // ensure EOA, https://eips.ethereum.org/EIPS/eip-3607
-        if !t.is_enqueued() {
-            let info = alloc::format!("ill sender: 0x{}", sender.to_hex());
-            let code_hash = self.state.code_hash(&sender).expect(info.as_str());
-            match code_hash {
-                Some(hash) => {
-                    if hash != KECCAK_EMPTY && hash != H256::zero() {
-                        return Err(ExecutionError::SenderMustEoa);
-                    }
+        let info = alloc::format!("ill sender: 0x{}", sender.to_hex());
+        let code_hash = self.state.code_hash(&sender).expect(info.as_str());
+        match code_hash {
+            Some(hash) => {
+                if hash != KECCAK_EMPTY && hash != H256::zero() {
+                    return Err(ExecutionError::SenderMustEoa);
                 }
-                None => (),
-            };
-        }
+            }
+            None => (),
+        };
 
         let mut base_gas_required = U256::from(t.tx().gas_required(&schedule));
 
