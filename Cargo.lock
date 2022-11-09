@@ -327,7 +327,7 @@ dependencies = [
  "keccak-hash",
  "parity-bytes",
  "riscv-evm",
- "rlp",
+ "rlp 0.5.2",
  "rlp_derive",
  "serde",
  "unexpected",
@@ -630,7 +630,8 @@ dependencies = [
  "rayon",
  "regex",
  "riscv-evm",
- "rlp",
+ "rlp 0.5.2",
+ "rlp_compress",
  "rlp_derive",
  "serde",
  "serde_json",
@@ -839,7 +840,7 @@ dependencies = [
  "hashbrown 0.12.3",
  "keccak-hasher 0.1.1",
  "memory-db 0.11.0",
- "rlp",
+ "rlp 0.5.2",
  "rustc-hex",
  "trie-db",
 ]
@@ -1004,7 +1005,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f28220f89297a075ddc7245cd538076ee98b01f2a9c23a53a4f1105d5a322808"
 dependencies = [
- "rlp",
+ "rlp 0.5.2",
 ]
 
 [[package]]
@@ -1357,7 +1358,7 @@ dependencies = [
  "keccak-hasher 0.1.1",
  "memory-db 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-bytes",
- "rlp",
+ "rlp 0.5.2",
  "trie-db",
 ]
 
@@ -1807,7 +1808,7 @@ dependencies = [
  "hash-db 0.12.4",
  "keccak-hasher 0.1.1",
  "memory-db 0.11.0",
- "rlp",
+ "rlp 0.5.2",
  "rustc-hex",
  "trie-db",
 ]
@@ -1828,9 +1829,18 @@ dependencies = [
  "keccak-hasher 0.1.1",
  "memory-db 0.11.0",
  "riscv-evm",
- "rlp",
+ "rlp 0.5.2",
  "rustc-hex",
  "trie-db",
+]
+
+[[package]]
+name = "rlp"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1190dcc8c3a512f1eef5d09bb8c84c7f39e1054e174d1795482e18f5272f2e73"
+dependencies = [
+ "rustc-hex",
 ]
 
 [[package]]
@@ -1844,12 +1854,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "rlp_compress"
+version = "0.1.0"
+dependencies = [
+ "elastic-array",
+ "lazy_static",
+ "rlp 0.4.6",
+]
+
+[[package]]
 name = "rlp_derive"
 version = "0.1.0"
 dependencies = [
  "proc-macro2 0.4.30",
  "quote 0.6.13",
- "rlp",
+ "rlp 0.5.2",
  "syn 0.15.44",
 ]
 
@@ -2225,7 +2244,7 @@ name = "triehash"
 version = "0.5.0"
 dependencies = [
  "hash-db 0.12.4",
- "rlp",
+ "rlp 0.5.2",
 ]
 
 [[package]]
@@ -2299,7 +2318,7 @@ dependencies = [
  "keccak-hash",
  "parity-bytes",
  "patricia-trie-ethereum",
- "rlp",
+ "rlp 0.5.2",
 ]
 
 [[package]]

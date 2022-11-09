@@ -103,6 +103,7 @@ mod tests {
     use crate::spec::Spec;
     use crate::test_helpers::get_temp_state_db;
     use ethereum_types::{Address, H520};
+    use std::io::Read;
     use std::sync::Arc;
     use types::header::Header;
 
@@ -138,7 +139,7 @@ mod tests {
 
         assert!(engine.verify_block_basic(&header).is_ok());
 
-        header.set_seal(vec![::rlp::encode(&H520::default())]);
+        header.set_seal(vec![::rlp::encode(&H520::default()).to_vec()]);
 
         assert!(engine.verify_block_unordered(&header).is_ok());
     }

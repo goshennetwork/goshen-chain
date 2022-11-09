@@ -1562,7 +1562,7 @@ mod tests {
         params.address = address.clone();
         params.sender = sender.clone();
         params.gas = U256::from(100_000);
-        params.code = Some(Arc::new("3331600055".from_hex().unwrap()));
+        params.code = Some(Arc::new(FromHex::from_hex("3331600055").unwrap()));
         params.value = ActionValue::Transfer(U256::from(0x7));
         let mut state = get_temp_state_with_factory(factory);
         state.add_balance(&sender, &U256::from(0x100u64), CleanupMode::NoEmpty).unwrap();
@@ -1612,7 +1612,7 @@ mod tests {
         // 60 00 - push 0
         // f3 - return
 
-        let code = "7c601080600c6000396000f3006000355415600957005b60203560003555600052601d60036017f0600055".from_hex().unwrap();
+        let code = FromHex::from_hex("7c601080600c6000396000f3006000355415600957005b60203560003555600052601d60036017f0600055").unwrap();
 
         let sender = Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let address = contract_address(
@@ -1661,7 +1661,7 @@ mod tests {
         // 61 ffff - push fff gas
         // f1 - CALL
 
-        let code = "60006000600060006001600361fffff1".from_hex().unwrap();
+        let code = FromHex::from_hex("60006000600060006001600361fffff1").unwrap();
         let sender = Address::from_str("4444444444444444444444444444444444444444").unwrap();
         let address = Address::from_str("5555555555555555555555555555555555555555").unwrap();
 
@@ -1753,7 +1753,7 @@ mod tests {
         // 60 00 - push 0
         // f3 - return
 
-        let code = "7c601080600c6000396000f3006000355415600957005b60203560003555600052601d60036017f0600055".from_hex().unwrap();
+        let code = FromHex::from_hex("7c601080600c6000396000f3006000355415600957005b60203560003555600052601d60036017f0600055").unwrap();
 
         let sender = Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let address = contract_address(
@@ -1883,7 +1883,7 @@ mod tests {
         // 60 00
         // fd - revert
 
-        let code = "6460016000fd6000526005601b6017f0600055".from_hex().unwrap();
+        let code = FromHex::from_hex("6460016000fd6000526005601b6017f0600055").unwrap();
 
         let sender = Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let address = contract_address(
@@ -1964,7 +1964,8 @@ mod tests {
         // 60 00 - push 0
         // f3 - return
 
-        let code = "601080600c6000396000f3006000355415600957005b60203560003555".from_hex().unwrap();
+        let code = FromHex::from_hex("601080600c6000396000f3006000355415600957005b60203560003555")
+            .unwrap();
 
         let sender = Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let address = contract_address(
@@ -2137,7 +2138,7 @@ mod tests {
         // 60 00 - push 0
         // f3 - return
 
-        let code = "7c601080600c6000396000f3006000355415600957005b60203560003555600052601d600360e6f0600055".from_hex().unwrap();
+        let code = FromHex::from_hex("7c601080600c6000396000f3006000355415600957005b60203560003555600052601d600360e6f0600055").unwrap();
 
         let sender = Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let address = contract_address(
@@ -2196,10 +2197,10 @@ mod tests {
         // 60 00 - push 0
         // f3 - return
 
-        let code =
-            "7c601080600c6000396000f3006000355415600957005b60203560003555600052601d60036017f0"
-                .from_hex()
-                .unwrap();
+        let code = FromHex::from_hex(
+            "7c601080600c6000396000f3006000355415600957005b60203560003555600052601d60036017f0",
+        )
+        .unwrap();
 
         let sender = Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let address = contract_address(
@@ -2254,10 +2255,10 @@ mod tests {
         // 58 - get PC
         // 55 - sstore
 
-        let code_a: Vec<u8> =
-            "6000600060006000601873945304eb96065b2a98b57a48a06ae28d285a71b56103e8f15855"
-                .from_hex()
-                .unwrap();
+        let code_a: Vec<u8> = FromHex::from_hex(
+            "6000600060006000601873945304eb96065b2a98b57a48a06ae28d285a71b56103e8f15855",
+        )
+        .unwrap();
 
         // 60 00 - push 0
         // 60 00 - push 0
@@ -2271,10 +2272,10 @@ mod tests {
         // 01 - add
         // 58 - get PC
         // 55 - sstore
-        let code_b: Vec<u8> =
-            "60006000600060006017730f572e5295c57f15886f9b263e2f6d2d6c7b5ec66101f4f16001015855"
-                .from_hex()
-                .unwrap();
+        let code_b: Vec<u8> = FromHex::from_hex(
+            "60006000600060006017730f572e5295c57f15886f9b263e2f6d2d6c7b5ec66101f4f16001015855",
+        )
+        .unwrap();
 
         let address_a = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
         let address_b = Address::from_str("945304eb96065b2a98b57a48a06ae28d285a71b5").unwrap();
@@ -2333,7 +2334,7 @@ mod tests {
         // 55 - sstore
         let sender = Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let code: Bytes =
-            "600160005401600055600060006000600060003060e05a03f1600155".from_hex().unwrap();
+            FromHex::from_hex("600160005401600055600060006000600060003060e05a03f1600155").unwrap();
         let address = contract_address(
             CreateContractAddress::FromSenderAndNonce,
             &sender,
@@ -2376,7 +2377,7 @@ mod tests {
         let t = TypedTransaction::Legacy(Transaction {
             action: Action::Create,
             value: U256::from(17),
-            data: "3331600055".from_hex().unwrap(),
+            data: FromHex::from_hex("3331600055").unwrap(),
             gas: U256::from(100_000),
             gas_price: U256::zero(),
             nonce: U256::zero(),
@@ -2425,7 +2426,7 @@ mod tests {
         let t = TypedTransaction::Legacy(Transaction {
             action: Action::Create,
             value: U256::from(17),
-            data: "3331600055".from_hex().unwrap(),
+            data: FromHex::from_hex("3331600055").unwrap(),
             gas: U256::from(100_000),
             gas_price: U256::zero(),
             nonce: U256::one(),
@@ -2462,7 +2463,7 @@ mod tests {
         let t = TypedTransaction::Legacy(Transaction {
             action: Action::Create,
             value: U256::from(17),
-            data: "3331600055".from_hex().unwrap(),
+            data: FromHex::from_hex("3331600055").unwrap(),
             gas: U256::from(80_001),
             gas_price: U256::zero(),
             nonce: U256::zero(),
@@ -2504,7 +2505,7 @@ mod tests {
                 Transaction {
                     action: Action::Create,
                     value: U256::from(17),
-                    data: "3331600055".from_hex().unwrap(),
+                    data: FromHex::from_hex("3331600055").unwrap(),
                     gas: U256::from(100_000),
                     gas_price: U256::from(150),
                     nonce: U256::zero(),
@@ -2547,7 +2548,7 @@ mod tests {
         let t = TypedTransaction::Legacy(Transaction {
             action: Action::Create,
             value: U256::from(18),
-            data: "3331600055".from_hex().unwrap(),
+            data: FromHex::from_hex("3331600055").unwrap(),
             gas: U256::from(100_000),
             gas_price: U256::one(),
             nonce: U256::zero(),
@@ -2590,7 +2591,7 @@ mod tests {
                 Transaction {
                     action: Action::Create,
                     value: U256::from(17),
-                    data: "3331600055".from_hex().unwrap(),
+                    data: FromHex::from_hex("3331600055").unwrap(),
                     gas: U256::from(100_000),
                     gas_price: max_priority_fee_per_gas,
                     nonce: U256::zero(),
@@ -2648,7 +2649,7 @@ mod tests {
                 Transaction {
                     action: Action::Create,
                     value: U256::from(17),
-                    data: "3331600055".from_hex().unwrap(),
+                    data: FromHex::from_hex("3331600055").unwrap(),
                     gas: U256::from(100_000),
                     gas_price: U256::from(150),
                     nonce: U256::zero(),
@@ -2697,7 +2698,7 @@ mod tests {
 
     evm_test! {test_keccak: test_keccak_int}
     fn test_keccak(factory: Factory) {
-        let code = "6064640fffffffff20600055".from_hex().unwrap();
+        let code = FromHex::from_hex("6064640fffffffff20600055").unwrap();
 
         let sender = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
         let address = contract_address(
@@ -2746,8 +2747,8 @@ mod tests {
             Address::from_str("cd1722f3947def4cf144679da39c4c32bdc35681").unwrap();
         let sender = Address::from_str("0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6").unwrap();
         // EIP-140 test case
-        let code = "6c726576657274656420646174616000557f726576657274206d657373616765000000000000000000000000000000000000600052600e6000fd".from_hex().unwrap();
-        let returns: Vec<u8> = "726576657274206d657373616765".from_hex().unwrap();
+        let code = FromHex::from_hex("6c726576657274656420646174616000557f726576657274206d657373616765000000000000000000000000000000000000600052600e6000fd").unwrap();
+        let returns: Vec<u8> = FromHex::from_hex("726576657274206d657373616765").unwrap();
         let mut state = get_temp_state_with_factory(factory.clone());
         state
             .add_balance(
@@ -2796,13 +2797,17 @@ mod tests {
 
         let mut state = get_temp_state_with_factory(factory.clone());
         state.new_contract(&x1, U256::zero(), U256::from(1)).unwrap();
-        state.init_code(&x1, "600160005560006000556001600055".from_hex().unwrap()).unwrap();
+        state.init_code(&x1, FromHex::from_hex("600160005560006000556001600055").unwrap()).unwrap();
         state.new_contract(&x2, U256::zero(), U256::from(1)).unwrap();
-        state.init_code(&x2, "600060005560016000556000600055".from_hex().unwrap()).unwrap();
+        state.init_code(&x2, FromHex::from_hex("600060005560016000556000600055").unwrap()).unwrap();
         state.new_contract(&y1, U256::zero(), U256::from(1)).unwrap();
-        state.init_code(&y1, "600060006000600061100062fffffff4".from_hex().unwrap()).unwrap();
+        state
+            .init_code(&y1, FromHex::from_hex("600060006000600061100062fffffff4").unwrap())
+            .unwrap();
         state.new_contract(&y2, U256::zero(), U256::from(1)).unwrap();
-        state.init_code(&y2, "600060006000600061100162fffffff4".from_hex().unwrap()).unwrap();
+        state
+            .init_code(&y2, FromHex::from_hex("600060006000600061100162fffffff4").unwrap())
+            .unwrap();
 
         let info = EnvInfo::default();
         let machine = ethereum::new_constantinople_test_machine();
@@ -2816,8 +2821,9 @@ mod tests {
         let (FinalizationResult { gas_left, .. }, refund, gas) = {
             let gas = U256::from(0xffffffffffu64);
             let mut params = ActionParams::default();
-            params.code =
-                Some(Arc::new("6001600055600060006000600061200163fffffffff4".from_hex().unwrap()));
+            params.code = Some(Arc::new(
+                FromHex::from_hex("6001600055600060006000600061200163fffffffff4").unwrap(),
+            ));
             params.gas = gas;
             let mut substate = Substate::new();
             let mut ex = Executive::new(&mut state, &info, &machine, &schedule);
@@ -2838,8 +2844,9 @@ mod tests {
         let (FinalizationResult { gas_left, .. }, refund, gas) = {
             let gas = U256::from(0xffffffffffu64);
             let mut params = ActionParams::default();
-            params.code =
-                Some(Arc::new("6001600055600060006000600061200263fffffffff4".from_hex().unwrap()));
+            params.code = Some(Arc::new(
+                FromHex::from_hex("6001600055600060006000600061200263fffffffff4").unwrap(),
+            ));
             params.gas = gas;
             let mut substate = Substate::new();
             let mut ex = Executive::new(&mut state, &info, &machine, &schedule);

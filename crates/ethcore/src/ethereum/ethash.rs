@@ -219,46 +219,50 @@ impl Engine<EthereumMachine> for Arc<Ethash> {
         let author = *block.header.author();
         let number = block.header.number();
 
-        let rewards =
-            {
-                let mut rewards = Vec::new();
+        let rewards = {
+            let mut rewards = Vec::new();
 
-                let (_, reward) = self.ethash_params.block_reward.iter()
-					.rev()
-					.find(|&(block, _)| *block <= number)
-					.expect("Current block's reward is not found; this indicates a chain config error; qed");
-                let reward = *reward;
+            let (_, reward) = self
+                .ethash_params
+                .block_reward
+                .iter()
+                .rev()
+                .find(|&(block, _)| *block <= number)
+                .expect(
+                    "Current block's reward is not found; this indicates a chain config error; qed",
+                );
+            let reward = *reward;
 
-                // Applies ECIP-1017 eras.
-                let eras_rounds = self.ethash_params.ecip1017_era_rounds;
-                let (eras, reward) = ecip1017_eras_block_reward(eras_rounds, reward, number);
+            // Applies ECIP-1017 eras.
+            let eras_rounds = self.ethash_params.ecip1017_era_rounds;
+            let (eras, reward) = ecip1017_eras_block_reward(eras_rounds, reward, number);
 
-                //let n_uncles = LiveBlock::uncles(&*block).len();
-                let n_uncles = block.uncles.len();
+            //let n_uncles = LiveBlock::uncles(&*block).len();
+            let n_uncles = block.uncles.len();
 
-                // Bestow block rewards.
-                let result_block_reward = reward + reward.shr(5) * U256::from(n_uncles);
+            // Bestow block rewards.
+            let result_block_reward = reward + reward.shr(5) * U256::from(n_uncles);
 
-                rewards.push((author, RewardKind::Author, result_block_reward));
+            rewards.push((author, RewardKind::Author, result_block_reward));
 
-                // Bestow uncle rewards.
-                for u in &block.uncles {
-                    let uncle_author = u.author();
-                    let result_uncle_reward = if eras == 0 {
-                        (reward * U256::from(8 + u.number() - number)).shr(3)
-                    } else {
-                        reward.shr(5)
-                    };
+            // Bestow uncle rewards.
+            for u in &block.uncles {
+                let uncle_author = u.author();
+                let result_uncle_reward = if eras == 0 {
+                    (reward * U256::from(8 + u.number() - number)).shr(3)
+                } else {
+                    reward.shr(5)
+                };
 
-                    rewards.push((
-                        *uncle_author,
-                        RewardKind::uncle(number, u.number()),
-                        result_uncle_reward,
-                    ));
-                }
+                rewards.push((
+                    *uncle_author,
+                    RewardKind::uncle(number, u.number()),
+                    result_uncle_reward,
+                ));
+            }
 
-                rewards
-            };
+            rewards
+        };
 
         block_reward::apply_block_rewards(&rewards, block, &self.machine)
     }
@@ -599,7 +603,10 @@ mod tests {
     fn can_do_difficulty_verification_fail() {
         let engine = test_spec().engine;
         let mut header: Header = Header::default();
-        header.set_seal(vec![rlp::encode(&H256::zero()), rlp::encode(&H64::zero())]);
+        header.set_seal(vec![
+            rlp::encode(&H256::zero()).to_vec(),
+            rlp::encode(&H64::zero()).to_vec(),
+        ]);
 
         let verify_result = engine.verify_block_basic(&header);
 
@@ -618,7 +625,10 @@ mod tests {
     fn can_do_proof_of_work_verification_fail() {
         let engine = test_spec().engine;
         let mut header: Header = Header::default();
-        header.set_seal(vec![rlp::encode(&H256::zero()), rlp::encode(&H64::zero())]);
+        header.set_seal(vec![
+            rlp::encode(&H256::zero()).to_vec(),
+            rlp::encode(&H64::zero()).to_vec(),
+        ]);
         header.set_difficulty(
             U256::from_str("ffffffffffffffffffffffffffffffffffffffffffffaaaaaaaaaaaaaaaaaaaa")
                 .unwrap(),
@@ -741,8 +751,9 @@ mod tests {
             rlp::encode(
                 &H256::from_str("b251bd2e0283d0658f2cadfdc8ca619b5de94eca5742725e2e757dd13ed7503d")
                     .unwrap(),
-            ),
-            rlp::encode(&H64::zero()),
+            )
+            .to_vec(),
+            rlp::encode(&H64::zero()).to_vec(),
         ]);
         let info = ethash.extra_info(&header);
         assert_eq!(info["nonce"], "0x0000000000000000");
