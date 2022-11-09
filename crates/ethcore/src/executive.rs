@@ -1112,8 +1112,8 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         }
 
         let init_gas = t.tx().gas - base_gas_required;
-        if init_gas.as_usize()>MAX_TX_EXEC_GAS{
-            return Err();
+        if init_gas.as_usize() > MAX_TX_EXEC_GAS {
+            return Err(ExecutionError::ExceedExecLimit);
         }
 
         let nonce = self.state.nonce(&sender)?;
@@ -1129,21 +1129,6 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
                 gas_used: self.info.gas_used,
                 gas: t.tx().gas,
             });
-        }
-
-        // ensure that the user was willing to at least pay the base fee
-        if t.tx().gas_price < self.info.base_fee.unwrap_or_default() && !t.has_zero_gas_price() {
-            return Err(ExecutionError::GasPriceLowerThanBaseFee {
-                gas_price: t.tx().gas_price,
-                base_fee: self.info.base_fee.unwrap_or_default(),
-            });
-        }
-
-        // verify that transaction max_fee_per_gas is higher or equal to max_priority_fee_per_gas
-        if t.tx().gas_price < t.max_priority_fee_per_gas() {
-            return Err(ExecutionError::TransactionMalformed(
-                "maxPriorityFeePerGas higher than maxFeePerGas".into(),
-            ));
         }
 
         // TODO: we might need bigints here, or at least check overflows.
