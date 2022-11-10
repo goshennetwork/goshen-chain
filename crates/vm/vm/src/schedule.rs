@@ -171,6 +171,8 @@ pub struct Schedule {
     pub max_refund_quotient: usize,
     // Enable EIP-3541 rule
     pub eip3541: bool,
+    // Enable EIP-3607 rule
+    pub eip3607: bool,
 }
 
 /// Dust accounts cleanup mode.
@@ -197,7 +199,7 @@ impl Schedule {
 
     /// Schedule for the post-EIP-150-era of the Ethereum main net.
     pub fn new_post_eip150(
-        max_code_size: usize, fix_exp: bool, no_empty: bool, kill_empty: bool,
+        max_code_size: usize, fix_exp: bool, no_empty: bool, kill_empty: bool, eip3607: bool,
     ) -> Schedule {
         Schedule {
             exceptional_failed_code_deposit: true,
@@ -266,12 +268,13 @@ impl Schedule {
             eip3198: false,
             max_refund_quotient: MAX_REFUND_QUOTIENT,
             eip3541: false,
+            eip3607,
         }
     }
 
     /// Schedule for the Byzantium fork of the Ethereum main net.
     pub fn new_byzantium() -> Schedule {
-        let mut schedule = Self::new_post_eip150(24576, true, true, true);
+        let mut schedule = Self::new_post_eip150(24576, true, true, true, false);
         schedule.have_create2 = true;
         schedule.have_revert = true;
         schedule.have_static_call = true;
@@ -408,6 +411,7 @@ impl Schedule {
             eip3198: false,
             max_refund_quotient: MAX_REFUND_QUOTIENT,
             eip3541: false,
+            eip3607: false,
         }
     }
 }

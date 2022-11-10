@@ -17,7 +17,6 @@
 #![warn(missing_docs, unused_extern_crates)]
 //! Ethcore library
 #![cfg_attr(not(feature = "std"), no_std)]
-
 #![feature(stmt_expr_attributes)]
 
 #[macro_use]

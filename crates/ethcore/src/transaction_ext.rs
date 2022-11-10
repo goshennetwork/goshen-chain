@@ -42,13 +42,20 @@ impl Transaction for transaction::Transaction {
 
 /// Get the transaction cost in gas for the given params.
 fn gas_required_for(is_create: bool, data: &[u8], schedule: &Schedule) -> u64 {
+    let mut intrinsic_gas_factor: usize = INTRINSIC_GAS_FACTOR;
+    let mut tx_base_size: usize = TX_BASE_SIZE;
+    #[cfg(any(test, feature = "test-helpers"))]
+    {
+        intrinsic_gas_factor = 1;
+        tx_base_size = 0;
+    }
     data.iter().fold(
-        (TX_BASE_SIZE * schedule.tx_data_non_zero_gas * INTRINSIC_GAS_FACTOR
+        (tx_base_size * schedule.tx_data_non_zero_gas * intrinsic_gas_factor
             + if is_create { schedule.tx_create_gas } else { schedule.tx_gas }) as u64,
         |g, b| {
             g + (match *b {
-                0 => schedule.tx_data_zero_gas * INTRINSIC_GAS_FACTOR,
-                _ => schedule.tx_data_non_zero_gas * INTRINSIC_GAS_FACTOR,
+                0 => schedule.tx_data_zero_gas * intrinsic_gas_factor,
+                _ => schedule.tx_data_non_zero_gas * intrinsic_gas_factor,
             }) as u64
         },
     )

@@ -21,8 +21,8 @@
 
 use crate::block::{OpenBlock, SealedBlock};
 use crate::engines::EthEngine;
-use crate::ethereum::ethash::Seal;
 use crate::error::Error;
+use crate::ethereum::ethash::Seal;
 use crate::executed::ExecutionError;
 use crate::factory::{Factories, VmFactory};
 use crate::state_db::StateDB;
@@ -99,7 +99,7 @@ pub fn generate_block(
         info.gas_range_target,
         info.extra_data.clone(),
     )
-        .ok()?;
+    .ok()?;
 
     let block_number = open_block.header.number();
     let mut skipped_transactions = 0usize;
@@ -126,10 +126,10 @@ pub fn generate_block(
 
         match result {
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
-                                     gas_limit,
-                                     gas_used,
-                                     gas,
-                                 })) => {
+                gas_limit,
+                gas_used,
+                gas,
+            })) => {
                 //debug!(target: "miner", "Skipping adding transaction to block because of gas limit: {:?} (limit: {:?}, used: {:?}, gas: {:?})", hash, gas_limit, gas_used, gas);
                 // Exit early if gas left is smaller then min_tx_gas
                 let gas_left = gas_limit - gas_used;
@@ -165,7 +165,8 @@ pub fn generate_block(
                 for log in receipt.logs.iter() {
                     if log.address == l2_witness_layer {
                         if log.topics[0] == event_id {
-                            seal.nonce = H64::from_low_u64_be(U256::from(log.topics[1].as_bytes()).as_u64());
+                            seal.nonce =
+                                H64::from_low_u64_be(U256::from(log.topics[1].as_bytes()).as_u64());
                             seal.mix_hash = H256::from_slice(&log.data[0..32]);
                         }
                     }
@@ -177,10 +178,16 @@ pub fn generate_block(
     let closed_block = open_block.close();
     match closed_block {
         Ok(t) => {
-            let sealed_block =
-                t.lock().try_seal(engine, alloc::vec![
-                    ::rlp::encode(&seal.mix_hash).to_vec(),
-                    ::rlp::encode(&seal.nonce).to_vec()]).expect("seal failed");
+            let sealed_block = t
+                .lock()
+                .try_seal(
+                    engine,
+                    alloc::vec![
+                        ::rlp::encode(&seal.mix_hash).to_vec(),
+                        ::rlp::encode(&seal.nonce).to_vec()
+                    ],
+                )
+                .expect("seal failed");
             #[cfg(feature = "std")]
             println!(
                 "{}: 0x{}, txNum: {}",
@@ -196,7 +203,7 @@ pub fn generate_block(
                     sealed_block.header.hash().to_hex(),
                     sealed_block.transactions.len()
                 )
-                    .as_str(),
+                .as_str(),
             );
             Some(sealed_block)
         }
