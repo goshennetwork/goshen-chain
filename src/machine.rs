@@ -1,6 +1,6 @@
-use crate::consts::{L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_MAX_TRANSACTION_SIZE};
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
+use common_types::l2_cfg::{L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_MAX_TRANSACTION_SIZE};
 use common_types::BlockNumber;
 use ethcore::machine::EthereumMachine;
 use ethcore::spec::CommonParams;

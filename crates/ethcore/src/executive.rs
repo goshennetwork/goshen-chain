@@ -1079,7 +1079,9 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
             }
             let mut intrinsic_gas_factor: usize = INTRINSIC_GAS_FACTOR;
             #[cfg(any(test, feature = "test-helpers"))]
-            intrinsic_gas_factor = 1;
+            {
+                intrinsic_gas_factor = 1;
+            }
             if let Some(al) = t.access_list() {
                 for item in al.iter() {
                     access_list.insert_address(item.0);
@@ -1116,10 +1118,6 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         }
 
         let init_gas = t.tx().gas - base_gas_required;
-        #[cfg(not(any(test, feature = "test-helpers")))]
-        if init_gas.as_usize() > MAX_TX_EXEC_GAS {
-            return Err(ExecutionError::ExceedExecLimit);
-        }
 
         let nonce = self.state.nonce(&sender)?;
         // validate transaction nonce

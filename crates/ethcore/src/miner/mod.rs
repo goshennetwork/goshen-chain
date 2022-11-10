@@ -65,16 +65,6 @@ impl BlockGenInfo {
     }
 }
 
-/// Allowed number of skipped transactions when constructing pending block.
-///
-/// When we push transactions to pending block, some of the transactions might
-/// get skipped because of block gas limit being reached.
-/// This constant controls how many transactions we can skip because of that
-/// before stopping attempts to push more transactions to the block.
-/// This is an optimization that prevents traversing the entire pool
-/// in case we have only a fraction of available block gas limit left.
-const MAX_SKIPPED_TRANSACTIONS: usize = 128;
-
 /// generate and seal new block.
 pub fn generate_block(
     db: Box<dyn HashDB<KeccakHasher, DBValue>>, engine: &impl EthEngine, info: &BlockGenInfo,
@@ -102,7 +92,6 @@ pub fn generate_block(
     .ok()?;
 
     let block_number = open_block.header.number();
-    let mut skipped_transactions = 0usize;
     let schedule = engine.schedule(block_number);
     let min_tx_gas: U256 = schedule.tx_gas.into();
 
@@ -135,13 +124,6 @@ pub fn generate_block(
                 let gas_left = gas_limit - gas_used;
                 if gas_left < min_tx_gas {
                     //debug!(target: "miner", "Remaining gas is lower than minimal gas for a transaction. Block is full.");
-                    break;
-                }
-
-                // Avoid iterating over the entire queue in case block is almost full.
-                skipped_transactions += 1;
-                if skipped_transactions > MAX_SKIPPED_TRANSACTIONS {
-                    //debug!(target: "miner", "Reached skipped transactions threshold. Assuming block is full.");
                     break;
                 }
             }

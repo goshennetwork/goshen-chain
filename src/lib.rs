@@ -12,6 +12,9 @@ use common_types::bytes::ToPretty;
 use ethereum_types::H256;
 
 use common_types::header::Header;
+use common_types::l2_cfg::{
+    L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_CROSS_LAYER_WITNESS, L2_FEE_COLLECTOR
+};
 use ethcore::engines::L2Seal;
 use ethcore::miner::{generate_block, BlockGenInfo};
 use hash_db::HashDB;
@@ -19,12 +22,8 @@ use input::RollupInput;
 use keccak_hasher::KeccakHasher;
 use trie_db::DBValue;
 
-use crate::consts::{
-    L2_BLOCK_MAX_GAS_LIMIT, L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_CROSS_LAYER_WITNESS, L2_FEE_COLLECTOR
-};
 use crate::input::load_last_hashes;
 
-mod consts;
 mod input;
 mod machine;
 

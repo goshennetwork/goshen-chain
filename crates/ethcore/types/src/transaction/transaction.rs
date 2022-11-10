@@ -24,7 +24,7 @@ use ethereum_types::{Address, BigEndianHash, H160, H256, U256};
 #[cfg(feature = "std")]
 use crypto::publickey::{self, Secret};
 
-use crate::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, L1_CROSS_LAYER_WITNESS};
+use crate::l2_cfg::INITIAL_ENQUEUE_TX_NONCE;
 use alloc::vec::Vec;
 use core::cmp::min;
 use core::ops::Deref;
@@ -141,6 +141,9 @@ pub struct Transaction {
 }
 
 impl Transaction {
+    pub fn is_enqueued(&self) -> bool {
+        return self.nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE;
+    }
     /// encode raw transaction
     fn encode(&self, chain_id: Option<u64>, signature: Option<&SignatureComponents>) -> Vec<u8> {
         let mut stream = RlpStream::new();
@@ -912,8 +915,7 @@ impl SignedTransaction {
     }
 
     pub fn is_enqueued(&self) -> bool {
-        return self.sender == L1_CROSS_LAYER_WITNESS
-            || self.tx().nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE;
+        return self.tx().is_enqueued();
     }
 
     /// Checks is signature is empty.

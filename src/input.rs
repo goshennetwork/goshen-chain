@@ -3,7 +3,10 @@ use alloc::format;
 use alloc::vec::Vec;
 use byteorder::{BigEndian, ByteOrder};
 use common_types::header::Header;
-use common_types::l2_cfg::{INITIAL_ENQUEUE_TX_NONCE, L1_CROSS_LAYER_WITNESS};
+use common_types::l2_cfg::{
+    INITIAL_ENQUEUE_TX_NONCE, INTRINSIC_GAS_FACTOR, L1_CROSS_LAYER_WITNESS, L2_BLOCK_MAX_GAS_LIMIT, MAX_SENDER_NONCE, TX_BASE_SIZE
+};
+use common_types::transaction::TypedTxId::Legacy;
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
 use ethereum_types::H256;
@@ -57,17 +60,25 @@ fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
     let num_batches = rlp.item_count().expect("expect batch list");
     let mut batches = Vec::with_capacity(num_batches);
     for (batch, time) in rlp.iter().zip(timestamp) {
-        let batch = Batch {
+        let mut batch = Batch {
             timestamp: time,
             transactions: TypedTransaction::decode_rlp_list(&batch).expect("decode batch err"),
         };
-        for tx in batch.transactions.iter() {
-            if tx.recover_sender().unwrap() == L1_CROSS_LAYER_WITNESS
-                || tx.tx().nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE
-            {
-                panic!("enqueued tx in batch");
+        // ensure there are not enqueued tx in batch
+        batch.transactions.retain(|tx| {
+            let sender = tx.recover_sender().unwrap_or(L1_CROSS_LAYER_WITNESS);
+            if sender == L1_CROSS_LAYER_WITNESS {
+                return false;
             }
-        }
+            let nonce = tx.tx().nonce.as_u64();
+            if nonce >= MAX_SENDER_NONCE {
+                return false;
+            }
+            if tx.tx_type() != Legacy {
+                return false;
+            }
+            return true;
+        });
         batches.push(batch);
     }
 
@@ -88,18 +99,34 @@ pub struct QueueTxInfo {
 fn load_queue_txes(db: &HashDBOracle, hash: H256) -> Vec<QueueTxInfo> {
     let raw = db.get(&hash).expect("queue preimage not found");
     let raw = raw.into_vec();
-    raw.chunks(40)
-        .map(|chunk| {
-            let txhash = H256::from_slice(&chunk[..32]);
-            let timestamp = BigEndian::read_u64(&chunk[32..]);
-            let raw = db.get(&txhash).expect("queue tx not found");
-            let rlp = Rlp::new(&raw);
-            let tx = TypedTransaction::decode_rlp(&rlp).unwrap();
-            let mut txs = Vec::new();
-            txs.push(tx);
-            QueueTxInfo { timestamp, txs }
-        })
-        .collect()
+    let mut result: Vec<QueueTxInfo> = Vec::new();
+    raw.chunks_exact(40).for_each(|chunk| {
+        let txhash = H256::from_slice(&chunk[..32]);
+        let timestamp = BigEndian::read_u64(&chunk[32..]);
+        let raw = db.get(&txhash).expect("queue tx not found");
+        let rlp = Rlp::new(&raw);
+        let tx = TypedTransaction::decode_rlp(&rlp).unwrap();
+        let q_info = result.iter_mut().rfind(|info| info.timestamp == timestamp);
+        match q_info {
+            None => {
+                let mut txs = Vec::new();
+                txs.push(tx);
+                result.push(QueueTxInfo { timestamp, txs })
+            }
+            Some(q) => {
+                let total_gas = q.txs.iter().fold(0, |gas, tx| gas + tx.tx().gas.as_u32());
+                if total_gas > L2_BLOCK_MAX_GAS_LIMIT {
+                    let mut txs = Vec::new();
+                    txs.push(tx);
+                    result.push(QueueTxInfo { timestamp, txs });
+                } else {
+                    q.txs.push(tx);
+                }
+            }
+        }
+    });
+    result.sort_by_key(|i| i.timestamp);
+    return result;
 }
 
 pub struct RollupInput {

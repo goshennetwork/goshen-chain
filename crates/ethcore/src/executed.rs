@@ -130,8 +130,6 @@ pub enum ExecutionError {
     Internal(String),
     /// Returned when generic transaction occurs
     TransactionMalformed(String),
-    /// Returned when tx exec gas exceed max exec gas limit
-    ExceedExecLimit,
 }
 
 impl From<Box<ethtrie::TrieError>> for ExecutionError {
@@ -194,7 +192,6 @@ impl fmt::Display for ExecutionError {
             SenderMustEoa => "Sender not an eoa".to_owned(),
             Internal(ref msg) => msg.clone(),
             TransactionMalformed(ref err) => format!("Malformed transaction: {}", err),
-            ExceedExecLimit => "Transaction exec gas is too many".to_owned(),
         };
 
         f.write_fmt(format_args!("Transaction execution error ({}).", msg))

@@ -78,6 +78,8 @@ pub enum Error {
     },
     /// Transaction's gas limit (aka gas) is invalid.
     InvalidGasLimit(OutOfBounds<U256>),
+    /// Returned when tx exec gas exceed max exec gas limit
+    ExceedExecLimit,
     /// Transaction sender is banned.
     SenderBanned,
     /// Transaction receipient is banned.
@@ -136,6 +138,7 @@ impl fmt::Display for Error {
                 format!("Gas limit exceeded. Limit={}, Given={}", limit, got)
             }
             InvalidGasLimit(ref err) => format!("Invalid gas limit. {}", err),
+            ExceedExecLimit => "Transaction exec gas is too many".into(),
             SenderBanned => "Sender is temporarily banned.".into(),
             RecipientBanned => "Recipient is temporarily banned.".into(),
             CodeBanned => "Contract code is temporarily banned.".into(),
