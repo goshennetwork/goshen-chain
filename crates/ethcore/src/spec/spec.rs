@@ -180,7 +180,7 @@ pub struct CommonParams {
     pub eip1559_fee_collector: Option<Address>,
     /// Block at which the fee collector should start being used.
     pub eip1559_fee_collector_transition: BlockNumber,
-
+    ///
     pub eip3607: bool,
 }
 
@@ -743,14 +743,14 @@ impl Spec {
                         let machine = self.engine.machine();
                         let schedule = machine.schedule(env_info.number);
                         let mut exec = Executive::new(&mut state, &env_info, &machine, &schedule);
-                        if let Err(e) =
+                        if let Err(_) =
                             exec.create(params, &mut substate, &mut NoopTracer, &mut NoopVMTracer)
                         {
                             //warn!(target: "spec", "Genesis constructor execution at {} failed: {}.", address, e);
                         }
                     }
 
-                    if let Err(e) = state.commit() {}
+                    if let Err(_) = state.commit() {}
                 }
             } else {
                 state.populate_from(self.genesis_state().to_owned());

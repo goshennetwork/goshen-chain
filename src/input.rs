@@ -1,16 +1,12 @@
 use crate::HashDBOracle;
-use alloc::format;
 use alloc::vec::Vec;
 use byteorder::{BigEndian, ByteOrder};
 use common_types::header::Header;
-use common_types::l2_cfg::{
-    INITIAL_ENQUEUE_TX_NONCE, INTRINSIC_GAS_FACTOR, L1_CROSS_LAYER_WITNESS, L2_BLOCK_MAX_GAS_LIMIT, MAX_SENDER_NONCE, TX_BASE_SIZE
-};
+use common_types::l2_cfg::{L1_CROSS_LAYER_WITNESS, L2_BLOCK_MAX_GAS_LIMIT, MAX_SENDER_NONCE};
 use common_types::transaction::TypedTxId::Legacy;
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
 use ethereum_types::H256;
-use hash_db::HashDB;
 use rlp::Rlp;
 
 // format: queueNum(uint64) + queueStart(uint64) + batchNum(uint64) + batch0Time(uint64) +

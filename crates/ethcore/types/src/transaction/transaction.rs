@@ -18,7 +18,7 @@
 
 use crate::transaction::{error, Error};
 use crypto::hash::keccak;
-use crypto::publickey::{recover, Message, Signature};
+use crypto::publickey::{recover, Signature};
 use ethereum_types::{Address, BigEndianHash, H160, H256, U256};
 
 #[cfg(feature = "std")]
@@ -142,7 +142,7 @@ pub struct Transaction {
 
 impl Transaction {
     pub fn is_enqueued(&self) -> bool {
-        return self.nonce.as_u64() >= INITIAL_ENQUEUE_TX_NONCE;
+        return self.nonce > U256::from(INITIAL_ENQUEUE_TX_NONCE);
     }
     /// encode raw transaction
     fn encode(&self, chain_id: Option<u64>, signature: Option<&SignatureComponents>) -> Vec<u8> {

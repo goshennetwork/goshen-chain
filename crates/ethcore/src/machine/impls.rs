@@ -39,13 +39,8 @@ use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use builtin::Builtin;
-use riscv_evm::runtime::ret;
-use rlp::RlpStream;
-use types::l2_cfg::{INTRINSIC_GAS_FACTOR, L2_CHAIN_ID, MAX_TX_EXEC_GAS};
-use types::transaction::Error::{
-    ExceedExecLimit, GasLimitExceeded, InsufficientGas, InvalidGasLimit
-};
-use unexpected::OutOfBounds;
+use types::l2_cfg::{L2_CHAIN_ID, MAX_TX_EXEC_GAS};
+use types::transaction::Error::{ExceedExecLimit, GasLimitExceeded, InsufficientGas};
 
 /// Ethash-specific extensions.
 #[derive(Debug, Clone)]

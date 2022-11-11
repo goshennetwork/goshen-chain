@@ -1,11 +1,11 @@
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use alloc::string::ToString;
 use common_types::l2_cfg::{L2_BLOCK_MIN_GAS_LIMIT, L2_CHAIN_ID, L2_MAX_TRANSACTION_SIZE};
 use common_types::BlockNumber;
 use ethcore::machine::EthereumMachine;
 use ethcore::spec::CommonParams;
 use ethcore_builtin::{
-    AltBn128ConstOperations, AltBn128PairingPrice, AltBn128PairingPricer, Blake2F, Blake2FPricer, Bn128Add, Bn128Mul, Bn128Pairing, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, Modexp2565Pricer, ModexpPricer, Pricing, Ripemd160, Sha256
+    AltBn128ConstOperations, AltBn128PairingPrice, AltBn128PairingPricer, Blake2F, Bn128Add, Bn128Mul, Bn128Pairing, Builtin, EcRecover, EthereumBuiltin, Identity, Linear, Modexp, ModexpPricer, Pricing, Ripemd160, Sha256
 };
 use ethereum_types::{Address, H160, U256};
 

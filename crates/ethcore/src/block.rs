@@ -38,7 +38,7 @@ use core::{cmp, ops};
 use hashbrown::HashSet;
 
 use bytes::Bytes;
-use ethereum_types::{Address, Bloom, H256, H64, U256, U64};
+use ethereum_types::{Address, Bloom, H256, U256};
 
 use crate::engines::EthEngine;
 use crate::error::{BlockError, Error};
@@ -245,7 +245,7 @@ impl<'x> OpenBlock<'x> {
 
         // adjust difficulty
         if t.is_enqueued() {
-            let mut difficulty = self.block.header.difficulty();
+            let difficulty = self.block.header.difficulty();
             self.block.header.set_difficulty(*difficulty + 1);
         }
 

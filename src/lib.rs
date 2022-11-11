@@ -3,12 +3,9 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
-use alloc::format;
-use alloc::string::ToString;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
-use common_types::bytes::ToPretty;
 use ethereum_types::H256;
 
 use common_types::header::Header;

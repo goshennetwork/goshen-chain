@@ -35,7 +35,6 @@ use core::convert::TryFrom;
 use ethereum_types::{Address, H256, U256, U512};
 use evm::{CallType, FinalizationResult, Finalize};
 use hash::{keccak, KECCAK_EMPTY};
-use types::l2_cfg::{L1_CROSS_LAYER_WITNESS, MAX_TX_EXEC_GAS};
 use types::transaction::{Action, SignedTransaction, TypedTransaction};
 use vm::{
     self, AccessList, ActionParams, ActionValue, CleanDustMode, CreateContractAddress, EnvInfo, ResumeCall, ResumeCreate, ReturnData, Schedule, TrapError

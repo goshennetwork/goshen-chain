@@ -433,6 +433,7 @@ pub struct VMTrace {
 
 impl VMTrace {
     #[cfg(feature = "std")]
+    ///
     pub fn print(&self) {
         for op in self.operations.iter() {
             match &op.executed {

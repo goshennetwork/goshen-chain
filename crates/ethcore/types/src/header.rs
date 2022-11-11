@@ -20,8 +20,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::iter::FromIterator;
 
-use ethereum_types::{Address, Bloom, H256, H64, U256};
-use keccak_hash::KECCAK_EMPTY;
+use ethereum_types::{Address, Bloom, H256, U256};
 use parity_bytes::ToPretty;
 use rlp::{DecoderError, Encodable, Rlp, RlpStream};
 

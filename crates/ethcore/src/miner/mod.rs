@@ -30,9 +30,8 @@ use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 use bytes::{Bytes, ToPretty};
-use ethereum_types::{Address, BigEndianHash, H64, U256, U64};
+use ethereum_types::{Address, H64, U256};
 use hash::{keccak, H256};
-use rlp::RlpStream;
 
 use ethtrie::TrieFactory;
 use evm::VMType;
@@ -46,10 +45,15 @@ use vm::LastHashes;
 
 /// Riscv evm execution env.
 pub struct BlockGenInfo {
+    ///
     pub parent_block_header: Header,
+    ///
     pub last_hashes: Arc<LastHashes>,
+    ///
     pub author: Address,
+    ///
     pub gas_range_target: (U256, U256),
+    ///
     pub extra_data: Bytes,
 }
 
@@ -102,7 +106,7 @@ pub fn generate_block(
     for transaction in txes {
         let transaction = {
             match engine.machine().verify_transaction_unordered(transaction, &open_block.header) {
-                Err(e) => continue,
+                Err(_) => continue,
                 Ok(t) => t,
             }
         };
@@ -117,7 +121,7 @@ pub fn generate_block(
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
                 gas_limit,
                 gas_used,
-                gas,
+                gas: _,
             })) => {
                 //debug!(target: "miner", "Skipping adding transaction to block because of gas limit: {:?} (limit: {:?}, used: {:?}, gas: {:?})", hash, gas_limit, gas_used, gas);
                 // Exit early if gas left is smaller then min_tx_gas

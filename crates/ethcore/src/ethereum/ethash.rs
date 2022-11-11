@@ -20,7 +20,7 @@ use core::cmp::{self};
 
 use ethereum_types::{H256, H64, U256};
 use hash::KECCAK_EMPTY_LIST_RLP;
-use rlp::{Rlp, RlpStream};
+use rlp::Rlp;
 use types::header::Header;
 use types::BlockNumber;
 use unexpected::{Mismatch, OutOfBounds};
