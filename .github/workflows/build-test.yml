@@ -15,7 +15,7 @@ jobs:
           - ubuntu-latest
           - macos-latest
         toolchain:
-          - stable
+          - nightly
     runs-on:                    ${{ matrix.platform }}
     steps:
       - name:                   Checkout sources
