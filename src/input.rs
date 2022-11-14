@@ -50,9 +50,13 @@ fn load_batches_from_hashdb(db: &HashDBOracle, batch_input_hash: H256) -> Vec<Ba
 // v0: 0 + rlplist(rlplist(tx))
 fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
     let version = data[0];
-    assert_eq!(version, 0, "unknown version");
+    if version != 0 {
+        return Vec::new();
+    }
     let rlp = Rlp::new(&data[1..]);
-    assert!(rlp.is_list());
+    if !rlp.is_list() {
+        return Vec::new();
+    }
     let num_batches = rlp.item_count().expect("expect batch list");
     if num_batches != timestamp.len() {
         return Vec::new();
@@ -94,7 +98,6 @@ pub struct QueueTxInfo {
     timestamp: u64,
 }
 
-// TODO: merge txs that included at same block to one QueueTxInfo
 fn load_queue_txes(db: &HashDBOracle, hash: H256) -> Vec<QueueTxInfo> {
     let raw = db.get(&hash).expect("queue preimage not found");
     let raw = raw.into_vec();
