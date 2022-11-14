@@ -180,8 +180,6 @@ pub struct CommonParams {
     pub eip1559_fee_collector: Option<Address>,
     /// Block at which the fee collector should start being used.
     pub eip1559_fee_collector_transition: BlockNumber,
-    ///
-    pub eip3607: bool,
 }
 
 impl CommonParams {
@@ -196,7 +194,6 @@ impl CommonParams {
                 block_number >= self.eip160_transition,
                 block_number >= self.eip161abc_transition,
                 block_number >= self.eip161d_transition,
-                self.eip3607,
             );
 
             self.update_schedule(block_number, &mut schedule);
@@ -406,7 +403,6 @@ impl From<ethjson::spec::Params> for CommonParams {
             eip1559_fee_collector_transition: p
                 .eip1559_fee_collector_transition
                 .map_or_else(BlockNumber::max_value, Into::into),
-            eip3607: false,
         }
     }
 }

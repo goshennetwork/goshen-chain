@@ -164,6 +164,5 @@ fn create_params() -> CommonParams {
         eip1559_base_fee_min_value_transition: BlockNumber::MAX.into(),
         eip1559_fee_collector: None,
         eip1559_fee_collector_transition: BlockNumber::MAX.into(),
-        eip3607: true,
     }
 }

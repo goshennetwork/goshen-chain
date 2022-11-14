@@ -1052,7 +1052,8 @@ impl<'a, B: 'a + StateBackend> Executive<'a, B> {
         let sender = t.sender();
 
         // ensure EOA, https://eips.ethereum.org/EIPS/eip-3607
-        if self.schedule.eip3607 {
+        #[cfg(not(any(test, feature = "test-helpers")))]
+        if self.info.number >= self.machine.params().eip3607_transition {
             let info = alloc::format!("ill sender: 0x{}", sender.to_hex());
             let code_hash = self.state.code_hash(&sender).expect(info.as_str());
             match code_hash {

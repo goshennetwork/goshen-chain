@@ -54,6 +54,9 @@ fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
     let rlp = Rlp::new(&data[1..]);
     assert!(rlp.is_list());
     let num_batches = rlp.item_count().expect("expect batch list");
+    if num_batches != timestamp.len() {
+        return Vec::new();
+    }
     let mut batches = Vec::with_capacity(num_batches);
     for (batch, time) in rlp.iter().zip(timestamp) {
         let mut batch = Batch {
