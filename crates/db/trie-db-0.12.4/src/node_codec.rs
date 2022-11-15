@@ -15,6 +15,7 @@
 //! Generic trait for trie node encoding/decoding. Takes a `hash_db::Hasher`
 //! to parametrize the hashes used in the codec.
 
+use core_::fmt::{Debug, Display};
 use hash_db::Hasher;
 use node::Node;
 use ChildReference;
@@ -36,7 +37,7 @@ impl<T> Error for T {}
 /// Trait for trie node encoding/decoding
 pub trait NodeCodec<H: Hasher>: Sized {
     /// Codec error type
-    type Error: Error;
+    type Error: Debug + Display;
 
     /// Get the hashed null node.
     fn hashed_null_node() -> H::Out;

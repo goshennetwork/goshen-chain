@@ -22,7 +22,7 @@ use rlp::{Decodable, DecoderError, Encodable, Rlp, RlpStream};
 
 use super::error::Error;
 use alloc::vec::Vec;
-use evm::CallType;
+use evm::{CallType, Instruction};
 use vm::ActionParams;
 
 /// `Call` result.
@@ -429,4 +429,48 @@ pub struct VMTrace {
     /// The sub traces for each interior action performed as part of this call/create.
     /// Thre is a 1:1 correspondance between these and a CALL/CREATE/CALLCODE/DELEGATECALL instruction.
     pub subs: Vec<VMTrace>,
+}
+
+impl VMTrace {
+    #[cfg(feature = "std")]
+    ///
+    pub fn print(&self) {
+        for op in self.operations.iter() {
+            match &op.executed {
+                Some(e) => println!(
+                    "{},{},{},{}",
+                    op.pc,
+                    Instruction::from_u8(op.instruction).unwrap().info().name,
+                    op.gas_cost + e.gas_used,
+                    op.gas_cost
+                ),
+                None => (),
+            }
+        }
+        for sub in self.subs.iter() {
+            sub.print();
+        }
+    }
+
+    #[cfg(feature = "riscv")]
+    pub fn evm_print(&self) {
+        for op in self.operations.iter() {
+            match &op.executed {
+                Some(e) => riscv_evm::runtime::debug(
+                    alloc::format!(
+                        "{},{},{},{}",
+                        op.pc,
+                        Instruction::from_u8(op.instruction).unwrap().info().name,
+                        op.gas_cost + e.gas_used,
+                        op.gas_cost
+                    )
+                    .as_str(),
+                ),
+                None => (),
+            }
+        }
+        for sub in self.subs.iter() {
+            sub.evm_print();
+        }
+    }
 }

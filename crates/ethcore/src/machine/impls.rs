@@ -33,11 +33,14 @@ use crate::block::ExecutedBlock;
 use crate::error::Error;
 use crate::spec::CommonParams;
 use crate::state::CleanupMode;
+use crate::transaction_ext::Transaction;
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use builtin::Builtin;
+use types::l2_cfg::{L2_CHAIN_ID, MAX_TX_EXEC_GAS};
+use types::transaction::Error::{ExceedExecLimit, GasLimitExceeded, InsufficientGas};
 
 /// Ethash-specific extensions.
 #[derive(Debug, Clone)]
@@ -140,6 +143,7 @@ impl EthereumMachine {
         &self, header: &mut Header, parent: &Header, gas_floor_target: U256, gas_ceil_target: U256,
     ) {
         header.set_difficulty(parent.difficulty().clone());
+
         let gas_limit = parent.gas_limit() * self.schedule(header.number()).eip1559_gas_limit_bump;
         assert!(!gas_limit.is_zero(), "Gas limit should be > 0");
 
@@ -245,7 +249,27 @@ impl EthereumMachine {
                 base_fee: header.base_fee().unwrap_or_default(),
             });
         }
-
+        // check L2 origin tx
+        if !t.tx().is_enqueued() && t.chain_id.unwrap_or(1) == L2_CHAIN_ID {
+            if t.encode().len() > self.params().max_transaction_size {
+                return Err(transaction::Error::TooBig {});
+            }
+            let gas_limit = t.tx().gas;
+            if gas_limit > *header.gas_limit() {
+                return Err(GasLimitExceeded { limit: *header.gas_limit(), got: gas_limit });
+            }
+            let base_gas_required = t.tx().gas_required(&self.params().schedule(header.number()));
+            if gas_limit.as_u64() < base_gas_required {
+                return Err(InsufficientGas {
+                    minimal: U256::from(base_gas_required),
+                    got: gas_limit,
+                });
+            }
+            let exec_gas = gas_limit.as_u64() - base_gas_required;
+            if exec_gas > MAX_TX_EXEC_GAS {
+                return Err(ExceedExecLimit);
+            }
+        }
         Ok(SignedTransaction::new(t)?)
     }
 
@@ -291,10 +315,10 @@ impl EthereumMachine {
 
         match tx.tx_type() {
             transaction::TypedTxId::AccessList if !schedule.eip2930 => {
-                return Err(transaction::Error::TransactionTypeNotEnabled)
+                return Err(transaction::Error::TransactionTypeNotEnabled);
             }
             transaction::TypedTxId::EIP1559Transaction if !schedule.eip1559 => {
-                return Err(transaction::Error::TransactionTypeNotEnabled)
+                return Err(transaction::Error::TransactionTypeNotEnabled);
             }
             _ => (),
         };
@@ -427,7 +451,7 @@ mod tests {
     #[test]
     fn should_disallow_unsigned_transactions() {
         let rlp = "ea80843b9aca0083015f90948921ebb5f79e9e3920abe571004d0b1d5119c154865af3107a400080038080";
-        let raw_tx: Vec<u8> = ::rustc_hex::FromHex::from_hex(rlp).unwrap();
+        let raw_tx: Vec<u8> = ::hex::FromHex::from_hex(rlp).unwrap();
         let transaction: UnverifiedTransaction = TypedTransaction::decode(&raw_tx).unwrap();
         let spec = ethereum::new_ropsten_test();
         let ethparams = get_default_ethash_extensions();

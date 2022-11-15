@@ -18,7 +18,7 @@ use crate::block::ExecutedBlock;
 use crate::engines::{Engine, Seal};
 use crate::machine::Machine;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU64, Ordering};
+use core::sync::atomic::{AtomicU32, Ordering};
 use types::header::Header;
 
 /// `InstantSeal` params.
@@ -40,13 +40,13 @@ impl From<ethjson::spec::InstantSealParams> for InstantSealParams {
 pub struct InstantSeal<M> {
     params: InstantSealParams,
     machine: M,
-    last_sealed_block: AtomicU64,
+    last_sealed_block: AtomicU32,
 }
 
 impl<M> InstantSeal<M> {
     /// Returns new instance of InstantSeal over the given state machine.
     pub fn new(params: InstantSealParams, machine: M) -> Self {
-        InstantSeal { params, machine, last_sealed_block: AtomicU64::new(0) }
+        InstantSeal { params, machine, last_sealed_block: AtomicU32::new(0) }
     }
 }
 
@@ -65,12 +65,12 @@ impl<M: Machine> Engine<M> for InstantSeal<M> {
             let last_sealed_block = self.last_sealed_block.load(Ordering::SeqCst);
             // Return a regular seal if the given block is _higher_ than
             // the last sealed one
-            if block_number > last_sealed_block {
+            if block_number > last_sealed_block as u64 {
                 if self
                     .last_sealed_block
                     .compare_exchange(
                         last_sealed_block,
-                        block_number,
+                        block_number as u32,
                         Ordering::SeqCst,
                         Ordering::SeqCst,
                     )
@@ -103,6 +103,7 @@ mod tests {
     use crate::spec::Spec;
     use crate::test_helpers::get_temp_state_db;
     use ethereum_types::{Address, H520};
+    use std::io::Read;
     use std::sync::Arc;
     use types::header::Header;
 
@@ -138,7 +139,7 @@ mod tests {
 
         assert!(engine.verify_block_basic(&header).is_ok());
 
-        header.set_seal(vec![::rlp::encode(&H520::default())]);
+        header.set_seal(vec![::rlp::encode(&H520::default()).to_vec()]);
 
         assert!(engine.verify_block_unordered(&header).is_ok());
     }

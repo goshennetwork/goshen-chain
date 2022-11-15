@@ -374,11 +374,14 @@ impl<B: Backend> State<B> {
             return Err(Box::new(TrieError::InvalidStateRoot(root)));
         }
 
+        let new_map = HashMap::new();
+        let cache = RefCell::new(new_map);
+        let checkpoints = RefCell::new(Vec::new());
         let state = State {
             db: db,
             root: root,
-            cache: RefCell::new(HashMap::new()),
-            checkpoints: RefCell::new(Vec::new()),
+            cache: cache,
+            checkpoints: checkpoints,
             account_start_nonce: account_start_nonce,
             factories: factories,
         };
@@ -623,7 +626,7 @@ impl<B: Backend> State<B> {
                     }
                     // The account didn't exist at that point. Return empty value.
                     Some(Some(AccountEntry { account: None, .. })) => {
-                        return Ok(Some(H256::default()))
+                        return Ok(Some(H256::default()));
                     }
                     // The value was not cached at that checkpoint, meaning it was not modified at all.
                     Some(None) => {
@@ -840,7 +843,7 @@ impl<B: Backend> State<B> {
         &mut self, env_info: &EnvInfo, machine: &Machine, t: &SignedTransaction, tracing: bool,
     ) -> ApplyResult<FlatTrace, VMTrace> {
         if tracing {
-            let options = TransactOptions::with_tracing();
+            let options = TransactOptions::with_tracing_and_vm_tracing();
             self.apply_with_tracing(env_info, machine, t, options.tracer, options.vm_tracer)
         } else {
             let options = TransactOptions::with_no_tracing();
@@ -972,14 +975,13 @@ impl<B: Backend> State<B> {
     ) -> TrieResult<()> {
         let to_kill: HashSet<_> = {
             self.cache.borrow().iter().filter_map(|(address, ref entry)|
-			if touched.contains(address) && // Check all touched accounts
-				((remove_empty_touched && entry.exists_and_is_null()) // Remove all empty touched accounts.
-				|| min_balance.map_or(false, |ref balance| entry.account.as_ref().map_or(false, |account|
-					(account.is_basic() || kill_contracts) // Remove all basic and optionally contract accounts where balance has been decreased.
-					&& account.balance() < balance && entry.old_balance.as_ref().map_or(false, |b| account.balance() < b)))) {
-
-				Some(address.clone())
-			} else { None }).collect()
+                if touched.contains(address) && // Check all touched accounts
+                    ((remove_empty_touched && entry.exists_and_is_null()) // Remove all empty touched accounts.
+                        || min_balance.map_or(false, |ref balance| entry.account.as_ref().map_or(false, |account|
+                        (account.is_basic() || kill_contracts) // Remove all basic and optionally contract accounts where balance has been decreased.
+                            && account.balance() < balance && entry.old_balance.as_ref().map_or(false, |b| account.balance() < b)))) {
+                    Some(address.clone())
+                } else { None }).collect()
         };
         for address in to_kill {
             self.kill_account(&address);
@@ -1413,7 +1415,7 @@ mod tests {
     use ethereum_types::{Address, BigEndianHash, H256, U256};
     use evm::CallType;
     use hash::{keccak, KECCAK_NULL_RLP};
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use types::transaction::*;
     use vm::EnvInfo;
 

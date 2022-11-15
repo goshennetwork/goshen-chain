@@ -41,7 +41,7 @@ pub use {keccak_hash as hash, parity_bytes as bytes};
 extern crate rlp_derive;
 
 #[cfg(test)]
-pub use rustc_hex;
+pub use hex;
 
 #[macro_use]
 pub mod views;
@@ -60,6 +60,7 @@ pub mod engines;
 pub mod filter;
 pub mod header;
 pub mod ids;
+pub mod l2_cfg;
 pub mod log_entry;
 pub mod pruning_info;
 pub mod receipt;

@@ -238,7 +238,7 @@ impl<'a> TypedTransactionView<'a> {
 #[cfg(test)]
 mod tests {
     use super::TypedTransactionView;
-    use rustc_hex::FromHex;
+    use hex::FromHex;
 
     #[test]
     fn test_transaction_view() {

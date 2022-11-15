@@ -15,24 +15,14 @@ jobs:
         uses:                   actions/checkout@main
         with:
           submodules:           true
-      - name:                   Install stable toolchain
+      - name:                   Install nightly toolchain
         uses:                   actions-rs/toolchain@v1
         with:
-          toolchain:            stable
+          toolchain:            nightly
           profile:              minimal
           override:             true
       - name:                   Run cargo check 1
         uses:                   actions-rs/cargo@v1
         with:
           command:              check
-          args:                 --locked --no-default-features --all --verbose
-      - name:                   Run cargo check 2
-        uses:                   actions-rs/cargo@v1
-        with:
-          command:              check
-          args:                 --locked --all
-      - name:                   Run cargo check benches
-        uses:                   actions-rs/cargo@v1
-        with:
-          command:              check
-          args:                 --locked --all --benches --verbose
+          args:                 --locked --no-default-features --all --verbose  --exclude riscv-l2chain

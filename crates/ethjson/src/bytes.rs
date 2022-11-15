@@ -16,7 +16,7 @@
 
 //! Lenient bytes json deserialization for test json files.
 
-use rustc_hex::FromHex;
+use hex::FromHex;
 use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer};
 use std::fmt;

@@ -127,7 +127,7 @@ pub struct Linear {
 /// A special pricing model for modular exponentiation.
 #[derive(Debug)]
 pub struct ModexpPricer {
-    divisor: u64,
+    pub divisor: u64,
 }
 
 /// The EIP2565 pricing model of modular exponentiation.
@@ -142,15 +142,15 @@ impl Pricer for Linear {
 
 /// alt_bn128 pairing price
 #[derive(Debug, Copy, Clone)]
-struct AltBn128PairingPrice {
-    base: u64,
-    pair: u64,
+pub struct AltBn128PairingPrice {
+    pub base: u64,
+    pub pair: u64,
 }
 
 /// alt_bn128_pairing pricing model. This computes a price using a base cost and a cost per pair.
 #[derive(Debug)]
 pub struct AltBn128PairingPricer {
-    price: AltBn128PairingPrice,
+    pub price: AltBn128PairingPrice,
 }
 
 /// Pricing for constant alt_bn128 operations (ECADD and ECMUL)
@@ -1359,13 +1359,13 @@ mod tests {
     use ethjson::spec::builtin::{
         AltBn128Pairing as JsonAltBn128PairingPricing, Builtin as JsonBuiltin, Linear as JsonLinearPricing, Pricing as JsonPricing, PricingAt
     };
+    use hex::FromHex;
     use hex_literal::hex;
     use macros::map;
     use maplit::btreemap;
     use num_bigint::BigUint;
     use num_traits::{One, Zero};
     use parity_bytes::BytesRef;
-    use rustc_hex::FromHex;
     use std::convert::TryFrom;
 
     #[test]

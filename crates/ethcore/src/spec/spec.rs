@@ -160,8 +160,6 @@ pub struct CommonParams {
     pub gas_limit_bound_divisor: U256,
     /// Registrar contract address.
     pub registrar: Address,
-    /// Node permission managing contract address.
-    pub node_permission_contract: Option<Address>,
     /// Maximum contract code size that can be deployed.
     pub max_code_size: u64,
     /// Number of first block where max code size limit is active.
@@ -383,7 +381,6 @@ impl From<ethjson::spec::Params> for CommonParams {
             remove_dust_contracts: p.remove_dust_contracts.unwrap_or(false),
             gas_limit_bound_divisor: p.gas_limit_bound_divisor.into(),
             registrar: p.registrar.map_or_else(Address::default, Into::into),
-            node_permission_contract: p.node_permission_contract.map(Into::into),
             max_code_size: p.max_code_size.map_or(u64::max_value(), Into::into),
             max_transaction_size: p.max_transaction_size.map_or(MAX_TRANSACTION_SIZE, Into::into),
             max_code_size_transition: p.max_code_size_transition.map_or(0, Into::into),
@@ -742,14 +739,14 @@ impl Spec {
                         let machine = self.engine.machine();
                         let schedule = machine.schedule(env_info.number);
                         let mut exec = Executive::new(&mut state, &env_info, &machine, &schedule);
-                        if let Err(e) =
+                        if let Err(_) =
                             exec.create(params, &mut substate, &mut NoopTracer, &mut NoopVMTracer)
                         {
                             //warn!(target: "spec", "Genesis constructor execution at {} failed: {}.", address, e);
                         }
                     }
 
-                    if let Err(e) = state.commit() {}
+                    if let Err(_) = state.commit() {}
                 }
             } else {
                 state.populate_from(self.genesis_state().to_owned());
@@ -829,7 +826,7 @@ impl Spec {
         ret.append(&header);
         ret.append_raw(&empty_list, 1);
         ret.append_raw(&empty_list, 1);
-        ret.out()
+        ret.out().to_vec()
     }
 
     /// Overwrite the genesis components.

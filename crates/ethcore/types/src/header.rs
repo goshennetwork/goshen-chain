@@ -16,14 +16,17 @@
 
 //! Block header.
 
-use crate::bytes::Bytes;
-use crate::hash::{keccak, KECCAK_EMPTY_LIST_RLP, KECCAK_NULL_RLP};
-use crate::BlockNumber;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::iter::FromIterator;
+
 use ethereum_types::{Address, Bloom, H256, U256};
+use parity_bytes::ToPretty;
 use rlp::{DecoderError, Encodable, Rlp, RlpStream};
+
+use crate::bytes::Bytes;
+use crate::hash::{keccak, KECCAK_EMPTY_LIST_RLP, KECCAK_NULL_RLP};
+use crate::BlockNumber;
 
 /// Semantic boolean for when a seal/signature is included.
 #[derive(Debug, Clone, Copy)]
@@ -71,7 +74,6 @@ pub struct Header {
     uncles_hash: H256,
     /// Block extra data.
     extra_data: Bytes,
-
     /// State root.
     state_root: H256,
     /// Block receipts root.
@@ -332,7 +334,7 @@ impl Header {
     fn rlp(&self, with_seal: Seal) -> Bytes {
         let mut s = RlpStream::new();
         self.stream_rlp(&mut s, with_seal);
-        s.out()
+        s.out().to_vec()
     }
 
     /// Place this header into an RLP stream `s`, optionally `with_seal`.
@@ -368,6 +370,15 @@ impl Header {
         if self.base_fee_per_gas.is_some() {
             s.append(&self.base_fee_per_gas.unwrap());
         }
+    }
+
+    pub fn print(&self) -> alloc::string::String {
+        return alloc::format!(
+            "gas used {}, state root 0x{}, receipts root 0x{}",
+            self.gas_used,
+            self.state_root.to_hex(),
+            self.receipts_root.to_hex()
+        );
     }
 }
 
@@ -447,12 +458,13 @@ impl ExtendedHeader {
 
 #[cfg(test)]
 mod tests {
+    use ethereum_types::U256;
+    use hex::FromHex;
+    use rlp::{self, Rlp};
+
     use crate::BlockNumber;
 
     use super::Header;
-    use ethereum_types::U256;
-    use rlp::{self, Rlp};
-    use rustc_hex::FromHex;
 
     #[test]
     fn test_header_seal_fields() {

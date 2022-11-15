@@ -96,7 +96,7 @@ pub fn compress(h: &mut [u64; 8], m: [u64; 16], t: [u64; 2], f: bool, rounds: us
 mod tests {
     extern crate std;
     use crate::compress;
-    use rustc_hex::FromHex;
+    use hex::FromHex;
     use std::vec;
     use std::vec::Vec;
 
@@ -188,7 +188,7 @@ mod tests {
 		];
         for (hex, output) in vec {
             let hex = hex;
-            let bytes: Vec<u8> = hex.from_hex().unwrap();
+            let bytes: Vec<u8> = FromHex::from_hex(hex).unwrap();
 
             assert_eq!(bytes.len(), 213);
 
@@ -209,7 +209,7 @@ mod tests {
 
             compress(&mut h, m, t, f, rounds as usize);
 
-            let output: Vec<u8> = output.from_hex().unwrap();
+            let output: Vec<u8> = FromHex::from_hex(output).unwrap();
 
             let mut out = [0u64; 8];
             to_u64_slice(&output[..], &mut out);

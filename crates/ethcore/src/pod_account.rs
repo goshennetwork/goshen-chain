@@ -21,7 +21,7 @@ use crate::state::Account;
 use alloc::collections::BTreeMap;
 use alloc::vec;
 use alloc::vec::Vec;
-use bytes::Bytes;
+use bytes::{Bytes, ToPretty};
 use core::fmt;
 use ethereum_types::{BigEndianHash, H256, U256};
 use ethtrie::RlpCodec;
@@ -30,7 +30,6 @@ use hash_db::HashDB;
 use itertools::Itertools;
 use keccak_hasher::KeccakHasher;
 use rlp::{self, RlpStream};
-use rustc_hex::ToHex;
 use serde::Serializer;
 use trie::{DBValue, TrieFactory};
 use triehash::sec_trie_root;
@@ -84,7 +83,7 @@ impl PodAccount {
             self.storage.iter().map(|(k, v)| (k, rlp::encode(&v.into_uint()))),
         ));
         stream.append(&keccak(&self.code.as_ref().unwrap_or(&vec![])));
-        stream.out()
+        stream.out().to_vec()
     }
 
     /// Place additional data into given hash DB.

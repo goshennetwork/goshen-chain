@@ -22,14 +22,17 @@
 use crate::block::{OpenBlock, SealedBlock};
 use crate::engines::EthEngine;
 use crate::error::Error;
+use crate::ethereum::ethash::Seal;
 use crate::executed::ExecutionError;
 use crate::factory::{Factories, VmFactory};
 use crate::state_db::StateDB;
 use alloc::boxed::Box;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
-use bytes::Bytes;
-use ethereum_types::{Address, U256};
+use bytes::{Bytes, ToPretty};
+use ethereum_types::{Address, H64, U256};
+use hash::{keccak, H256};
+
 use ethtrie::TrieFactory;
 use evm::VMType;
 use hash_db::HashDB;
@@ -37,16 +40,21 @@ use keccak_hasher::KeccakHasher;
 use trie::{DBValue, TrieSpec};
 use types::header::Header;
 use types::transaction;
-use types::transaction::SignedTransaction;
+use types::transaction::UnverifiedTransaction;
 use vm::LastHashes;
 
 /// Riscv evm execution env.
 pub struct BlockGenInfo {
-    parent_block_header: Header,
-    last_hashes: Arc<LastHashes>,
-    author: Address,
-    gas_range_target: (U256, U256),
-    extra_data: Bytes,
+    ///
+    pub parent_block_header: Header,
+    ///
+    pub last_hashes: Arc<LastHashes>,
+    ///
+    pub author: Address,
+    ///
+    pub gas_range_target: (U256, U256),
+    ///
+    pub extra_data: Bytes,
 }
 
 const MB: usize = 1024 * 1024;
@@ -56,25 +64,15 @@ impl BlockGenInfo {
     pub fn new(
         parent_block_header: Header, last_hashes: Arc<LastHashes>, author: Address,
         gas_range_target: (U256, U256), extra_data: Bytes,
-    ) -> Result<BlockGenInfo, Error> {
-        Ok(BlockGenInfo { last_hashes, parent_block_header, author, gas_range_target, extra_data })
+    ) -> BlockGenInfo {
+        BlockGenInfo { last_hashes, parent_block_header, author, gas_range_target, extra_data }
     }
 }
 
-/// Allowed number of skipped transactions when constructing pending block.
-///
-/// When we push transactions to pending block, some of the transactions might
-/// get skipped because of block gas limit being reached.
-/// This constant controls how many transactions we can skip because of that
-/// before stopping attempts to push more transactions to the block.
-/// This is an optimization that prevents traversing the entire pool
-/// in case we have only a fraction of available block gas limit left.
-const MAX_SKIPPED_TRANSACTIONS: usize = 128;
-
 /// generate and seal new block.
 pub fn generate_block(
-    db: Box<dyn HashDB<KeccakHasher, DBValue>>, engine: &impl EthEngine, info: BlockGenInfo,
-    txes: Vec<SignedTransaction>,
+    db: Box<dyn HashDB<KeccakHasher, DBValue>>, engine: &impl EthEngine, info: &BlockGenInfo,
+    txes: Vec<UnverifiedTransaction>, l2_witness_layer: Address,
 ) -> Option<SealedBlock> {
     let trie_factory = TrieFactory::new(TrieSpec::Secure);
     let factories = Factories {
@@ -87,23 +85,31 @@ pub fn generate_block(
     let mut open_block = OpenBlock::new(
         engine,
         factories,
-        false,
+        true,
         state_db,
         &info.parent_block_header,
         info.last_hashes.clone(),
         info.author,
         info.gas_range_target,
-        info.extra_data,
+        info.extra_data.clone(),
     )
     .ok()?;
 
     let block_number = open_block.header.number();
-    let mut skipped_transactions = 0usize;
     let schedule = engine.schedule(block_number);
     let min_tx_gas: U256 = schedule.tx_gas.into();
 
+    let event_sig = "MessageSent(uint64,address,address,bytes32,bytes)".as_bytes();
+    let event_id = keccak(event_sig);
+    let mut seal = Seal::parse_seal(info.parent_block_header.seal()).unwrap();
+
     for transaction in txes {
-        let hash = transaction.hash();
+        let transaction = {
+            match engine.machine().verify_transaction_unordered(transaction, &open_block.header) {
+                Err(_) => continue,
+                Ok(t) => t,
+            }
+        };
         // Re-verify transaction again vs current state.
         let result = engine
             .machine()
@@ -115,20 +121,13 @@ pub fn generate_block(
             Err(Error::Execution(ExecutionError::BlockGasLimitReached {
                 gas_limit,
                 gas_used,
-                gas,
+                gas: _,
             })) => {
                 //debug!(target: "miner", "Skipping adding transaction to block because of gas limit: {:?} (limit: {:?}, used: {:?}, gas: {:?})", hash, gas_limit, gas_used, gas);
                 // Exit early if gas left is smaller then min_tx_gas
                 let gas_left = gas_limit - gas_used;
                 if gas_left < min_tx_gas {
                     //debug!(target: "miner", "Remaining gas is lower than minimal gas for a transaction. Block is full.");
-                    break;
-                }
-
-                // Avoid iterating over the entire queue in case block is almost full.
-                skipped_transactions += 1;
-                if skipped_transactions > MAX_SKIPPED_TRANSACTIONS {
-                    //debug!(target: "miner", "Reached skipped transactions threshold. Assuming block is full.");
                     break;
                 }
             }
@@ -140,13 +139,60 @@ pub fn generate_block(
             Err(Error::Transaction(transaction::Error::NotAllowed)) => {
                 //debug!(target: "miner", "Skipping non-allowed transaction for sender {:?}", hash);
             }
-            Err(_e) => {}
+            Err(_e) => {
+                #[cfg(feature = "std")]
+                println!("push tx, {}", _e);
+
+                #[cfg(not(feature = "std"))]
+                riscv_evm::runtime::debug(alloc::format!("push tx, {}", _e).as_str());
+            }
             // imported ok
-            _ => {}
+            Ok(receipt) => {
+                for log in receipt.logs.iter() {
+                    if log.address == l2_witness_layer {
+                        if log.topics[0] == event_id {
+                            seal.nonce =
+                                H64::from_low_u64_be(U256::from(log.topics[1].as_bytes()).as_u64());
+                            seal.mix_hash = H256::from_slice(&log.data[0..32]);
+                        }
+                    }
+                }
+            }
         }
     }
 
-    let closed_block = open_block.close().ok()?;
-    let sealed_block = closed_block.lock().try_seal(engine, Vec::new()).expect("seal failed");
-    Some(sealed_block)
+    let closed_block = open_block.close();
+    match closed_block {
+        Ok(t) => {
+            let sealed_block = t
+                .lock()
+                .try_seal(
+                    engine,
+                    alloc::vec![
+                        ::rlp::encode(&seal.mix_hash).to_vec(),
+                        ::rlp::encode(&seal.nonce).to_vec()
+                    ],
+                )
+                .expect("seal failed");
+            #[cfg(feature = "std")]
+            println!(
+                "{}: 0x{}, txNum: {}",
+                sealed_block.header.number(),
+                sealed_block.header.hash().to_hex(),
+                sealed_block.transactions.len()
+            );
+            #[cfg(not(feature = "std"))]
+            riscv_evm::runtime::debug(
+                alloc::format!(
+                    "{}: 0x{}, txNum: {}",
+                    sealed_block.header.number(),
+                    sealed_block.header.hash().to_hex(),
+                    sealed_block.transactions.len()
+                )
+                .as_str(),
+            );
+            Some(sealed_block)
+        }
+        Err(e) => panic!("{}", e),
+    }
 }

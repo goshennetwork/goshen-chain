@@ -169,8 +169,8 @@ mod tests {
     use super::BodyView;
     use crate::bytes::Bytes;
     use crate::views::BlockView;
+    use hex::FromHex;
     use rlp::RlpStream;
-    use rustc_hex::FromHex;
 
     fn block_to_body(block: &[u8]) -> Bytes {
         let mut body = RlpStream::new_list(2);

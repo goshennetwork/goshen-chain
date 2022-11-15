@@ -17,6 +17,7 @@
 #![warn(missing_docs, unused_extern_crates)]
 //! Ethcore library
 #![cfg_attr(not(feature = "std"), no_std)]
+#![feature(stmt_expr_attributes)]
 
 #[macro_use]
 extern crate macros;
@@ -59,6 +60,8 @@ pub mod json_tests;
 pub mod test_helpers;
 
 extern crate alloc;
+extern crate core;
+
 pub use evm::CreateContractAddress;
 pub use executive::contract_address;
 pub use trie::TrieSpec;

@@ -21,6 +21,7 @@ use ethereum_types::Bloom;
 use rlp::{Decodable, DecoderError, Encodable, Rlp, RlpStream};
 
 use alloc::vec::Vec;
+use bytes::ToPretty;
 
 /// Trace localized in vector of traces produced by a single transaction.
 ///
@@ -84,6 +85,25 @@ impl FlatTransactionTraces {
     /// Returns bloom of all traces in the collection.
     pub fn bloom(&self) -> Bloom {
         self.0.iter().fold(Default::default(), |bloom, trace| bloom | trace.bloom())
+    }
+
+    #[cfg(feature = "std")]
+    ///
+    pub fn print(&self) {
+        for t in self.0.iter() {
+            if let Action::Call(call) = &t.action {
+                if let Res::Call(res) = &t.result {
+                    println!(
+                        "type: {:#?}, gas: {}, from: {}, to: {}, gasUsed: {}",
+                        call.call_type,
+                        call.gas,
+                        call.from.to_hex(),
+                        call.to.to_hex(),
+                        res.gas_used
+                    );
+                }
+            }
+        }
     }
 }
 

@@ -171,6 +171,7 @@ impl<'x> OpenBlock<'x> {
             engine.account_start_nonce(number),
             factories,
         )?;
+
         let mut r =
             OpenBlock { block: ExecutedBlock::new(state, last_hashes, tracing), engine: engine };
 
@@ -193,7 +194,6 @@ impl<'x> OpenBlock<'x> {
         );
         // t_nb 8.1.3 this adds engine specific things
         engine.populate_from_parent(&mut r.block.header, parent);
-
         // t_nb 8.1.3 updating last hashes and the DAO fork, for ethash.
         engine.machine().on_new_block(&mut r.block)?;
         Ok(r)
@@ -243,6 +243,12 @@ impl<'x> OpenBlock<'x> {
             return Err(TransactionError::AlreadyImported.into());
         }
 
+        // adjust difficulty
+        if t.is_enqueued() {
+            let difficulty = self.block.header.difficulty();
+            self.block.header.set_difficulty(*difficulty + 1);
+        }
+
         let env_info = self.block.env_info();
         let outcome = self.block.state.apply(
             &env_info,
@@ -250,6 +256,9 @@ impl<'x> OpenBlock<'x> {
             &t,
             self.block.traces.is_enabled(),
         )?;
+
+        // #[cfg(feature = "riscv")]
+        // outcome.vm_trace.unwrap().evm_print();
 
         self.block.transactions_set.insert(h.unwrap_or_else(|| t.hash()));
         self.block.transactions.push(t.into());
@@ -454,7 +463,7 @@ impl SealedBlock {
         block_rlp.append(&self.block.header);
         SignedTransaction::rlp_append_list(&mut block_rlp, &self.block.transactions);
         block_rlp.append_list(&self.block.uncles);
-        block_rlp.out()
+        block_rlp.out().to_vec()
     }
 }
 
