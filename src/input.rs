@@ -7,7 +7,7 @@ use common_types::transaction::TypedTxId::Legacy;
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
 use ethereum_types::H256;
-use rlp::Rlp;
+use rlp::{DecoderError, Rlp};
 
 // format: queueNum(uint64) + queueStart(uint64) + batchNum(uint64) + batch0Time(uint64) +
 // batchLeftTimeDiff([]uint32) + batchesData
@@ -63,10 +63,11 @@ fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
     }
     let mut batches = Vec::with_capacity(num_batches);
     for (batch, time) in rlp.iter().zip(timestamp) {
-        let mut batch = Batch {
-            timestamp: time,
-            transactions: TypedTransaction::decode_rlp_list(&batch).expect("decode batch err"),
+        let txs = match TypedTransaction::decode_rlp_list(&batch) {
+            Err(e) => return Vec::new(),
+            Ok(t) => t,
         };
+        let mut batch = Batch { timestamp: time, transactions: txs };
         // ensure there are not enqueued tx in batch
         batch.transactions.retain(|tx| {
             let sender = tx.recover_sender().unwrap_or(L1_CROSS_LAYER_WITNESS);
