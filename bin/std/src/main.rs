@@ -15,10 +15,13 @@ use hash_db::HashDB;
 #[command(author = "Goshen Team")]
 #[command(version = "1.0")]
 struct Cli {
+    /// entry hash
     #[arg(long, short)]
     input: String,
+    /// batch state(hash of end block that batch included)
     #[arg(long, short)]
     output: String,
+    /// file path of batch data
     #[arg(long, short)]
     data: String,
 }
