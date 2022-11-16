@@ -19,6 +19,8 @@ common-types = { path = "./crates/ethcore/types", default-features = false }
 rlp = { version = "0.5.1", default-features = false }
 rustc-hex = { version = "2.1.0", default-features = false }
 hashbrown = "0.12.0"
+brotli = {path="crates/util/brotli",default-features = false}
+
 
 [features]
 json-tests = ["ethcore/json-tests"]
@@ -46,5 +48,5 @@ members = [
     "crates/util/riscv-evm",
     "bin/std",
     "bin/riscv",
-	"brotli-bin"
+	"bin/brotli-bin"
 ]

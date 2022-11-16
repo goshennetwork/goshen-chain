@@ -202,6 +202,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "brotli-bin"
+version = "0.1.0"
+dependencies = [
+ "brotli",
+ "byteorder",
+ "common-types",
+ "rlp 0.5.2",
+ "rustc-hex",
+]
+
+[[package]]
 name = "brotli-decompressor"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -868,6 +879,7 @@ dependencies = [
 name = "goshen-chain"
 version = "0.1.0"
 dependencies = [
+ "brotli",
  "byteorder",
  "common-types",
  "ethcore",
