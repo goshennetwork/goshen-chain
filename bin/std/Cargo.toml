@@ -1,6 +1,6 @@
 [package]
-description = "Goshen Network Tester"
-name = "riscv-l2-chain-test"
+description = "Goshen Network Sequencer Checker"
+name = "sequencer-checker"
 version = "0.1.0"
 edition = "2021"
 
@@ -17,9 +17,10 @@ common-types = { path = "../../crates/ethcore/types", default-features = false }
 rlp = { version = "0.5.1", default-features = false }
 rustc-hex = { version = "2.1.0" }
 goshen-chain={path="../../", default-features = false}
+clap = { version = "4.0.25", features = ["derive"] }
 
 [[bin]]
-name = "riscv-l2-chain-test"
+name = "sequencer-checker"
 path = "src/main.rs"
 doc = false
 
