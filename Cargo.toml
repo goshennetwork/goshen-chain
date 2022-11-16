@@ -45,5 +45,6 @@ members = [
     "crates/util/brotli",
     "crates/util/riscv-evm",
     "bin/std",
-    "bin/riscv"
+    "bin/riscv",
+	"brotli-bin"
 ]
