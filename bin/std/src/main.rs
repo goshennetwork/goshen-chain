@@ -19,16 +19,18 @@ struct Cli {
     input: String,
     #[arg(long, short)]
     output: String,
+    #[arg(long, short)]
+    data: String,
 }
 
 fn main() {
-    let contents = fs::read_to_string("./batch.data").unwrap();
+    let cli: Cli = Cli::parse();
+    let contents = fs::read_to_string(cli.data).unwrap();
     let mut db = ProofCheck::new(&[]);
     for line in contents.lines() {
         let data: Vec<u8> = line.from_hex().unwrap();
         db.insert(&data);
     }
-    let cli: Cli = Cli::parse();
     let input = if cli.input.starts_with("0x") { &cli.input[2..] } else { &cli.input };
     let output = if cli.output.starts_with("0x") { &cli.output[2..] } else { &cli.output };
 
