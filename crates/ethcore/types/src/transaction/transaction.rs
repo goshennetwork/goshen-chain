@@ -142,7 +142,7 @@ pub struct Transaction {
 
 impl Transaction {
     pub fn is_enqueued(&self) -> bool {
-        return self.nonce > U256::from(INITIAL_ENQUEUE_TX_NONCE);
+        return self.nonce >= U256::from(INITIAL_ENQUEUE_TX_NONCE);
     }
     /// encode raw transaction
     fn encode(&self, chain_id: Option<u64>, signature: Option<&SignatureComponents>) -> Vec<u8> {

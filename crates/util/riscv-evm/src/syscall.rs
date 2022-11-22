@@ -12,100 +12,100 @@ pub use x64::*;
 pub use unimpl::*;
 
 mod unimpl {
-	#[inline]
-	pub unsafe fn syscall0_readonly(nr: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    pub unsafe fn syscall0_readonly(nr: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	pub unsafe fn syscall1(nr: usize, a0: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    pub unsafe fn syscall1(nr: usize, a0: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall1_readonly(nr: usize, a0: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall1_readonly(nr: usize, a0: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall1_noreturn(nr: usize, a0: usize) -> ! {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall1_noreturn(nr: usize, a0: usize) -> ! {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	pub unsafe fn syscall2(nr: usize, a0: usize, a1: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    pub unsafe fn syscall2(nr: usize, a0: usize, a1: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall2_noreturn(nr: usize, a0: usize, a1: usize) -> ! {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall2_noreturn(nr: usize, a0: usize, a1: usize) -> ! {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	pub unsafe fn syscall2_readonly(nr: usize, a0: usize, a1: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    pub unsafe fn syscall2_readonly(nr: usize, a0: usize, a1: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall3(nr: usize, a0: usize, a1: usize, a2: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall3(nr: usize, a0: usize, a1: usize, a2: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall3_readonly(nr: usize, a0: usize, a1: usize, a2: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall3_readonly(nr: usize, a0: usize, a1: usize, a2: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall4(nr: usize, a0: usize, a1: usize, a2: usize, a3: usize) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall4(nr: usize, a0: usize, a1: usize, a2: usize, a3: usize) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall4_readonly(
-		nr: usize, a0: usize, a1: usize, a2: usize, a3: usize,
-	) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall4_readonly(
+        nr: usize, a0: usize, a1: usize, a2: usize, a3: usize,
+    ) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	pub unsafe fn syscall5(
-		nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize,
-	) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    pub unsafe fn syscall5(
+        nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize,
+    ) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall5_readonly(
-		nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize,
-	) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall5_readonly(
+        nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize,
+    ) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall6(
-		nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize, a5: usize,
-	) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall6(
+        nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize, a5: usize,
+    ) -> usize {
+        unimplemented!("todo")
+    }
 
-	#[inline]
-	#[must_use]
-	pub unsafe fn syscall6_readonly(
-		nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize, a5: usize,
-	) -> usize {
-		unimplemented!("todo")
-	}
+    #[inline]
+    #[must_use]
+    pub unsafe fn syscall6_readonly(
+        nr: usize, a0: usize, a1: usize, a2: usize, a3: usize, a4: usize, a5: usize,
+    ) -> usize {
+        unimplemented!("todo")
+    }
 }
 
 #[cfg(target_arch = "x86_64")]
