@@ -7,3 +7,8 @@ cd bin/std
 cargo build --release --bin sequencer-checker
 cd ../../
 cp target/release/sequencer-checker .
+
+cd bin/brotli-bin
+cargo build --release --bin brotli-bin
+cd ../../
+cp target/release/brotli-bin .

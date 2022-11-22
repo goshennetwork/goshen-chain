@@ -1,5 +1,6 @@
 use crate::HashDBOracle;
 use alloc::vec::Vec;
+use brotli::decompress;
 use byteorder::{BigEndian, ByteOrder};
 use common_types::header::Header;
 use common_types::l2_cfg::{L1_CROSS_LAYER_WITNESS, L2_BLOCK_MAX_GAS_LIMIT, MAX_SENDER_NONCE};
@@ -50,10 +51,29 @@ fn load_batches_from_hashdb(db: &HashDBOracle, batch_input_hash: H256) -> Vec<Ba
 // v0: 0 + rlplist(rlplist(tx))
 fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
     let version = data[0];
-    if version != 0 {
+    if version > 1 {
+        // invalid version, now only support 0, 1
         return Vec::new();
     }
-    let rlp = Rlp::new(&data[1..]);
+    let mut rlp = Rlp::new(&data[1..]);
+    let mut d: Vec<u8>; //hold the var, avoid  drop
+    match version {
+        ///just as normal, do nothing
+        0 => {}
+        /// brotli coded, try decode to rlp code
+        1 => {
+            let ret = brotli::decompress(&data[1..], 4 * 1024 * 1024); // Now limit is 4MB
+            if ret.is_err() {
+                return Vec::new();
+            }
+            d = ret.unwrap();
+            rlp = Rlp::new(d.as_slice());
+        }
+        /// invalid version
+        _ => {
+            return Vec::new();
+        }
+    }
     if !rlp.is_list() {
         return Vec::new();
     }
