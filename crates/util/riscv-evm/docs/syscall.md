@@ -1,9 +1,9 @@
  # System Call
- 
+
 ## Input/Output
 
 ```rust
-pub fn input(hash: *mut u8); 
+pub fn input(hash: *mut u8);
 pub fn ret(hash: *const u8) -> !;
 ```
 
@@ -11,6 +11,12 @@ pub fn ret(hash: *const u8) -> !;
 ```rust
 pub fn preimage_at(hash: *const u8, offset: usize) -> u32;
 pub fn preimage_len(hash: *const u8) -> usize;
+```
+
+## EIP4844 BlobDB
+```rust
+// hash: the blob version hash, index: 0-4095, output: [u8;32]
+pub fn blob_at(hash: *const u8, index: usize, output: *mut u8);
 ```
 
 ##  Debug/Panic
