@@ -63,12 +63,14 @@ pub fn preimage(hash: [u8; 32]) -> Vec<u8> {
     return result;
 }
 
-pub fn blob_at(hash: [u8;32], index: usize) -> [u8;32] {
-	let ptr = hash.as_ptr() as usize;
-	let mut output: [u8; 32] = [0; 32];
-	unsafe { syscall::syscall3(RUNTIME_BLOB, ptr, index, output.as_mut_ptr() as usize); }
+pub fn blob_at(hash: [u8; 32], index: usize) -> [u8; 32] {
+    let ptr = hash.as_ptr() as usize;
+    let mut output: [u8; 32] = [0; 32];
+    unsafe {
+        syscall::syscall3(RUNTIME_BLOB, ptr, index, output.as_mut_ptr() as usize);
+    }
 
-	output
+    output
 }
 
 pub fn ecrecover(hash: [u8; 32], r: [u8; 32], s: [u8; 32], v: usize) -> [u8; 20] {
