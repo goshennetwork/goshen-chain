@@ -189,7 +189,6 @@ mod x64 {
     }
 
     #[inline]
-    #[must_use]
     pub unsafe fn syscall3(nr: usize, a0: usize, a1: usize, a2: usize) -> usize {
         let r0;
         asm!(
