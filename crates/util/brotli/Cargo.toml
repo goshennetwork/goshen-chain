@@ -1,7 +1,6 @@
 [package]
 name = "brotli"
 version = "0.1.0"
-authors = ["r1cs"]
 edition = "2021"
 
 [dependencies]
