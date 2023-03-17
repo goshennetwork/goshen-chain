@@ -149,6 +149,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "blob"
+version = "0.1.0"
+dependencies = [
+ "riscv-evm",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -879,6 +886,7 @@ dependencies = [
 name = "goshen-chain"
 version = "0.1.0"
 dependencies = [
+ "blob",
  "brotli",
  "byteorder",
  "common-types",

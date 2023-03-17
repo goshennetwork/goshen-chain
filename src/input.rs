@@ -1,9 +1,13 @@
 use crate::HashDBOracle;
+use alloc::vec;
 use alloc::vec::Vec;
+use blob::BlobFetcher;
 use brotli::decompress;
 use byteorder::{BigEndian, ByteOrder};
 use common_types::header::Header;
-use common_types::l2_cfg::{L1_CROSS_LAYER_WITNESS, L2_BLOCK_MAX_GAS_LIMIT, MAX_SENDER_NONCE};
+use common_types::l2_cfg::{
+    BLOB_ENABLED_MASK, ENCODE_TYPE_MASK, L1_CROSS_LAYER_WITNESS, L2_BLOCK_MAX_GAS_LIMIT, MAX_SENDER_NONCE
+};
 use common_types::transaction::TypedTxId::Legacy;
 use common_types::transaction::{TypedTransaction, UnverifiedTransaction};
 use ethcore::client::LastHashes;
@@ -49,15 +53,25 @@ fn load_batches_from_hashdb(db: &HashDBOracle, batch_input_hash: H256) -> Vec<Ba
 
 // verison(byte) + data
 // v0: 0 + rlplist(rlplist(tx))
+// v1: 1 + brotliEncode(rlplist(rlplist(tx)))
+// blob enabled: 1<<7+{0,1} | uint8(blobNum) |  bytes32[](versionHash)
 fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
     let version = data[0];
-    if version > 1 {
-        // invalid version, now only support 0, 1
-        return Vec::new();
+    let mut rlp: Rlp;
+    if version & BLOB_ENABLED_MASK == 1 {
+        //blob supported just load blob
+        let blob_num = data[1] as usize;
+        let version_hashes = &data[2..];
+        if version_hashes.len() < blob_num * 32 {
+            //should never happen
+            return Vec::new();
+        }
+        rlp = Rlp::new(BlobFetcher::decode_version_hashes(blob_num, version_hashes).as_slice());
     }
-    let mut rlp = Rlp::new(&data[1..]);
+
+    rlp = Rlp::new(&data[1..]);
     let mut d: Vec<u8>; //hold the var, avoid  drop
-    match version {
+    match version & ENCODE_TYPE_MASK {
         ///just as normal, do nothing
         0 => {}
         /// brotli coded, try decode to rlp code
