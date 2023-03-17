@@ -2,9 +2,7 @@
 
 extern crate alloc;
 
-use alloc::collections::TryReserveError;
 use alloc::vec::Vec;
-use core::ops::Index;
 use riscv_evm;
 
 pub const FIELD_ELEMENTS_PER_BLOB: usize = 4096;
@@ -48,20 +46,5 @@ impl BlobFetcher {
         }
         data.truncate(data_len);
         Some(data)
-    }
-}
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
     }
 }
