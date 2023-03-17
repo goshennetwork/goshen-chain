@@ -66,7 +66,12 @@ fn decode_batches(data: &[u8], timestamp: Vec<u64>) -> Vec<Batch> {
             //should never happen
             return Vec::new();
         }
-        rlp = Rlp::new(BlobFetcher::decode_version_hashes(blob_num, version_hashes).as_slice());
+        let tx_data = BlobFetcher::decode_version_hashes(blob_num, version_hashes);
+        if tx_data.is_none() {
+            //decode failed, but also try to execute queue tx
+            return Vec::new();
+        }
+        rlp = Rlp::new(tx_data.unwrap().as_slice());
     }
 
     rlp = Rlp::new(&data[1..]);

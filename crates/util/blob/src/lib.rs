@@ -18,8 +18,8 @@ impl BlobFetcher {
         riscv_evm::runtime::blob_at(version, index)
     }
 
-    //version_hashes and blob num should have been already checked before
-    pub fn decode_version_hashes(blob_num: usize, version_hashes: &[u8]) -> Vec<u8> {
+    //version_hashes and blob num should have been already checked before.blob num is checked by l1 contract that always >0
+    pub fn decode_version_hashes(blob_num: usize, version_hashes: &[u8]) -> Option<Vec<u8>> {
         let mut ret = Vec::new();
         let mut i = 0usize;
         for chunk in version_hashes.chunks_exact(32) {
@@ -27,10 +27,11 @@ impl BlobFetcher {
                 break;
             }
             for j in 0..FIELD_ELEMENTS_PER_BLOB {
+                //should never panic with unwrap method
                 let element = BlobFetcher::get_element(chunk.try_into().unwrap(), j);
                 //last byte should be zero, check it.
                 if element[31] != 0 {
-                    return Vec::new();
+                    return None;
                 }
                 ret.extend_from_slice(&element[..31]);
             }
@@ -43,10 +44,10 @@ impl BlobFetcher {
         let data_len = u32::from_be_bytes(ret.try_into().unwrap()) as usize;
         if data_len > data.len() {
             //wrong data len
-            return Vec::new();
+            return None;
         }
         data.truncate(data_len);
-        data
+        Some(data)
     }
 }
 
