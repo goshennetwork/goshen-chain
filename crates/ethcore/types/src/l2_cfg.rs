@@ -20,3 +20,6 @@ pub const L2_FEE_COLLECTOR: Address =
 
 pub const L2_BLOCK_MAX_GAS_LIMIT: u32 = 0x3938700;
 pub const L2_BLOCK_MIN_GAS_LIMIT: u32 = 0x3938700;
+
+pub const ENCODE_TYPE_MASK: u8 = 1 << 0;
+pub const BLOB_ENABLED_MASK: u8 = 1 << 7;
